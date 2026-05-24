@@ -68,6 +68,7 @@
 
   environment.systemPackages = with pkgs; [
     vim wget google-chrome helix claude-code kitty brightnessctl
+    git
   ];
 
   environment.variables.TERMINAL = "kitty";
