@@ -20,15 +20,14 @@
 
 ## GIAI ĐOẠN 1 — Flake + Home Manager (nền móng)
 
-- [ ] Tạo repo git mới `~/nixos-config`, copy `hardware-configuration.nix` từ `/etc/nixos`.
-- [ ] Viết `flake.nix`: inputs nixpkgs(unstable) + home-manager + niri(sodiboo) + noctalia; output `nixosConfigurations.<host>`.
-- [ ] Thêm cachix noctalia (substituter + trusted-public-key) vào `nix.settings`.
-- [ ] Bật `nix.settings.experimental-features = ["nix-command" "flakes"];`.
-- [ ] Chuyển nội dung `configuration.nix` hiện tại (bootloader GRUB, hostname, kitty, allowUnfree, fcitx5 nếu đã có) vào flake.
-- [ ] Gắn home-manager module + tạo `home.nix` tối thiểu (chỉ `home.stateVersion`, username).
-- [ ] `time.hardwareClockInLocalTime = true;` (fix lệch giờ dual-boot).
-- [ ] Đặt CLAUDE.md + CHECKLIST.md vào repo. `git init`, commit đầu.
-- [ ] Rebuild bằng flake: `sudo nixos-rebuild switch --flake ~/nixos-config#<host>`.
+- [x] Tạo repo git mới `~/nixos-config`, copy `hardware-configuration.nix` từ `/etc/nixos`.
+- [x] Viết `flake.nix`: inputs nixpkgs(unstable) + home-manager + niri(sodiboo) + noctalia; output `nixosConfigurations.Ithilien`.
+- [x] Thêm cachix noctalia (substituter + trusted-public-key) vào `nix.settings`.
+- [x] Bật `nix.settings.experimental-features = ["nix-command" "flakes"];`.
+- [x] Chuyển nội dung `configuration.nix` hiện tại vào flake (GRUB, hostname, fcitx5, allowUnfree, v.v.).
+- [x] Gắn home-manager module + tạo `home.nix` tối thiểu (stateVersion + username).
+- [x] `time.hardwareClockInLocalTime = true;` (fix lệch giờ dual-boot).
+- [x] `git init`, commit đầu. Rebuild bằng flake thành công, reboot sạch.
 
 **Xong khi:** rebuild từ flake thành công, máy vẫn boot & dùng bình thường (vẫn XFCE), GRUB dual-boot còn nguyên.
 
@@ -36,13 +35,12 @@
 
 ## GIAI ĐOẠN 2 — Desktop core: niri + Noctalia
 
-- [ ] `programs.niri.enable = true;` (qua niri-flake).
-- [ ] Cài noctalia (package từ flake) + cấu hình display manager hiện session niri.
-- [ ] Cấu hình spawn-at-startup trong niri: `qs -c noctalia-shell` (KHÔNG systemd).
-- [ ] Đối chiếu env vars (misc.kdl) với cái NixOS/niri-flake/fcitx5 module đã tự set — chỉ thêm cái còn thiếu.
-- [ ] i18n.inputMethod fcitx5 + bamboo (nếu chưa làm ở GĐ1).
-- [ ] Service nền cho Noctalia widgets: networkmanager, bluetooth, upower (power profile để GĐ5 cùng TLP).
-- [ ] Rebuild. Đăng xuất XFCE → đăng nhập session **niri**.
+- [x] `programs.niri.enable = true;` (qua niri-flake nixosModules.niri).
+- [x] Cài noctalia: `noctalia.packages.x86_64-linux.default` qua extraSpecialArgs → home.packages.
+- [x] spawn-at-startup: binary là `noctalia-shell` (không phải `qs -c noctalia-shell`). Phải set `QS_CONFIG_PATH = "${noctalia-pkg}/share/noctalia-shell"` trong niri environment.
+- [x] fcitx5 đã có từ Giai đoạn 1, OK.
+- [x] bluetooth, upower, power-profiles-daemon enabled.
+- [x] Rebuild + đăng nhập niri: Noctalia bar hiện, kitty mở được (Mod+Return).
 
 **Xong khi:** đăng nhập vào niri, Noctalia bar hiện, mở được kitty (dù keybind tạm), fcitx5 gõ tiếng Việt OK. XFCE vẫn còn (chưa gỡ).
 

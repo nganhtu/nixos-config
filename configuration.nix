@@ -58,6 +58,12 @@
     pulse.enable = true;
   };
 
+  programs.niri.enable = true;
+
+  hardware.bluetooth.enable = true;
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true;
+
   users.users.nat = {
     isNormalUser = true;
     description = "Natyusha";
@@ -68,7 +74,8 @@
 
   environment.systemPackages = with pkgs; [
     vim wget google-chrome helix claude-code kitty brightnessctl
-    git
+    git gh
+    wl-clipboard cliphist
   ];
 
   environment.variables.TERMINAL = "kitty";

@@ -20,17 +20,26 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, ... }: {
+  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, ... }:
+  let
+    system = "x86_64-linux";
+    noctalia-pkg = noctalia.packages.${system}.default;
+  in {
     nixosConfigurations.Ithilien = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
       modules = [
         ./configuration.nix
         niri-flake.nixosModules.niri
+        noctalia.nixosModules.default
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.nat = import ./home.nix;
+          home-manager.extraSpecialArgs = { inherit noctalia-pkg; };
+          home-manager.sharedModules = [
+            noctalia.homeModules.default
+          ];
         }
       ];
     };
