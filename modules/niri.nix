@@ -1,12 +1,36 @@
 { config, pkgs, noctalia-pkg, ... }:
 
 {
+  home.packages = [ pkgs.apple-cursor ];
+
   programs.niri.settings = {
     prefer-no-csd = true;
+    screenshot-path = null;
     hotkey-overlay.skip-at-startup = true;
+
+    cursor = {
+      theme = "macOS";
+      size = 24;
+    };
+
+    debug.honor-xdg-activation-with-invalid-serial = { };
 
     environment = {
       QS_CONFIG_PATH = "${noctalia-pkg}/share/noctalia-shell";
+
+      ELECTRON_OZONE_PLATFORM_HINT = "auto";
+      QT_QPA_PLATFORM = "wayland";
+      QT_QPA_PLATFORMTHEME = "gtk3";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      XDG_CURRENT_DESKTOP = "niri";
+      XDG_SESSION_TYPE = "wayland";
+
+      QT_IM_MODULE = "fcitx5";
+      XMODIFIERS = "@im=fcitx5";
+      INPUT_METHOD = "fcitx5";
+      SDL_IM_MODULE = "fcitx5";
+
+      _JAVA_AWT_WM_NONREPARENTING = "1";
     };
 
     spawn-at-startup = [
