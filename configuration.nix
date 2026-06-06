@@ -78,6 +78,7 @@
     wl-clipboard cliphist
     # Niri keybind targets (Stage 3.7)
     thunar grim slurp swappy fuzzel
+    xwayland-satellite
   ];
 
   environment.variables.TERMINAL = "kitty";

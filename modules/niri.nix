@@ -33,6 +33,12 @@
       _JAVA_AWT_WM_NONREPARENTING = "1";
     };
 
+    # niri-managed xwayland-satellite: niri tự spawn + set DISPLAY env cho
+    # các bind/spawn-at-startup khác. Cần cho swappy GDK_BACKEND=x11.
+    xwayland-satellite = {
+      path = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
+    };
+
     spawn-at-startup = [
       { command = [ "noctalia-shell" ]; }
       { command = [ "fcitx5" "-d" ]; }
@@ -354,7 +360,7 @@
       # ─── Screenshots ───
       "Mod+Shift+S".action.spawn = [
         "bash" "-c"
-        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | swappy -f -; fi"
+        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | env GDK_BACKEND=x11 swappy -f -; fi"
       ];
       "Print".action.screenshot-screen.show-pointer = false;
       "Mod+Ctrl+Shift+S".action.screenshot-window = { };
