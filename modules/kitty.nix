@@ -4,10 +4,10 @@
   programs.kitty = {
     enable = true;
 
+    # Font cài system-wide qua fonts.packages trong configuration.nix.
     font = {
       name = "CaskaydiaCove NF SemiLight";
       size = 13;
-      package = pkgs.nerd-fonts.caskaydia-cove;
     };
 
     settings = {

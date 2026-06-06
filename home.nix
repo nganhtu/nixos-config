@@ -5,6 +5,8 @@
     ./modules/niri.nix
     ./modules/kitty.nix
     ./modules/helix.nix
+    ./modules/btop.nix
+    ./modules/fuzzel.nix
   ];
 
   home.username = "nat";
