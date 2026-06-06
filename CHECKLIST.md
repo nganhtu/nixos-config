@@ -46,23 +46,28 @@
 
 ---
 
-## GIAI ĐOẠN 3 — Dịch dotfiles niri sang Nix (phần nặng nhất)
+## GIAI ĐOẠN 3 — Dịch dotfiles niri sang Nix (phần nặng nhất) ✅
 
-- [ ] Dịch `input.kdl` → programs.niri.settings.input.
-- [ ] Dịch `layout.kdl` (nhớ background-color transparent + preset widths).
-- [ ] Dịch `animation.kdl` (các spring/duration).
-- [ ] Dịch `rules.kdl` (window-rule kitty/steam + layer-rule noctalia-wallpaper).
-- [ ] Dịch `display.kdl` (verify tên output bằng `niri msg outputs`).
-- [ ] Dịch `misc.kdl` (cursor macOS, debug honor-xdg-activation, hotkey-overlay skip, env).
-- [ ] Dịch `keybinds.kdl` (~100 bind; action dạng LIST; ipc call noctalia dạng list).
-- [ ] Đảm bảo binary mà bind gọi đều được cài: kitty, google-chrome, thunar, grim, slurp, swappy, cliphist, fuzzel, wl-clipboard.
-- [ ] noctalia.kdl: quyết định hardcode màu hay để noctalia tự quản.
-- [ ] Dịch kitty config + theme noctalia → `programs.kitty`.
-- [ ] Dịch helix config + theme → `programs.helix`.
-- [ ] Dịch btop + fuzzel config.
-- [ ] Rebuild + kiểm tra từng nhóm keybind.
+- [x] Dịch `input.kdl` → programs.niri.settings.input.
+- [x] Dịch `layout.kdl` (background-color transparent + preset widths).
+- [x] Dịch `animation.kdl` (.kind wrapper cho spring/easing theo schema niri-flake mới).
+- [x] Dịch `rules.kdl` (window-rule kitty/steam + layer-rule noctalia-wallpaper + swappy floating).
+- [x] Dịch `display.kdl` (eDP-1 1920x1080@144.001Hz — user chọn 144 thay 60).
+- [x] Dịch `misc.kdl` (cursor macOS 24 + apple-cursor pkg, debug honor-xdg-activation, env Qt/Electron/fcitx5/Java, screenshot-path null).
+- [x] Dịch `keybinds.kdl` (~100 bind; action LIST; noctalia-shell ipc trực tiếp; hotkey-overlay.title không phải hotkey-overlay-title).
+- [x] Đảm bảo binary: kitty, google-chrome, thunar, grim, slurp, swappy, cliphist, fuzzel, wl-clipboard — đã thêm vào configuration.nix.
+- [x] noctalia.kdl: **bỏ block** — để noctalia tự push màu qua IPC (quyết định 2026-06-06).
+- [x] Dịch kitty config + theme **Cherry Midnight** (state thực tế dotfiles, không phải noctalia như CLAUDE.md cũ).
+- [x] Dịch helix config + theme transparent_focus_nova.
+- [x] Dịch btop + fuzzel config (nord theme btop shipped sẵn; fuzzel.ini qua xdg.configFile để giữ include).
+- [x] Fonts system-wide: nerd-fonts.caskaydia-cove, lxgw-wenkai, noto-fonts-cjk-sans/serif (sớm hơn Stage 6 vì fuzzel/kitty cần).
+- [x] xwayland-satellite niri-managed → swappy GDK_BACKEND=x11 tự resize panel.
 
-**Xong khi:** niri hành xử giống hệt CachyOS cũ — keybind, layout, animation, screenshot, clipboard, launcher đều chạy.
+**Tồn (chuyển sang phase sau / quan sát):**
+- Brightness keys (XF86MonBrightnessUp/Down) không emit trên laptop này — bind vẫn để, im lặng.
+- Mod+Shift+Tab recent-windows.binds chưa thêm (action `previous-window` cần recent-windows mode, niri-flake schema chưa rõ — defer).
+
+**Xong khi:** ✅ niri hành xử giống hệt CachyOS cũ — keybind, layout, animation, screenshot, clipboard, launcher đều chạy.
 
 ---
 
