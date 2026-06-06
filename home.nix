@@ -7,6 +7,8 @@
     ./modules/helix.nix
     ./modules/btop.nix
     ./modules/fuzzel.nix
+    ./modules/theme.nix
+    ./modules/claude.nix
   ];
 
   home.username = "nat";

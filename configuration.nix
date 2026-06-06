@@ -1,5 +1,12 @@
 { config, pkgs, ... }:
 
+let
+  proprietary-fonts = pkgs.runCommand "proprietary-fonts" { } ''
+    mkdir -p $out/share/fonts/truetype
+    find ${./fonts} -type f \( -name '*.ttf' -o -name '*.ttc' -o -name '*.otf' \) \
+      -exec cp -L {} $out/share/fonts/truetype/ \;
+  '';
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -69,7 +76,7 @@
     fira-code
     inconsolata
     corefonts
-    # TODO Stage 6: Google Sans, Segoe UI Variable, Cascadia non-NF — cần file user
+    proprietary-fonts
   ];
 
   hardware.bluetooth.enable = true;
@@ -91,6 +98,7 @@
     grim slurp swappy fuzzel
     xwayland-satellite
     file-roller
+    jq
   ];
 
   programs.thunar = {
