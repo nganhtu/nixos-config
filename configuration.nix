@@ -76,6 +76,8 @@
     vim wget google-chrome helix claude-code kitty brightnessctl
     git gh
     wl-clipboard cliphist
+    # Niri keybind targets (Stage 3.7)
+    thunar grim slurp swappy fuzzel
   ];
 
   environment.variables.TERMINAL = "kitty";
