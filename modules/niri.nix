@@ -33,11 +33,7 @@
       _JAVA_AWT_WM_NONREPARENTING = "1";
     };
 
-    # niri-managed xwayland-satellite: niri tự spawn + set DISPLAY env cho
-    # các bind/spawn-at-startup khác. Cần cho swappy GDK_BACKEND=x11.
-    xwayland-satellite = {
-      path = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
-    };
+    xwayland-satellite.path = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
 
     spawn-at-startup = [
       { command = [ "noctalia-shell" ]; }
@@ -146,7 +142,6 @@
         };
         open-focused = false;
       }
-      # Swappy: annotator popup → floating, user resize tay khi mở panel
       {
         matches = [ { app-id = "swappy"; } ];
         open-floating = true;
@@ -237,9 +232,6 @@
       };
 
       # ─── Brightness ───
-      # NOTE: laptop hiện tại không emit XF86MonBrightnessUp/Down qua evdev
-      # (kernel/EC handle ACPI trực tiếp) → bind có nhưng im lặng. Để đây
-      # phòng máy khác hoặc kernel update.
       "XF86MonBrightnessUp" = {
         allow-when-locked = true;
         action.spawn = [ "noctalia-shell" "ipc" "call" "brightness" "increase" ];
@@ -341,6 +333,7 @@
       "Mod+Shift+0".action.move-column-to-workspace = 10;
 
       "Mod+Tab".action.focus-workspace-previous = { };
+      "Mod+Shift+Tab".action.focus-window-previous = { };
 
       # ─── Layout controls ───
       "Mod+F".action.set-column-width = "100%";

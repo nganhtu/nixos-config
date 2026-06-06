@@ -1,10 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  # Không dùng programs.fuzzel.settings vì cần giữ directive `include` ở
-  # top-level (ngoài section) để noctalia push colors vào themes/noctalia
-  # runtime. Home-manager's INI generator không expose global section.
-  # Fuzzel binary đã cài qua environment.systemPackages.
+  # xdg.configFile thay programs.fuzzel: giữ `include` top-level cho noctalia push theme.
   xdg.configFile."fuzzel/fuzzel.ini".text = ''
     [main]
     font=CaskaydiaCove NF:size=9,LXGW WenKai TC:weight=bold:size=9,Noto Serif KR:weight=bold:size=9

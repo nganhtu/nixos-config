@@ -63,8 +63,13 @@
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
     lxgw-wenkai
+    noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif
+    fira-code
+    inconsolata
+    corefonts
+    # TODO Stage 6: Google Sans, Segoe UI Variable, Cascadia non-NF — cần file user
   ];
 
   hardware.bluetooth.enable = true;
@@ -83,10 +88,21 @@
     vim wget google-chrome helix claude-code kitty brightnessctl
     git gh
     wl-clipboard cliphist
-    # Niri keybind targets (Stage 3.7)
-    thunar grim slurp swappy fuzzel
+    grim slurp swappy fuzzel
     xwayland-satellite
+    file-roller
   ];
+
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs; [
+      thunar-archive-plugin
+      thunar-volman
+      thunar-media-tags-plugin
+    ];
+  };
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
 
   environment.variables.TERMINAL = "kitty";
 
