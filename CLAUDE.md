@@ -31,8 +31,9 @@
 - 2 ổ NVMe 512GB.
 - **Ổ 1 (nvme1n1)** = Windows. Có ESP riêng: `nvme1n1p1`, vfat FAT32, label `SYSTEM_DRV`, **FS UUID `1EC6-4D7E`**, chứa `/EFI/Microsoft/Boot/bootmgfw.efi`. Các phân vùng khác: p2, p3 (ntfs `Laurelin`), p4 (ntfs `WINRE_DRV`).
 - **Ổ 2 (nvme0n1)** = một phần Windows (ntfs `Telperion` ở p1) + 2 phân vùng cho NixOS:
-  - nvme0n1p2 → **btrfs** label `Ithilien` UUID `e99b7bcd-aa2c-4ecf-ba65-c24d65a148b1` → `/`, `/home`, `/nix/store`
-  - nvme0n1p3 → vfat 4GB UUID `61DD-4ABF` → `/boot` (ESP NixOS, hiện 2% dùng)
+  - nvme0n1p2 → **btrfs** (không label) UUID `9ecd5758-9d28-4f60-a5ce-8027ce2e3543` → `/` (subvol mặc định), `/home` (subvol=home), `/nix` (subvol=nix). `/nix/store` bind từ `/nix`.
+  - nvme0n1p3 → vfat 4GB UUID `B34C-B10B` → `/boot` (ESP NixOS, hiện 4% dùng)
+  - **(Lịch sử)** Bản cài đầu (2026-05-24) dùng UUID `e99b7bcd-aa2c-4ecf-ba65-c24d65a148b1` (root) + `61DD-4ABF` (boot) + subvol `@`/`@home`. User cài lại NixOS ngày 2026-06-06, layout/UUID thay đổi như trên.
 - ESP Windows (ổ 1 nvme1n1) và bootloader NixOS (ổ 2 nvme0n1) ở **2 ổ vật lý khác nhau** → cô lập tốt. Hiện đang dùng GRUB+os-prober nên không vấn đề.
 - **Tuyệt đối không format/đụng** các phân vùng ntfs (Windows). Chỉ thao tác trên nvme0n1p2 và nvme0n1p3.
 - **Cần làm trong Windows (nhắc user, Claude Code không làm được):** tắt Fast Startup; cân nhắc tắt BitLocker / lưu recovery key.
@@ -43,7 +44,7 @@
 
 ## 3. Filesystem
 
-- **ĐÃ XÁC NHẬN (2026-05-24):** Root là **btrfs** (label `Ithilien`), subvolume cho `/`, `/home`, `/nix/store`. KHÔNG format lại.
+- **CẬP NHẬT (2026-06-06):** Root là **btrfs** (không label, UUID `9ecd5758-9d28-4f60-a5ce-8027ce2e3543`). Subvol: top-level cho `/`, `home` cho `/home`, `nix` cho `/nix`. KHÔNG format lại.
 
 ---
 
