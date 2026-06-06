@@ -130,6 +130,12 @@
 
 ---
 
+## README
+
+- [x] Viết README.md: hướng dẫn sử dụng config này bằng tiếng Anh (stack, cấu trúc, cách rebuild, lưu ý fonts).
+
+---
+
 ## Ghi chú vận hành
 - Lỗi rebuild → đọc kỹ message, đừng `--force`. Rollback: chọn generation cũ ở GRUB, hoặc `nixos-rebuild switch --rollback`.
 - /boot 4GB: theo dõi `df -h /boot`; nếu gần đầy giảm số generation + `nix-collect-garbage -d`.
