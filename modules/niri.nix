@@ -140,6 +140,11 @@
         };
         open-focused = false;
       }
+      # Satty: annotator popup → floating cho đỡ phá layout
+      {
+        matches = [ { app-id = "satty"; } ];
+        open-floating = true;
+      }
     ];
 
     layer-rules = [
@@ -226,6 +231,9 @@
       };
 
       # ─── Brightness ───
+      # NOTE: laptop hiện tại không emit XF86MonBrightnessUp/Down qua evdev
+      # (kernel/EC handle ACPI trực tiếp) → bind có nhưng im lặng. Để đây
+      # phòng máy khác hoặc kernel update.
       "XF86MonBrightnessUp" = {
         allow-when-locked = true;
         action.spawn = [ "noctalia-shell" "ipc" "call" "brightness" "increase" ];
@@ -346,7 +354,7 @@
       # ─── Screenshots ───
       "Mod+Shift+S".action.spawn = [
         "bash" "-c"
-        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | env GDK_BACKEND=x11 swappy -f -; fi"
+        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | satty -f -; fi"
       ];
       "Print".action.screenshot-screen.show-pointer = false;
       "Mod+Ctrl+Shift+S".action.screenshot-window = { };
