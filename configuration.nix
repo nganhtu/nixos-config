@@ -77,7 +77,7 @@
     git gh
     wl-clipboard cliphist
     # Niri keybind targets (Stage 3.7)
-    thunar grim slurp satty fuzzel
+    thunar grim slurp swappy fuzzel
   ];
 
   environment.variables.TERMINAL = "kitty";

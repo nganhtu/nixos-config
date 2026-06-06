@@ -140,9 +140,9 @@
         };
         open-focused = false;
       }
-      # Satty: annotator popup → floating cho đỡ phá layout
+      # Swappy: annotator popup → floating, user resize tay khi mở panel
       {
-        matches = [ { app-id = "satty"; } ];
+        matches = [ { app-id = "swappy"; } ];
         open-floating = true;
       }
     ];
@@ -354,7 +354,7 @@
       # ─── Screenshots ───
       "Mod+Shift+S".action.spawn = [
         "bash" "-c"
-        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | satty -f -; fi"
+        "area=$(slurp); if [ -n \"$area\" ]; then grim -g \"$area\" - | tee >(wl-copy) | swappy -f -; fi"
       ];
       "Print".action.screenshot-screen.show-pointer = false;
       "Mod+Ctrl+Shift+S".action.screenshot-window = { };

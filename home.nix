@@ -1,7 +1,10 @@
 { config, pkgs, noctalia-pkg, ... }:
 
 {
-  imports = [ ./modules/niri.nix ];
+  imports = [
+    ./modules/niri.nix
+    ./modules/kitty.nix
+  ];
 
   home.username = "nat";
   home.homeDirectory = "/home/nat";

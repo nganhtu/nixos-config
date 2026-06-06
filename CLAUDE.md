@@ -95,7 +95,7 @@ Nội dung đã backup:
 - **layout.kdl:** gaps 4; center-focused-column never; **background-color transparent (BẮT BUỘC cho noctalia set wallpaper)**; preset-column-widths 1/3,1/2,2/3; focus-ring width 2.
 - **rules.kdl:** corner-radius 8 clip-to-geometry; kitty default width 0.5; steam floating rules; **layer-rule noctalia-wallpaper place-within-backdrop true**.
 - **animation.kdl:** dịch nguyên các spring/duration (workspace-switch, window-open/close, view-movement, resize, overview, screenshot-ui...).
-- **noctalia.kdl:** màu focus-ring/border/tab/shadow/insert-hint (#3b5ba9 active, #fbf8fd inactive, #ba1a1a urgent). Cân nhắc để noctalia tự quản màu thay vì hardcode.
+- **noctalia.kdl:** ~~hardcode màu~~ → **BỎ block này hoàn toàn**, để noctalia tự push màu qua IPC khi đổi wallpaper. (Quyết định 2026-06-06.)
 - **autostart.kdl:** `qs -c noctalia-shell` (noctalia), `fcitx5 -d`, `wl-paste --watch cliphist store`. → chuyển thành `spawn-at-startup` trong niri settings. KHÔNG chạy noctalia qua systemd (docs cảnh báo lag + IPC bug).
 - **keybinds.kdl:** ~100 bind. Format Nix: action là LIST không phải string (vd `spawn = ["kitty"]`; ipc call = `["qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"]`). Binds tham chiếu binary: `kitty`, `google-chrome-stable`, `thunar`, `grim`/`slurp`/`swappy`, `cliphist`, `fuzzel`, `wl-copy` → đảm bảo các package được cài, nếu thiếu bind gãy.
 
@@ -167,7 +167,7 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 
 - Chạy bằng **spawn-at-startup trong niri**, KHÔNG systemd (docs đã deprecated systemd: gây lag khởi động + IPC bất ổn).
 - niri keybind gọi noctalia phải truyền **list**, không phải string.
-- `programs.noctalia-shell.settings` (attrset Nix → JSON) phủ gần hết Settings Panel. `settings.json` thành **symlink read-only** → nguồn sự thật là Nix. Workflow: chỉnh thử GUI → `Copy Settings` hoặc `noctalia-shell ipc call state all | jq .settings` → bake vào Nix.
+- ~~`programs.noctalia-shell.settings`~~ → **KHÔNG dùng**. User chốt (2026-06-06): noctalia auto-update palette từ wallpaper, bake vào Nix sẽ chết chức năng này. Chỉ giữ `programs.noctalia-shell.enable = true;`. Không set `.settings`, không set `.colors`. Plugin enable qua `.plugins` thì OK (cài/bật, không phải theme).
 - `programs.noctalia-shell.colors`: nếu override màu phải set **ĐỦ BỘ** (kể cả hover) không thì vỡ theme.
 - Plugins (file-search, clipboard, tailscale) declarable qua `plugins`; bật plugin chưa cài → noctalia tự cài lúc khởi động.
 - Để widget wifi/bt/power/battery chạy: cần `networking.networkmanager.enable`, `hardware.bluetooth.enable`, `services.upower.enable`, và ppd HOẶC tuned (xung đột TLP — xem mục 6).

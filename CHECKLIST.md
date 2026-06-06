@@ -99,7 +99,7 @@
 ## GIAI ĐOẠN 6 — Đuôi dài (khó / proprietary)
 
 - [ ] Fonts proprietary: user cấp file (Google Sans, MS, Segoe) → đóng derivation hoặc home.file. Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove.
-- [ ] Noctalia settings declarative: chỉnh GUI ưng → copy state → bake vào `programs.noctalia-shell.settings`. Bật plugins (file-search, clipboard 500, tailscale). Color scheme. Wallpaper.
+- [x] ~~Noctalia settings declarative bake~~ → BỎ (user chốt: noctalia tự update palette theo wallpaper, không sync vào Nix). Vẫn cần: bật plugins (file-search, clipboard 500, tailscale) qua `programs.noctalia-shell.plugins`. Wallpaper: home.file.
 - [ ] Noctalia calendar: evolution-data-server + override calendarSupport (nếu cần).
 - [ ] Package khó: antigravity (wrap/AppImage hoặc bỏ), uad, payload-dumper-go, openai-codex, github-desktop, android-studio — verify từng cái trên search.nixos.org, wrap cái thiếu.
 - [ ] JetBrains (license + canary nếu cần).
