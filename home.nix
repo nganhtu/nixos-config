@@ -4,6 +4,7 @@
   imports = [
     ./modules/niri.nix
     ./modules/kitty.nix
+    ./modules/helix.nix
   ];
 
   home.username = "nat";
