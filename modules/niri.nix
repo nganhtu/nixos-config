@@ -77,6 +77,16 @@
       };
     };
 
+    outputs."eDP-1" = {
+      enable = true;
+      mode = {
+        width = 1920;
+        height = 1080;
+        refresh = 144.001;
+      };
+      scale = 1.0;
+    };
+
     window-rules = [
       {
         geometry-corner-radius = {
