@@ -26,7 +26,7 @@ in
     default = "saved";
   };
 
-  networking.hostName = "Ithilien";
+  networking.hostName = "Niquesse";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Asia/Ho_Chi_Minh";

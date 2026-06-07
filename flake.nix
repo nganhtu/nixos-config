@@ -1,5 +1,5 @@
 {
-  description = "NixOS — Ithilien (Niri + Noctalia)";
+  description = "NixOS — Niquesse (Niri + Noctalia)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -25,7 +25,7 @@
     system = "x86_64-linux";
     noctalia-pkg = noctalia.packages.${system}.default;
   in {
-    nixosConfigurations.Ithilien = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.Niquesse = nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
         ./configuration.nix
