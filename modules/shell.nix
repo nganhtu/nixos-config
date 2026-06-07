@@ -100,9 +100,13 @@
         echo -e "\n[+] Rebuilding NixOS..."
         sudo nixos-rebuild switch --flake ~/nixos-config#Ithilien
 
-        echo -e "\n[+] Collecting nix garbage (giữ generation 14 ngày gần nhất)..."
-        nix-collect-garbage --delete-older-than 14d
-        sudo nix-collect-garbage --delete-older-than 14d
+        echo -e "\n[+] Cleaning old generations (giữ 10 bản gần nhất)..."
+        sudo nix-env --delete-generations '+10' --profile /nix/var/nix/profiles/system
+        nix-env --delete-generations '+10' --profile "$HOME/.local/state/nix/profiles/home-manager" 2>/dev/null || true
+
+        echo -e "\n[+] Collecting nix garbage (store paths không tham chiếu)..."
+        nix-collect-garbage
+        sudo nix-collect-garbage
 
         echo -e "\n[✔] All tasks completed successfully."
       }
