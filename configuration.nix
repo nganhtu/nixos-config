@@ -89,6 +89,9 @@ in
   services.upower.enable = true;
   services.power-profiles-daemon.enable = true;
 
+  # VAAPI cho Intel Alder Lake iGPU: hardware encode (wf-recorder) + decode (VLC/Chrome).
+  hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
+
   # Gập máy không suspend (cả khi dùng pin, cắm sạc, lẫn docked).
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";

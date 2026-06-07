@@ -55,7 +55,7 @@
 
       setopt appendhistory
 
-      fastfetch -l NixOS -s title:separator:kernel:uptime:packages:shell:wm:terminal:localip:locale:break:theme:icons:cursor:font:terminalfont:break:colors
+      fastfetch -l NixOS -s title:separator:os:kernel:uptime:packages:localip:locale:wm:shell:terminal:break:theme:icons:cursor:font:terminalfont:break:colors
 
       if command -v fzf >/dev/null 2>&1; then
         source <(fzf --zsh)
@@ -67,6 +67,36 @@
         for hwmon in /sys/class/hwmon/hwmon*/name; do
           echo "$hwmon: $(cat $hwmon)"
         done
+      }
+
+      # screenrec — quay màn hình chất lượng cao (VAAPI hardware encode trên Intel iGPU, 60fps).
+      # Mặc định KHÔNG thu âm. Audio:
+      #   -a  thu tiếng máy/app (monitor của sink đang phát, sạch không qua mic)
+      #   -m  thu mic (default source)
+      # (-a và -m loại trừ nhau; thu cả hai cùng lúc cần virtual combined source.)
+      #   screenrec          → toàn màn hình, không tiếng
+      #   screenrec -r       → chọn vùng bằng slurp
+      #   screenrec -a       → kèm tiếng app
+      #   screenrec -m       → kèm mic
+      #   (kết hợp được, vd: screenrec -r -a)
+      #   Ctrl+C để dừng. File lưu ở ~/Videos/rec-<ngày-giờ>.mp4
+      screenrec() {
+        local out="$HOME/Videos/rec-$(date +%Y%m%d-%H%M%S).mp4"
+        mkdir -p "$HOME/Videos"
+        local args=(-c h264_vaapi -d /dev/dri/renderD128 -p qp=18 -r 60)
+        local audio=""
+        while [[ $# -gt 0 ]]; do
+          case "$1" in
+            -r) local area; area=$(slurp) || return 1; args+=(-g "$area") ;;
+            -a) audio="-a$(pactl get-default-sink).monitor" ;;
+            -m) audio="-a" ;;
+            *)  echo "screenrec: tùy chọn lạ '$1' (chỉ nhận -r, -a, -m)"; return 1 ;;
+          esac
+          shift
+        done
+        [[ -n "$audio" ]] && args+=("$audio")
+        echo "Recording → $out   (Ctrl+C để dừng)"
+        wf-recorder "''${args[@]}" -f "$out"
       }
 
       docobash() {
