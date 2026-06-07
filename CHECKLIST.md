@@ -99,11 +99,11 @@
 - [x] logind lid switch: ignore cả ba (`HandleLidSwitch`, `HandleLidSwitchExternalPower`, `HandleLidSwitchDocked`).
 - [ ] TLP: tạm bỏ qua (máy tản nhiệt tốt, không cần tinh chỉnh CPU). ppd giữ nguyên.
 - [ ] steam: đợi sau khi dựng nvidia proprietary driver.
-- [ ] App GUI: spotify, discord, libreoffice, obs-studio, pavucontrol, ristretto, postman, vscode, parsec.
-- [ ] Dev/LSP/formatters: toàn bộ list mục 7 CLAUDE.md.
-- [ ] Rebuild theo từng nhóm nhỏ.
+- [x] App GUI (5b): spotify, discord, libreoffice, pavucontrol, ristretto, postman, parsec-bin, vlc. Gỡ obs (wf-recorder thay thế) + vscode (không hoạt động). Thêm asciinema, wf-recorder, vlc.
+- [x] Dev/LSP/formatters (5c): nil+nixfmt (Nix), jdtls+google-java-format (Java), pyright+ruff (Python), rust-analyzer+rustfmt (Rust), gopls (Go), typescript-language-server+vscode-langservers-extracted+prettier (TS/JS/HTML/CSS/JSON), bash-language-server+shfmt (Bash), lua-language-server (Lua), taplo (TOML), yaml-language-server (YAML), marksman (Markdown), clang-tools (C/C++), dockerfile-language-server (Dockerfile), intelephense+php (PHP). Pyright wire vào Helix languages.toml.
+- [x] Bonus: VAAPI Intel iGPU (intel-media-driver), hàm `screenrec` (wf-recorder hardware encode), NIXOS_OZONE_WL=1 (Chrome Wayland + screen-share qua portal), unmask xdg-desktop-portal.
 
-**Xong khi (5a ✅):** docker/tailscale/adb chạy, group docker+kvm OK, gập máy không suspend.
+**Xong khi (5a+5b+5c ✅):** docker/tailscale/adb chạy, app GUI mở được, LSP đầy đủ cho 14 ngôn ngữ, screen-share + quay màn hình hoạt động.
 
 ---
 

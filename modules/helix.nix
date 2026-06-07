@@ -41,5 +41,25 @@
       inherits = "focus_nova";
       "ui.background" = { };
     };
+
+    languages = {
+      # Helix 25.07 mặc định python dùng ty/ruff, không có pyright → wire lại.
+      language-server.pyright = {
+        command = "pyright-langserver";
+        args = [ "--stdio" ];
+      };
+
+      language = [
+        {
+          name = "python";
+          language-servers = [ "pyright" "ruff" ];
+        }
+        {
+          # nil tự được nhận làm LSP; Helix không có formatter nix mặc định.
+          name = "nix";
+          formatter.command = "nixfmt";
+        }
+      ];
+    };
   };
 }

@@ -131,6 +131,20 @@ in
     # App GUI (Giai đoạn 5b)
     spotify discord libreoffice-fresh pavucontrol
     ristretto postman parsec-bin
+
+    # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH
+    nodejs
+    nil nixfmt
+    jdt-language-server google-java-format
+    pyright ruff
+    rust-analyzer rustfmt
+    gopls
+    typescript-language-server vscode-langservers-extracted prettier
+    bash-language-server shfmt
+    lua-language-server taplo yaml-language-server marksman
+    clang-tools
+    dockerfile-language-server
+    intelephense php
   ];
 
   programs.thunar = {
