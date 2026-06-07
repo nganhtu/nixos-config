@@ -71,6 +71,8 @@ in
 
   programs.niri.enable = true;
 
+  fonts.fontconfig.defaultFonts.monospace = [ "Google Sans Code" ];
+
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
     lxgw-wenkai
