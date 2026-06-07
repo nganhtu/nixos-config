@@ -45,6 +45,8 @@
 
       cdc = "cd ~/src/Onschool/SLC";
 
+      nrs = "sudo nixos-rebuild switch --flake ~/nixos-config#Ithilien";
+
       upsync = "update_and_merge_sync";
     };
 
