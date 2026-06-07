@@ -164,7 +164,10 @@
         { proportion = 1.0 / 2.0; }
         { proportion = 2.0 / 3.0; }
       ];
-      focus-ring.width = 2;
+      focus-ring = {
+        width = 2;
+        active.color = "#CCCCFF";
+      };
     };
 
     binds = {
