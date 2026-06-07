@@ -89,13 +89,23 @@ in
   services.upower.enable = true;
   services.power-profiles-daemon.enable = true;
 
+  # Gập máy không suspend (cả khi dùng pin, cắm sạc, lẫn docked).
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchDocked = "ignore";
+  };
+
+  virtualisation.docker.enable = true;
+  services.tailscale.enable = true;
+
   programs.zsh.enable = true;
 
   users.users.nat = {
     isNormalUser = true;
     description = "Natyusha";
     shell = pkgs.zsh;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "kvm" ];
   };
 
   nixpkgs.config.allowUnfree = true;

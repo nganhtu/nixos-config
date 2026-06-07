@@ -92,16 +92,18 @@
 
 ## GIAI ĐOẠN 5 — Toàn bộ package & services
 
-- [ ] System services: docker (+ group), tailscale, steam (programs.steam), kvm group.
-- [x] adb + fastboot: `android-tools` trong systemPackages. NixOS unstable mới đã bỏ `programs.adb.enable` — systemd 258 tự xử lý uaccess, không cần group `adbusers`.
-- [ ] TLP vs ppd theo quyết định user (nếu TLP: tắt power-profiles-daemon + settings CPU; nếu ppd: bỏ TLP).
-- [ ] logind lid switch ignore (x3).
-- [ ] App GUI: spotify, discord, libreoffice, obs-studio, pavucontrol, thunar(+gvfs,plugins,tumbler), file-roller, ristretto, postman, vscode, parsec.
-- [ ] Dev/LSP/formatters: toàn bộ list mục 7 CLAUDE.md (jdtls, pyright, ruff, rust-analyzer, gopls, prettier, typescript-language-server, lua-language-server, taplo, yaml-language-server, marksman, shfmt, bash-language-server, vscode-langservers-extracted, rustfmt, google-java-format).
-- [ ] GTK theme/cursor/font qua Home Manager `gtk` (adw-gtk-theme, apple-cursor, dark→light prefer-light).
-- [ ] Rebuild theo từng nhóm nhỏ (đừng nhồi 1 lần) để dễ cô lập lỗi.
+- [x] docker: `virtualisation.docker.enable` + group `docker` + `docker-compose` v2 plugin qua `home.file.".docker/cli-plugins/docker-compose"`.
+- [x] tailscale: `services.tailscale.enable` (tailscale up chạy tay 1 lần khi cần).
+- [x] kvm: thêm group `kvm` cho user.
+- [x] adb + fastboot: `android-tools` trong systemPackages.
+- [x] logind lid switch: ignore cả ba (`HandleLidSwitch`, `HandleLidSwitchExternalPower`, `HandleLidSwitchDocked`).
+- [ ] TLP: tạm bỏ qua (máy tản nhiệt tốt, không cần tinh chỉnh CPU). ppd giữ nguyên.
+- [ ] steam: đợi sau khi dựng nvidia proprietary driver.
+- [ ] App GUI: spotify, discord, libreoffice, obs-studio, pavucontrol, ristretto, postman, vscode, parsec.
+- [ ] Dev/LSP/formatters: toàn bộ list mục 7 CLAUDE.md.
+- [ ] Rebuild theo từng nhóm nhỏ.
 
-**Xong khi:** các app mở được, docker/tailscale/adb chạy, theme sáng + cursor macOS áp dụng.
+**Xong khi (5a ✅):** docker/tailscale/adb chạy, group docker+kvm OK, gập máy không suspend.
 
 ---
 

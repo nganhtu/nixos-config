@@ -20,5 +20,10 @@
 
   home.packages = [ noctalia-pkg ];
 
+  # `docker compose` v2 plugin: docker CLI chỉ tìm trong ~/.docker/cli-plugins
+  # (các path /usr/... không có trên NixOS).
+  home.file.".docker/cli-plugins/docker-compose".source =
+    "${pkgs.docker-compose}/libexec/docker/cli-plugins/docker-compose";
+
   programs.noctalia-shell.enable = true;
 }
