@@ -27,10 +27,12 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 ├── modules/
 │   ├── niri.nix               # full niri settings (input, layout, keybinds, rules, animations)
 │   ├── kitty.nix              # terminal + Cherry Midnight theme
-│   ├── helix.nix              # editor + transparent_focus_nova theme
+│   ├── helix.nix              # editor + LSP wiring + transparent_focus_nova theme + .desktop override
 │   ├── btop.nix               # system monitor (nord theme)
 │   ├── fuzzel.nix             # launcher (noctalia runtime colors via include)
 │   ├── theme.nix              # GTK theme, cursor, icon theme, system font
+│   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
+│   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
 │   └── claude.nix             # Claude Code statusline
 ├── claude/
 │   └── statusline.sh          # statusline script (context %, quota %, git branch)

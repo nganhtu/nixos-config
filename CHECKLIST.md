@@ -109,16 +109,15 @@
 
 ## GIAI ĐOẠN 6 — Đuôi dài (khó / proprietary)
 
-- [ ] Fonts proprietary: user cấp file (Google Sans, MS, Segoe) → đóng derivation hoặc home.file. Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove.
-- [x] ~~Noctalia settings declarative bake~~ → BỎ (user chốt: noctalia tự update palette theo wallpaper, không sync vào Nix). Vẫn cần: bật plugins (file-search, clipboard 500, tailscale) qua `programs.noctalia-shell.plugins`. Wallpaper: home.file.
+- [x] Fonts proprietary: Google Sans + Google Sans Code + Windows fonts đóng vào `proprietary-fonts` derivation (`fonts/` trong repo). Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove, corefonts.
+- [x] ~~Noctalia settings/colors/plugins declarative bake~~ → BỎ HẾT (user chốt: noctalia tự update palette + quản plugin lúc runtime; bake `plugins.json` thành symlink read-only sẽ chặn bật/tắt plugin trong app). Chỉ giữ `programs.noctalia-shell.enable`. Wallpaper: home.file (làm sau nếu cần).
 - [ ] Noctalia calendar: evolution-data-server + override calendarSupport (nếu cần).
-- [ ] Package khó: antigravity (wrap/AppImage hoặc bỏ), uad, payload-dumper-go, openai-codex, github-desktop, android-studio — verify từng cái trên search.nixos.org, wrap cái thiếu.
-- [ ] JetBrains (license + canary nếu cần).
-- [ ] Thunar custom action `kitty --directory %f` (uca.xml qua xdg.configFile).
-- [ ] helix.desktop override (`kitty helix`, Terminal=false) qua xdg.desktopEntries.
-- [ ] Gỡ XFCE (đã không cần bàn-làm-việc tạm nữa) — cẩn thận giữ display manager.
+- [~] Package khó — verify 2026-06-07: **TẤT CẢ đã có sẵn nixpkgs, không cần wrap/AppImage**. Cài (hẹn 2026-06-08): `jetbrains.idea-ultimate`, `jetbrains.phpstorm`, `antigravity-fhs`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`. (antigravity-cli = tool TUI riêng, hỏi user mai.)
+- [x] Thunar custom action `kitty --directory %f` (uca.xml qua xdg.configFile — `modules/thunar.nix`). uca.xml read-only → không thêm action qua GUI được nữa.
+- [x] helix.desktop override (`kitty hx`, Terminal=false) qua xdg.desktopEntries (`modules/helix.nix`).
 - [ ] Cân nhắc Stylix cho theme toàn hệ thống (tùy chọn).
 - [ ] Cân nhắc btrfs snapper / impermanence (tùy chọn, nếu dùng btrfs).
+- [ ] **Gỡ XFCE — LÀM SAU CÙNG**, sau khi xong Limine (Giai đoạn 7). Bỏ `desktopManager.xfce.enable`, GIỮ lightdm.
 
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
 
