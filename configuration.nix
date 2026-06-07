@@ -89,9 +89,12 @@ in
   services.upower.enable = true;
   services.power-profiles-daemon.enable = true;
 
+  programs.zsh.enable = true;
+
   users.users.nat = {
     isNormalUser = true;
     description = "Natyusha";
+    shell = pkgs.zsh;
     extraGroups = [ "networkmanager" "wheel" ];
   };
 
@@ -106,6 +109,10 @@ in
     file-roller
     jq
     android-tools
+
+    # CLI tools (Giai đoạn 4)
+    lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab
+    nvtopPackages.intel
   ];
 
   programs.thunar = {

@@ -71,19 +71,22 @@
 
 ---
 
-## GIAI ĐOẠN 4 — Shell + CLI (zsh)
+## GIAI ĐOẠN 4 — Shell + CLI (zsh) ✅
 
-- [ ] `programs.zsh.enable` + oh-my-zsh (theme `ys`, plugin git) + autosuggestion + syntaxHighlighting (KHÔNG git clone tay).
-- [ ] Bỏ plugin `archlinux`.
-- [ ] Bê alias dùng được: lsd/bat/helix, docker (doco...), git config, fzf, history, BAT_THEME, cdc, upsync.
-- [ ] Viết lại `update` function cho NixOS (rebuild/flake update/gc/journal vacuum).
-- [ ] fastfetch đổi logo NixOS.
-- [ ] Quyết định (hỏi user): giữ `syncdotfiles`/bare-repo song song hay bỏ.
-- [ ] Quyết định nvim (alias vi→nvim) — cài nvim hay đổi alias.
-- [ ] Cài CLI tools: lsd, bat, tealdeer, dust, gdu, fzf, ripgrep, fd, fastfetch, tmux, htop, btop, nvtop, github-cli, glab.
-- [ ] Rebuild.
+- [x] `programs.zsh.enable` + oh-my-zsh + autosuggestion + syntaxHighlighting. Theme fork từ `ys` → `natys` (sao file vào `shell/themes/`, `oh-my-zsh.custom = ../shell`).
+- [x] Bỏ plugin `archlinux`.
+- [x] Bê alias dùng được: lsd, `cat=bat`, `vi=nvim`/`suvi`, `suhx`, docker (`doco/docodul/docobuild`), `gitcfX`, `cdc`, `upsync`, fzf, history 10000.
+- [x] Viết lại `update` cho NixOS: docker prune + tldr update + journal vacuum + `nix flake update` + `nixos-rebuild switch` + `nix-collect-garbage --delete-older-than 14d` (giữ 14 ngày để có đường lui khi rebuild fail).
+- [x] fastfetch đổi `-l Arch` → `-l NixOS`.
+- [x] `syncdotfiles`/bare-repo: bỏ hẳn (user chốt).
+- [x] nvim: giữ `alias vi=nvim` (chưa cài, dùng khi cần thì cài).
+- [x] CLI tools: lsd, bat, tealdeer, dust, gdu, fzf, ripgrep, fd, fastfetch, tmux, htop, glab, nvtopPackages.intel. (btop+gh đã có.)
+- [x] Rebuild + đăng nhập lại, login shell = zsh.
 
-**Xong khi:** mở terminal, zsh + prompt + plugin + alias hoạt động, `update` chạy đúng kiểu NixOS.
+**Tồn:**
+- `alias hx=helix` cũ trỏ về binary `helix` không tồn tại (nixpkgs ship binary tên `hx`). Đã bỏ alias `hx`, giữ `suhx=sudo -E hx`.
+
+**Xong khi:** ✅ mở terminal, zsh + prompt + plugin + alias hoạt động, `update` chạy đúng kiểu NixOS.
 
 ---
 

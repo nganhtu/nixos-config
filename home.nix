@@ -9,6 +9,7 @@
     ./modules/fuzzel.nix
     ./modules/theme.nix
     ./modules/claude.nix
+    ./modules/shell.nix
   ];
 
   home.username = "nat";
