@@ -62,4 +62,20 @@
       ];
     };
   };
+
+  # Override Helix.desktop của nixpkgs (Exec=hx, Terminal=true) → mở trong kitty.
+  # Bỏ ConsoleOnly để file manager "Open With" liệt kê được.
+  xdg.desktopEntries.Helix = {
+    name = "Helix";
+    genericName = "Text Editor";
+    comment = "Edit text files";
+    exec = "kitty hx %F";
+    terminal = false;
+    type = "Application";
+    icon = "helix";
+    categories = [ "Utility" "TextEditor" ];
+    startupNotify = false;
+    mimeType = [ "text/plain" "text/x-makefile" "application/x-shellscript" ];
+    settings.Keywords = "Text;editor;";
+  };
 }

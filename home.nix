@@ -10,6 +10,7 @@
     ./modules/theme.nix
     ./modules/claude.nix
     ./modules/shell.nix
+    ./modules/thunar.nix
   ];
 
   home.username = "nat";
