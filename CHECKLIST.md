@@ -89,7 +89,8 @@
 
 ## GIAI ĐOẠN 5 — Toàn bộ package & services
 
-- [ ] System services: docker (+ group), tailscale, adb (+ udev + group adbusers), steam (programs.steam), kvm group.
+- [ ] System services: docker (+ group), tailscale, steam (programs.steam), kvm group.
+- [x] adb + fastboot: `android-tools` trong systemPackages. NixOS unstable mới đã bỏ `programs.adb.enable` — systemd 258 tự xử lý uaccess, không cần group `adbusers`.
 - [ ] TLP vs ppd theo quyết định user (nếu TLP: tắt power-profiles-daemon + settings CPU; nếu ppd: bỏ TLP).
 - [ ] logind lid switch ignore (x3).
 - [ ] App GUI: spotify, discord, libreoffice, obs-studio, pavucontrol, thunar(+gvfs,plugins,tumbler), file-roller, ristretto, postman, vscode, parsec.

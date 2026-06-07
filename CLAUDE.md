@@ -108,7 +108,7 @@ Nội dung đã backup:
 | `paru -S <pkg>` | `environment.systemPackages` / `home.packages` |
 | `systemctl enable docker` + `usermod -aG docker` | `virtualisation.docker.enable=true` + `users.users.<u>.extraGroups=["docker"]` |
 | `systemctl enable --now tailscaled && tailscale up` | `services.tailscale.enable=true` (up vẫn chạy tay 1 lần) |
-| adb + android-udev | `programs.adb.enable=true` + `services.udev.packages=[pkgs.android-udev-rules]` + group `adbusers` |
+| adb + android-udev | `environment.systemPackages = [ pkgs.android-tools ];` (NixOS unstable mới: systemd 258 tự xử lý uaccess, `programs.adb.enable` đã bị bỏ, không cần group `adbusers`) |
 | steam (pkg) | `programs.steam.enable=true` (KHÔNG chỉ cài package) |
 | `usermod -aG kvm` | `users.users.<u>.extraGroups += ["kvm"]` |
 | sửa `/etc/tlp.conf` | `services.tlp.enable=true` + `services.tlp.settings={...}` + **`services.power-profiles-daemon.enable=false`** (xung đột TLP!) |
@@ -130,7 +130,7 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 
 **Map sạch (có sẵn nixpkgs):** helix, thunar (+gvfs, archive-plugin, tumbler), file-roller, ristretto, lsd, kitty, github-cli, glab, docker(+buildx,compose), bat, zip, tealdeer, nodejs/npm, spotify, dust, libreoffice, obs-studio, adw-gtk-theme, brightnessctl, capitaine-cursors, niri, qt6-wayland, seatd, wlr-randr, xwayland-satellite, discord, pavucontrol, android-tools(adb), htop, btop, nvtop, wl-clipboard, cliphist, fuzzel, steam, grim, slurp, swappy, gdu, baobab, tailscale, tmux, tlp, ripgrep, fd, fzf, fastfetch, eza. LSP/formatters: jdtls, google-java-format, prettier, typescript-language-server, vscode-langservers-extracted, shfmt, bash-language-server, ruff, pyright, rust-analyzer, rustfmt, taplo, yaml-language-server, marksman, lua-language-server, gopls. Cursor: `apple-cursor` (macOS cursor). nerd-fonts.caskaydia-cove.
 
-**Cần option đặc biệt (không chỉ cài package):** steam (programs.steam), docker (virtualisation), tailscale (services), adb (programs.adb), fcitx5 (i18n.inputMethod), niri (programs.niri qua flake), noctalia (programs.noctalia-shell).
+**Cần option đặc biệt (không chỉ cài package):** steam (programs.steam), docker (virtualisation), tailscale (services), fcitx5 (i18n.inputMethod), niri (programs.niri qua flake), noctalia (programs.noctalia-shell).
 
 **Unfree (cần allowUnfree, đã bật):** spotify, discord, steam, vscode, google-chrome, jetbrains.*, parsec, postman, android-studio.
 

@@ -103,6 +103,7 @@ in
     xwayland-satellite
     file-roller
     jq
+    android-tools
   ];
 
   programs.thunar = {
