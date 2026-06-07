@@ -10,6 +10,10 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
+  # Nvidia dGPU: nouveau Vulkan deadlock làm treo compositor lúc khởi động.
+  # Tạm tắt cả dGPU; Stage 5 sẽ thay bằng nvidia proprietary nếu cần Steam.
+  boot.blacklistedKernelModules = [ "nouveau" ];
+
   # Bootloader
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 3;
