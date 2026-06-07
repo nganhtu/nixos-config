@@ -123,6 +123,11 @@ in
     # CLI tools (Giai đoạn 4)
     lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab
     nvtopPackages.intel
+    asciinema wf-recorder vlc
+
+    # App GUI (Giai đoạn 5b)
+    spotify discord libreoffice-fresh pavucontrol
+    ristretto postman parsec-bin
   ];
 
   programs.thunar = {
