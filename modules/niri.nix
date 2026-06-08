@@ -1,4 +1,4 @@
-{ config, pkgs, noctalia-pkg, ... }:
+{ config, pkgs, ... }:
 
 {
   home.packages = [ pkgs.apple-cursor ];
@@ -16,8 +16,6 @@
     debug.honor-xdg-activation-with-invalid-serial = { };
 
     environment = {
-      QS_CONFIG_PATH = "${noctalia-pkg}/share/noctalia-shell";
-
       NIXOS_OZONE_WL = "1";
       ELECTRON_OZONE_PLATFORM_HINT = "auto";
       QT_QPA_PLATFORM = "wayland";
@@ -37,7 +35,7 @@
     xwayland-satellite.path = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
 
     spawn-at-startup = [
-      { command = [ "noctalia-shell" ]; }
+      { command = [ "noctalia" ]; }
       { command = [ "fcitx5" "-d" ]; }
       { command = [ "wl-paste" "--watch" "cliphist" "store" ]; }
     ];
@@ -182,7 +180,7 @@
       };
       "Mod+D" = {
         hotkey-overlay.title = "Open App Launcher: noctalia launcher";
-        action.spawn = [ "noctalia-shell" "ipc" "call" "launcher" "toggle" ];
+        action.spawn = [ "noctalia" "msg" "panel-toggle" "launcher" ];
       };
       "Mod+B" = {
         hotkey-overlay.title = "Open Browser: Google Chrome";
@@ -190,11 +188,11 @@
       };
       "Mod+Alt+L" = {
         hotkey-overlay.title = "Lock Screen: noctalia lock";
-        action.spawn = [ "noctalia-shell" "ipc" "call" "lockScreen" "lock" ];
+        action.spawn = [ "noctalia" "msg" "session" "lock" ];
       };
       "Mod+Shift+Q" = {
         hotkey-overlay.title = "Session Menu: noctalia sessionMenu";
-        action.spawn = [ "noctalia-shell" "ipc" "call" "sessionMenu" "toggle" ];
+        action.spawn = [ "noctalia" "msg" "panel-toggle" "session" ];
       };
       "Mod+E" = {
         hotkey-overlay.title = "File Manager: Thunar";
@@ -204,45 +202,45 @@
       # ─── Media controls ───
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "volume" "increase" ];
+        action.spawn = [ "noctalia" "msg" "volume-up" ];
       };
       "XF86AudioLowerVolume" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "volume" "decrease" ];
+        action.spawn = [ "noctalia" "msg" "volume-down" ];
       };
       "XF86AudioMute" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "volume" "muteOutput" ];
+        action.spawn = [ "noctalia" "msg" "volume-mute" ];
       };
       "XF86AudioMicMute" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "volume" "muteInput" ];
+        action.spawn = [ "noctalia" "msg" "mic-mute" ];
       };
       "XF86AudioNext" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "media" "next" ];
+        action.spawn = [ "noctalia" "msg" "media" "next" ];
       };
       "XF86AudioPrev" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "media" "previous" ];
+        action.spawn = [ "noctalia" "msg" "media" "previous" ];
       };
       "XF86AudioPlay" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "media" "playPause" ];
+        action.spawn = [ "noctalia" "msg" "media" "toggle" ];
       };
       "XF86AudioPause" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "media" "playPause" ];
+        action.spawn = [ "noctalia" "msg" "media" "toggle" ];
       };
 
       # ─── Brightness ───
       "XF86MonBrightnessUp" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "brightness" "increase" ];
+        action.spawn = [ "noctalia" "msg" "brightness-up" ];
       };
       "XF86MonBrightnessDown" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia-shell" "ipc" "call" "brightness" "decrease" ];
+        action.spawn = [ "noctalia" "msg" "brightness-down" ];
       };
 
       # ─── Window/focus ───
@@ -377,11 +375,15 @@
       };
 
       # ─── Clipboard ───
-      "Mod+V".action.spawn = [ "noctalia-shell" "ipc" "call" "plugin:clipboard" "toggle" ];
+      "Mod+V".action.spawn = [ "noctalia" "msg" "panel-toggle" "clipboard" ];
       "Mod+Alt+V".action.spawn = [ "sh" "-c" "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy" ];
 
       # ─── File search ───
-      "Mod+Alt+D".action.spawn = [ "noctalia-shell" "ipc" "call" "plugin:file-search" "toggle" ];
+      # noctalia v5 bỏ plugin file-search → thay bằng fd + fuzzel (mở bằng xdg-open).
+      "Mod+Alt+D".action.spawn = [
+        "sh" "-c"
+        "sel=$(fd --type f . \"$HOME\" | fuzzel --dmenu) && xdg-open \"$sel\""
+      ];
     };
   };
 }

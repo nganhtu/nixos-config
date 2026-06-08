@@ -76,7 +76,7 @@ nixos-config/
 - `nixpkgs` → **nixos-unstable** (Noctalia/Quickshell cần unstable; desktop bits đổi nhanh).
 - `home-manager` (follows nixpkgs).
 - `niri` → `github:sodiboo/niri-flake` (bleeding-edge + module).
-- `noctalia` → **PIN tag `v4.7.7`** (`github:noctalia-dev/noctalia-shell/v4.7.7`, follows nixpkgs). KHÔNG bỏ pin khi `nix flake update`. Docs v4: https://docs.noctalia.dev/v4/getting-started/nixos/ — **v5 là bản rewrite phá vỡ config, xem mục 9 + task đầu Giai đoạn 6.**
+- `noctalia` → **v5** (`github:noctalia-dev/noctalia`, follows nixpkgs). Đã migrate từ v4.7.7 sang v5 ngày 2026-06-09. Docs v5: https://docs.noctalia.dev/v5/getting-started/nixos/ — chỉ còn `homeModules.default` (KHÔNG có `nixosModules`), option `programs.noctalia`, binary `noctalia`, IPC `noctalia msg <command>`. Xem mục 9.
 - **Cachix:** thêm substituter `https://noctalia.cachix.org` + trusted-public-key `noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=` để KHỎI build Qt/Quickshell từ source.
 
 ---
@@ -136,7 +136,7 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 
 **Map sạch (có sẵn nixpkgs):** helix, thunar (+gvfs, archive-plugin, tumbler), file-roller, ristretto, lsd, kitty, github-cli, glab, docker(+buildx,compose), bat, zip, tealdeer, nodejs/npm, spotify, dust, libreoffice, obs-studio, adw-gtk-theme, brightnessctl, capitaine-cursors, niri, qt6-wayland, seatd, wlr-randr, xwayland-satellite, discord, pavucontrol, android-tools(adb), htop, btop, nvtop, wl-clipboard, cliphist, fuzzel, steam, grim, slurp, swappy, gdu, baobab, tailscale, tmux, tlp, ripgrep, fd, fzf, fastfetch, eza. LSP/formatters: jdtls, google-java-format, prettier, typescript-language-server, vscode-langservers-extracted, shfmt, bash-language-server, ruff, pyright, rust-analyzer, rustfmt, taplo, yaml-language-server, marksman, lua-language-server, gopls. Cursor: `apple-cursor` (macOS cursor). nerd-fonts.caskaydia-cove.
 
-**Cần option đặc biệt (không chỉ cài package):** steam (programs.steam), docker (virtualisation), tailscale (services), fcitx5 (i18n.inputMethod), niri (programs.niri qua flake), noctalia (programs.noctalia-shell).
+**Cần option đặc biệt (không chỉ cài package):** steam (programs.steam), docker (virtualisation), tailscale (services), fcitx5 (i18n.inputMethod), niri (programs.niri qua flake), noctalia (programs.noctalia, v5).
 
 **Unfree (cần allowUnfree, đã bật):** spotify, discord, steam, vscode, google-chrome, jetbrains.*, parsec, postman, android-studio.
 
@@ -171,15 +171,21 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 
 ## 9. Cảnh báo Noctalia (từ docs chính thức)
 
-- **⚠️ ĐANG PIN v4.7.7. v5 (phát hành 2026-06-08) là bản VIẾT LẠI TỪ ĐẦU** (Wayland+OpenGL ES, bỏ Quickshell) → phá vỡ: binary `noctalia-shell`→`noctalia`, bỏ `QS_CONFIG_PATH`, bỏ `nixosModules.default`, option `programs.noctalia-shell`→`programs.noctalia`, config sang `~/.config/noctalia/config.toml`, IPC có thể khác. Toàn bộ mục 9 dưới đây mô tả **v4**. Nâng cấp v5 = task ưu tiên kế tiếp (xem Giai đoạn 6).
-- Chạy bằng **spawn-at-startup trong niri**, KHÔNG systemd (docs đã deprecated systemd: gây lag khởi động + IPC bất ổn).
+- **Đang dùng v5** (migrate 2026-06-09). v5 = bản viết lại (Wayland+OpenGL ES, bỏ Quickshell, standalone — không cần `qs`). Binary `noctalia`. Flake chỉ còn `homeModules.default` (đã bỏ `noctalia.nixosModules.default` khỏi flake), option home `programs.noctalia`. Config TOML ở `~/.config/noctalia/` (settings.toml), KHÔNG còn `QS_CONFIG_PATH`.
+- Chạy bằng **spawn-at-startup trong niri** (`{ command = [ "noctalia" ]; }`). v5 có systemd service (`programs.noctalia.systemd.enable`) nhưng ta dùng spawn-at-startup.
 - niri keybind gọi noctalia phải truyền **list**, không phải string.
-- ~~`programs.noctalia-shell.settings`~~ → **KHÔNG dùng**. User chốt (2026-06-06): noctalia auto-update palette từ wallpaper, bake vào Nix sẽ chết chức năng này. Chỉ giữ `programs.noctalia-shell.enable = true;`. Không set `.settings`, không set `.colors`. Plugin enable qua `.plugins` thì OK (cài/bật, không phải theme).
-- `programs.noctalia-shell.colors`: nếu override màu phải set **ĐỦ BỘ** (kể cả hover) không thì vỡ theme.
-- Plugins (file-search, clipboard, tailscale) declarable qua `plugins`; bật plugin chưa cài → noctalia tự cài lúc khởi động.
+- **IPC v5 = `noctalia msg <command>`** (KHÔNG còn `ipc call <target> <method>`). Lấy danh sách đầy đủ bằng `noctalia msg --help` (cần instance đang chạy). Map các bind hiện dùng:
+  - launcher: `noctalia msg panel-toggle launcher` (panel khác: clipboard, control-center, session, wallpaper, polkit, tray-drawer)
+  - lock: `noctalia msg session lock` (session action: lock/suspend/logout/reboot/shutdown)
+  - session menu: `noctalia msg panel-toggle session`
+  - volume: `volume-up` / `volume-down` / `volume-mute` ; mic: `mic-mute`
+  - brightness: `brightness-up` / `brightness-down`
+  - media: `noctalia msg media <next|previous|toggle|stop>`
+  - clipboard: `noctalia msg panel-toggle clipboard`
+  - **file-search KHÔNG còn** (v4 `plugin:file-search` bị bỏ) → Mod+Alt+D thay bằng `fd | fuzzel | xdg-open`.
+- **Không bake settings/colors.** User chốt (2026-06-06): noctalia auto-update palette từ wallpaper, bake vào Nix sẽ chết chức năng này. Chỉ giữ `programs.noctalia.enable = true;`. Không set `.settings`.
 - Để widget wifi/bt/power/battery chạy: cần `networking.networkmanager.enable`, `hardware.bluetooth.enable`, `services.upower.enable`, và ppd HOẶC tuned (xung đột TLP — xem mục 6).
-- Calendar: cần `services.gnome.evolution-data-server.enable` + `pkgs.noctalia-shell.override { calendarSupport = true; }`.
-- Wallpaper: `home.file.".cache/noctalia/wallpapers.json"`.
+- Calendar / wallpaper: cú pháp v5 có thể khác v4 — verify trước khi cấu hình (chưa làm).
 
 ---
 

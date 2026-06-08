@@ -15,8 +15,7 @@
     };
 
     noctalia = {
-      # Pin v4: v5 là bản rewrite (Wayland+OpenGL ES, bỏ Quickshell) đổi binary/IPC/config.
-      url = "github:noctalia-dev/noctalia-shell/v4.7.7";
+      url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -31,7 +30,6 @@
       modules = [
         ./hosts/niquesse/configuration.nix
         niri-flake.nixosModules.niri
-        noctalia.nixosModules.default
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
