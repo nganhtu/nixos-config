@@ -109,10 +109,11 @@
 
 ## GIAI ĐOẠN 6 — Đuôi dài (khó / proprietary)
 
+- [!] **TASK ƯU TIÊN KẾ TIẾP — nâng cấp Noctalia v4.7.7 → v5.** v5 (2026-06-08) là bản rewrite (Wayland+OpenGL ES, bỏ Quickshell). Đang pin tag `v4.7.7` để desktop chạy. Migrate cần: bỏ pin; đổi binary `noctalia-shell`→`noctalia` (`modules/niri.nix`, ~18 keybind IPC + spawn-at-startup); bỏ `QS_CONFIG_PATH`; bỏ `noctalia.nixosModules.default` khỏi flake; đổi `programs.noctalia-shell`→`programs.noctalia` (`home/nat.nix`); dò lại toàn bộ IPC/wallpaper namespace/launcher theo docs v5 (https://docs.noctalia.dev/v5). Test từng keybind.
 - [x] Fonts proprietary: Google Sans + Google Sans Code + Windows fonts đóng vào `proprietary-fonts` derivation (`fonts/` trong repo). Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove, corefonts.
 - [x] ~~Noctalia settings/colors/plugins declarative bake~~ → BỎ HẾT (user chốt: noctalia tự update palette + quản plugin lúc runtime; bake `plugins.json` thành symlink read-only sẽ chặn bật/tắt plugin trong app). Chỉ giữ `programs.noctalia-shell.enable`. Wallpaper: home.file (làm sau nếu cần).
 - [ ] Noctalia calendar: evolution-data-server + override calendarSupport (nếu cần).
-- [~] Package khó — verify 2026-06-07: **TẤT CẢ đã có sẵn nixpkgs, không cần wrap/AppImage**. Cài (hẹn 2026-06-08): `jetbrains.idea-ultimate`, `jetbrains.phpstorm`, `antigravity-fhs`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`. (antigravity-cli = tool TUI riêng, hỏi user mai.)
+- [~] Package khó — verify 2026-06-07: **TẤT CẢ đã có sẵn nixpkgs, không cần wrap/AppImage**. Cài: `jetbrains.idea-ultimate`, `jetbrains.phpstorm`, `antigravity` (native, KHÔNG fhs) + `antigravity-cli`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`.
 - [x] Thunar custom action `kitty --directory %f` (uca.xml qua xdg.configFile — `modules/thunar.nix`). uca.xml read-only → không thêm action qua GUI được nữa.
 - [x] helix.desktop override (`kitty hx`, Terminal=false) qua xdg.desktopEntries (`modules/helix.nix`).
 - [ ] Cân nhắc Stylix cho theme toàn hệ thống (tùy chọn).

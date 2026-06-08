@@ -76,7 +76,7 @@ nixos-config/
 - `nixpkgs` → **nixos-unstable** (Noctalia/Quickshell cần unstable; desktop bits đổi nhanh).
 - `home-manager` (follows nixpkgs).
 - `niri` → `github:sodiboo/niri-flake` (bleeding-edge + module).
-- `noctalia` → `github:noctalia-dev/noctalia-shell` (follows nixpkgs). Tham khảo docs: https://docs.noctalia.dev/v4/getting-started/nixos/
+- `noctalia` → **PIN tag `v4.7.7`** (`github:noctalia-dev/noctalia-shell/v4.7.7`, follows nixpkgs). KHÔNG bỏ pin khi `nix flake update`. Docs v4: https://docs.noctalia.dev/v4/getting-started/nixos/ — **v5 là bản rewrite phá vỡ config, xem mục 9 + task đầu Giai đoạn 6.**
 - **Cachix:** thêm substituter `https://noctalia.cachix.org` + trusted-public-key `noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=` để KHỎI build Qt/Quickshell từ source.
 
 ---
@@ -171,6 +171,7 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 
 ## 9. Cảnh báo Noctalia (từ docs chính thức)
 
+- **⚠️ ĐANG PIN v4.7.7. v5 (phát hành 2026-06-08) là bản VIẾT LẠI TỪ ĐẦU** (Wayland+OpenGL ES, bỏ Quickshell) → phá vỡ: binary `noctalia-shell`→`noctalia`, bỏ `QS_CONFIG_PATH`, bỏ `nixosModules.default`, option `programs.noctalia-shell`→`programs.noctalia`, config sang `~/.config/noctalia/config.toml`, IPC có thể khác. Toàn bộ mục 9 dưới đây mô tả **v4**. Nâng cấp v5 = task ưu tiên kế tiếp (xem Giai đoạn 6).
 - Chạy bằng **spawn-at-startup trong niri**, KHÔNG systemd (docs đã deprecated systemd: gây lag khởi động + IPC bất ổn).
 - niri keybind gọi noctalia phải truyền **list**, không phải string.
 - ~~`programs.noctalia-shell.settings`~~ → **KHÔNG dùng**. User chốt (2026-06-06): noctalia auto-update palette từ wallpaper, bake vào Nix sẽ chết chức năng này. Chỉ giữ `programs.noctalia-shell.enable = true;`. Không set `.settings`, không set `.colors`. Plugin enable qua `.plugins` thì OK (cài/bật, không phải theme).
