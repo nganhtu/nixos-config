@@ -28,7 +28,7 @@
     nixosConfigurations.Niquesse = nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
-        ./configuration.nix
+        ./hosts/niquesse/configuration.nix
         niri-flake.nixosModules.niri
         noctalia.nixosModules.default
         home-manager.nixosModules.home-manager
@@ -36,7 +36,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "hm-bak";
-          home-manager.users.nat = import ./home.nix;
+          home-manager.users.nat = import ./home/nat.nix;
           home-manager.extraSpecialArgs = { inherit noctalia-pkg; };
           home-manager.sharedModules = [
             noctalia.homeModules.default

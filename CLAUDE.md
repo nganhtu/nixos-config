@@ -51,19 +51,25 @@
 ## 4. Kiến trúc đích
 
 ```
-nixos-config/                  (repo git MỚI, tách khỏi repo dotfiles cũ)
+nixos-config/
 ├── flake.nix
-├── configuration.nix          # system: bootloader, services, system packages
-├── hardware-configuration.nix # giữ nguyên cái GUI installer sinh ra
-├── home.nix                   # Home Manager: dotfiles dịch sang Nix
-├── modules/                   # tách nhỏ khi home.nix phình to
+├── hosts/
+│   └── niquesse/
+│       ├── configuration.nix          # system: bootloader, services, system packages
+│       └── hardware-configuration.nix # giữ nguyên cái GUI installer sinh ra
+├── home/
+│   └── nat.nix                        # Home Manager: dotfiles dịch sang Nix
+├── modules/                           # HM modules dùng chung
 │   ├── niri.nix
-│   ├── noctalia.nix
+│   ├── kitty.nix
+│   ├── helix.nix
 │   ├── shell.nix
-│   ├── fonts.nix
 │   └── ...
-├── CLAUDE.md                  # file này
-└── CHECKLIST.md               # kế hoạch
+├── fonts/                             # font assets (google-sans, windows)
+├── shell/                             # oh-my-zsh custom theme
+├── claude/                            # statusline script
+├── CLAUDE.md                          # file này
+└── CHECKLIST.md                       # kế hoạch
 ```
 
 ### Flake inputs cần có

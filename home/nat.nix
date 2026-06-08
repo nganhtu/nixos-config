@@ -2,15 +2,15 @@
 
 {
   imports = [
-    ./modules/niri.nix
-    ./modules/kitty.nix
-    ./modules/helix.nix
-    ./modules/btop.nix
-    ./modules/fuzzel.nix
-    ./modules/theme.nix
-    ./modules/claude.nix
-    ./modules/shell.nix
-    ./modules/thunar.nix
+    ../modules/niri.nix
+    ../modules/kitty.nix
+    ../modules/helix.nix
+    ../modules/btop.nix
+    ../modules/fuzzel.nix
+    ../modules/theme.nix
+    ../modules/claude.nix
+    ../modules/shell.nix
+    ../modules/thunar.nix
   ];
 
   home.username = "nat";

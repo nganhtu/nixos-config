@@ -3,7 +3,7 @@
 let
   proprietary-fonts = pkgs.runCommand "proprietary-fonts" { } ''
     mkdir -p $out/share/fonts/truetype
-    find ${./fonts} -type f \( -name '*.ttf' -o -name '*.ttc' -o -name '*.otf' \) \
+    find ${../../fonts} -type f \( -name '*.ttf' -o -name '*.ttc' -o -name '*.otf' \) \
       -exec cp -L {} $out/share/fonts/truetype/ \;
   '';
 in
