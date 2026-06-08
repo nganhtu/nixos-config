@@ -63,6 +63,13 @@
 
       alias watch_cpu="watch -n 1 \"grep '^[c]pu MHz' /proc/cpuinfo\""
 
+      diskusage() {
+        findmnt -t btrfs -o TARGET -n -l | sort | while IFS= read -r mp; do
+          echo "\n=== $mp ==="
+          sudo dust -x "$mp"
+        done
+      }
+
       check_hmwon() {
         for hwmon in /sys/class/hwmon/hwmon*/name; do
           echo "$hwmon: $(cat $hwmon)"
