@@ -2,7 +2,7 @@
 
 {
   home.file.".claude/statusline-command.sh" = {
-    source = ../claude/statusline.sh;
+    source = ../assets/claude/statusline.sh;
     executable = true;
   };
 

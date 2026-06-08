@@ -6,17 +6,17 @@
   ];
 
   xdg.configFile = {
-    "nnn/plugins/.nnn-plugin-helper".source = ../nnn/plugins/.nnn-plugin-helper;
+    "nnn/plugins/.nnn-plugin-helper".source = ../assets/nnn/plugins/.nnn-plugin-helper;
     "nnn/plugins/opener" = {
-      source = ../nnn/plugins/opener;
+      source = ../assets/nnn/plugins/opener;
       executable = true;
     };
     "nnn/plugins/fzopen" = {
-      source = ../nnn/plugins/fzopen;
+      source = ../assets/nnn/plugins/fzopen;
       executable = true;
     };
     "nnn/plugins/preview-tui" = {
-      source = ../nnn/plugins/preview-tui;
+      source = ../assets/nnn/plugins/preview-tui;
       executable = true;
     };
   };

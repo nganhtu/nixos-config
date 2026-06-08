@@ -7,7 +7,7 @@
     oh-my-zsh = {
       enable = true;
       theme = "natys";
-      custom = "${../shell}";
+      custom = "${../assets/shell}";
       plugins = [ "git" ];
     };
 
