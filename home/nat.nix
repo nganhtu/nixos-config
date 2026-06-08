@@ -11,6 +11,7 @@
     ../modules/claude.nix
     ../modules/shell.nix
     ../modules/thunar.nix
+    ../modules/nnn.nix
   ];
 
   home.username = "nat";

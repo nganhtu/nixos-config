@@ -5,12 +5,26 @@
     enable = true;
 
     font = {
-      name = "CaskaydiaCove NF SemiLight";
-      size = 13;
+      name = "MonaspiceAr Nerd Font";
+      size = 12;
     };
 
+    extraConfig = ''
+      modify_font cell_height 110%
+      modify_font baseline -1
+      font_features MonaspiceArNF-Regular +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceArNF-Bold +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceArNF-Italic +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceArNF-BoldItalic +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+    '';
+
     settings = {
-      modify_font = "cell_height 100%";
+      # nnn preview-tui: kitty split + icat image preview
+      allow_remote_control = "yes";
+      listen_on = "unix:/tmp/kitty%i";
+      active_border_color = "#ccccff";
+      inactive_border_color = "#ccccff";
+
       bold_font = "auto";
       italic_font = "auto";
       bold_italic_font = "auto";

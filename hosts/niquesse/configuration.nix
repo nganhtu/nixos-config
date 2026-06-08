@@ -75,6 +75,7 @@ in
 
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
+    nerd-fonts.monaspace
     lxgw-wenkai
     noto-fonts
     noto-fonts-cjk-sans
@@ -124,9 +125,10 @@ in
     android-tools
 
     # CLI tools (Giai đoạn 4)
-    lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab
+    lsd bat tealdeer dust gdu ncdu fzf ripgrep fd fastfetch tmux htop glab
     nvtopPackages.intel
     asciinema wf-recorder vlc
+    ueberzugpp imagemagick
 
     # App GUI (Giai đoạn 5b)
     spotify discord libreoffice-fresh pavucontrol

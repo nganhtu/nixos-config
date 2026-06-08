@@ -11,6 +11,7 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 | Shell / bar | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) |
 | Terminal | Kitty |
 | Editor | Helix |
+| File manager | nnn (+ preview-tui) / Thunar |
 | Launcher | Fuzzel |
 | Input method | Fcitx5 + Bamboo (Vietnamese) |
 | GTK theme | adw-gtk3 |
@@ -29,14 +30,17 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 │   └── nat.nix                            # Home Manager entry point
 ├── modules/                               # shared HM modules (all hosts)
 │   ├── niri.nix               # full niri settings (input, layout, keybinds, rules, animations)
-│   ├── kitty.nix              # terminal + Cherry Midnight theme
+│   ├── kitty.nix              # terminal + Cherry Midnight theme + Monaspace Argon font
 │   ├── helix.nix              # editor + LSP wiring + transparent_focus_nova theme + .desktop override
 │   ├── btop.nix               # system monitor (nord theme)
 │   ├── fuzzel.nix             # launcher (noctalia runtime colors via include)
 │   ├── theme.nix              # GTK theme, cursor, icon theme, system font
 │   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
 │   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
+│   ├── nnn.nix                # nnn file manager + preview-tui/fzopen/opener plugins
 │   └── claude.nix             # Claude Code statusline
+├── nnn/
+│   └── plugins/               # nnn plugin scripts (preview-tui, fzopen, opener)
 ├── claude/
 │   └── statusline.sh          # statusline script (context %, quota %, git branch)
 └── fonts/

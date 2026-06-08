@@ -4,7 +4,7 @@
   # xdg.configFile thay programs.fuzzel: giữ `include` top-level cho noctalia push theme.
   xdg.configFile."fuzzel/fuzzel.ini".text = ''
     [main]
-    font=CaskaydiaCove NF:size=9,LXGW WenKai TC:weight=bold:size=9,Noto Serif KR:weight=bold:size=9
+    font=Google Sans Code:size=9,LXGW WenKai TC:weight=bold:size=9,Noto Serif KR:weight=bold:size=9
     prompt="󰅍  Clipboard history: "
     icon-theme=Papirus
 
