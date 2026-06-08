@@ -109,6 +109,7 @@
 
 ## GIAI ĐOẠN 6 — Đuôi dài (khó / proprietary)
 
+- [!] **Noctalia IPC keybinds không hoạt động (2026-06-08):** `Mod+Shift+Q` (sessionMenu) và `Mod+D` (launcher) không trigger được qua niri bind; GUI noctalia vẫn chạy bình thường. Nguyên nhân chưa rõ — có thể IPC socket/path thay đổi sau rebuild, hoặc noctalia-shell chưa register IPC đúng lúc. Investigate khi migrate v5 (IPC có thể được viết lại hoàn toàn → không đáng debug v4).
 - [!] **TASK ƯU TIÊN KẾ TIẾP — nâng cấp Noctalia v4.7.7 → v5.** v5 (2026-06-08) là bản rewrite (Wayland+OpenGL ES, bỏ Quickshell). Đang pin tag `v4.7.7` để desktop chạy. Migrate cần: bỏ pin; đổi binary `noctalia-shell`→`noctalia` (`modules/niri.nix`, ~18 keybind IPC + spawn-at-startup); bỏ `QS_CONFIG_PATH`; bỏ `noctalia.nixosModules.default` khỏi flake; đổi `programs.noctalia-shell`→`programs.noctalia` (`home/nat.nix`); dò lại toàn bộ IPC/wallpaper namespace/launcher theo docs v5 (https://docs.noctalia.dev/v5). Test từng keybind.
 - [x] Fonts proprietary: Google Sans + Google Sans Code + Windows fonts đóng vào `proprietary-fonts` derivation (`fonts/` trong repo). Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove, corefonts.
 - [x] ~~Noctalia settings/colors/plugins declarative bake~~ → BỎ HẾT (user chốt: noctalia tự update palette + quản plugin lúc runtime; bake `plugins.json` thành symlink read-only sẽ chặn bật/tắt plugin trong app). Chỉ giữ `programs.noctalia-shell.enable`. Wallpaper: home.file (làm sau nếu cần).
