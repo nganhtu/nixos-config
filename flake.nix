@@ -30,7 +30,6 @@
       modules = [
         ./hosts/niquesse/configuration.nix
         niri-flake.nixosModules.niri
-        noctalia.nixosModules.default
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
