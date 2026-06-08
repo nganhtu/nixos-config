@@ -116,7 +116,7 @@
         sudo pwd
 
         echo -e "\n[+] Pruning Docker system..."
-        docker system prune -f || true
+        docker system prune -f --volumes || true
         docker network create srm 2>/dev/null || true
         docker network create slc 2>/dev/null || true
 
