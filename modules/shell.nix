@@ -45,7 +45,6 @@
 
       cdc = "cd ~/src/Onschool/SLC";
 
-      nrs = "sudo nixos-rebuild switch --flake ~/nixos-config#Niquesse";
 
       upsync = "update_and_merge_sync";
     };
@@ -116,6 +115,17 @@
         local container="$1"
         shift
         docker compose exec -it --user 1000 "$container" sh "$@"
+      }
+
+      nrs() {
+        local host="Niquesse"
+        while [[ $# -gt 0 ]]; do
+          case "$1" in
+            -h|--hostname) host="$2"; shift 2 ;;
+            *) host="$1"; shift ;;
+          esac
+        done
+        sudo nixos-rebuild switch --flake ~/nixos-config#"$host"
       }
 
       update() {
