@@ -1,4 +1,4 @@
-{ config, pkgs, noctalia-pkg, noctalia-version ? 5, ... }:
+{ config, pkgs, noctalia-pkg, ... }:
 
 {
   imports = [
