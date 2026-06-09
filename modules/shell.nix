@@ -119,6 +119,26 @@
       }
 
       update() {
+        local host="Niquesse"
+
+        while [[ $# -gt 0 ]]; do
+          case "$1" in
+            -h|--hostname)
+              if [[ -n "$2" ]]; then
+                host="$2"
+                shift 2
+              else
+                echo "❌ Lỗi: Cờ $1 yêu cầu tham số hostname."
+                return 1
+              fi
+              ;;
+            *)
+              host="$1"
+              shift
+              ;;
+          esac
+        done
+
         echo -e "\n[+] Requesting sudo access..."
         sudo pwd
 
@@ -136,8 +156,8 @@
         echo -e "\n[+] Updating flake inputs..."
         (cd ~/nixos-config && nix flake update)
 
-        echo -e "\n[+] Rebuilding NixOS..."
-        sudo nixos-rebuild switch --flake ~/nixos-config#Niquesse
+        echo -e "\n[+] Rebuilding NixOS with host: $host..."
+        sudo nixos-rebuild switch --flake ~/nixos-config#"$host"
 
         echo -e "\n[+] Cleaning old generations (giữ 10 bản gần nhất)..."
         sudo nix-env --delete-generations '+10' --profile /nix/var/nix/profiles/system

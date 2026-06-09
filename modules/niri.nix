@@ -1,5 +1,66 @@
-{ config, pkgs, ... }:
+{ config, pkgs, noctalia-pkg ? null, noctalia-version ? 5, ... }:
 
+let
+  ipc = rec {
+    binary = if noctalia-version == 4 then "noctalia-shell" else "noctalia";
+
+    launcher = if noctalia-version == 4
+      then [ binary "ipc" "call" "launcher" "toggle" ]
+      else [ binary "msg" "panel-toggle" "launcher" ];
+
+    lock = if noctalia-version == 4
+      then [ binary "ipc" "call" "lockScreen" "lock" ]
+      else [ binary "msg" "session" "lock" ];
+
+    session = if noctalia-version == 4
+      then [ binary "ipc" "call" "sessionMenu" "toggle" ]
+      else [ binary "msg" "panel-toggle" "session" ];
+
+    vol-up = if noctalia-version == 4
+      then [ binary "ipc" "call" "volume" "increase" ]
+      else [ binary "msg" "volume-up" ];
+
+    vol-down = if noctalia-version == 4
+      then [ binary "ipc" "call" "volume" "decrease" ]
+      else [ binary "msg" "volume-down" ];
+
+    vol-mute = if noctalia-version == 4
+      then [ binary "ipc" "call" "volume" "muteOutput" ]
+      else [ binary "msg" "volume-mute" ];
+
+    mic-mute = if noctalia-version == 4
+      then [ binary "ipc" "call" "volume" "muteInput" ]
+      else [ binary "msg" "mic-mute" ];
+
+    media-next = if noctalia-version == 4
+      then [ binary "ipc" "call" "media" "next" ]
+      else [ binary "msg" "media" "next" ];
+
+    media-prev = if noctalia-version == 4
+      then [ binary "ipc" "call" "media" "previous" ]
+      else [ binary "msg" "media" "previous" ];
+
+    media-toggle = if noctalia-version == 4
+      then [ binary "ipc" "call" "media" "playPause" ]
+      else [ binary "msg" "media" "toggle" ];
+
+    brightness-up = if noctalia-version == 4
+      then [ binary "ipc" "call" "brightness" "increase" ]
+      else [ binary "msg" "brightness-up" ];
+
+    brightness-down = if noctalia-version == 4
+      then [ binary "ipc" "call" "brightness" "decrease" ]
+      else [ binary "msg" "brightness-down" ];
+
+    clipboard = if noctalia-version == 4
+      then [ binary "ipc" "call" "plugin:clipboard" "toggle" ]
+      else [ binary "msg" "panel-toggle" "clipboard" ];
+
+    file-search = if noctalia-version == 4
+      then [ binary "ipc" "call" "plugin:file-search" "toggle" ]
+      else [ "sh" "-c" "sel=$(fd --type f . \"$HOME\" | fuzzel --dmenu) && xdg-open \"$sel\"" ];
+  };
+in
 {
   home.packages = [ pkgs.apple-cursor ];
 
@@ -30,12 +91,14 @@
       SDL_IM_MODULE = "fcitx5";
 
       _JAVA_AWT_WM_NONREPARENTING = "1";
-    };
+    } // (if noctalia-version == 4 then {
+      QS_CONFIG_PATH = "${noctalia-pkg}/share/noctalia-shell";
+    } else {});
 
     xwayland-satellite.path = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
 
     spawn-at-startup = [
-      { command = [ "noctalia" ]; }
+      { command = [ ipc.binary ]; }
       { command = [ "fcitx5" "-d" ]; }
       { command = [ "wl-paste" "--watch" "cliphist" "store" ]; }
     ];
@@ -180,7 +243,7 @@
       };
       "Mod+D" = {
         hotkey-overlay.title = "Open App Launcher: noctalia launcher";
-        action.spawn = [ "noctalia" "msg" "panel-toggle" "launcher" ];
+        action.spawn = ipc.launcher;
       };
       "Mod+B" = {
         hotkey-overlay.title = "Open Browser: Google Chrome";
@@ -188,11 +251,11 @@
       };
       "Mod+Alt+L" = {
         hotkey-overlay.title = "Lock Screen: noctalia lock";
-        action.spawn = [ "noctalia" "msg" "session" "lock" ];
+        action.spawn = ipc.lock;
       };
       "Mod+Shift+Q" = {
         hotkey-overlay.title = "Session Menu: noctalia sessionMenu";
-        action.spawn = [ "noctalia" "msg" "panel-toggle" "session" ];
+        action.spawn = ipc.session;
       };
       "Mod+E" = {
         hotkey-overlay.title = "File Manager: Thunar";
@@ -202,45 +265,45 @@
       # ─── Media controls ───
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "volume-up" ];
+        action.spawn = ipc.vol-up;
       };
       "XF86AudioLowerVolume" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "volume-down" ];
+        action.spawn = ipc.vol-down;
       };
       "XF86AudioMute" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "volume-mute" ];
+        action.spawn = ipc.vol-mute;
       };
       "XF86AudioMicMute" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "mic-mute" ];
+        action.spawn = ipc.mic-mute;
       };
       "XF86AudioNext" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "media" "next" ];
+        action.spawn = ipc.media-next;
       };
       "XF86AudioPrev" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "media" "previous" ];
+        action.spawn = ipc.media-prev;
       };
       "XF86AudioPlay" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "media" "toggle" ];
+        action.spawn = ipc.media-toggle;
       };
       "XF86AudioPause" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "media" "toggle" ];
+        action.spawn = ipc.media-toggle;
       };
 
       # ─── Brightness ───
       "XF86MonBrightnessUp" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "brightness-up" ];
+        action.spawn = ipc.brightness-up;
       };
       "XF86MonBrightnessDown" = {
         allow-when-locked = true;
-        action.spawn = [ "noctalia" "msg" "brightness-down" ];
+        action.spawn = ipc.brightness-down;
       };
 
       # ─── Window/focus ───
@@ -375,15 +438,11 @@
       };
 
       # ─── Clipboard ───
-      "Mod+V".action.spawn = [ "noctalia" "msg" "panel-toggle" "clipboard" ];
+      "Mod+V".action.spawn = ipc.clipboard;
       "Mod+Alt+V".action.spawn = [ "sh" "-c" "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy" ];
 
       # ─── File search ───
-      # noctalia v5 bỏ plugin file-search → thay bằng fd + fuzzel (mở bằng xdg-open).
-      "Mod+Alt+D".action.spawn = [
-        "sh" "-c"
-        "sel=$(fd --type f . \"$HOME\" | fuzzel --dmenu) && xdg-open \"$sel\""
-      ];
+      "Mod+Alt+D".action.spawn = ipc.file-search;
     };
   };
 }

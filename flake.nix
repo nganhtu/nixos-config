@@ -18,12 +18,16 @@
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    noctalia-v4 = {
+      url = "github:noctalia-dev/noctalia-shell/v4.7.7";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, ... }:
+  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, noctalia-v4, ... }:
   let
     system = "x86_64-linux";
-    noctalia-pkg = noctalia.packages.${system}.default;
   in {
     nixosConfigurations.Niquesse = nixpkgs.lib.nixosSystem {
       inherit system;
@@ -36,10 +40,33 @@
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "hm-bak";
           home-manager.users.nat = import ./home/nat.nix;
-          home-manager.extraSpecialArgs = { inherit noctalia-pkg; };
+          home-manager.extraSpecialArgs = {
+            noctalia-pkg = noctalia.packages.${system}.default;
+            noctalia-version = 5;
+          };
           home-manager.sharedModules = [
             noctalia.homeModules.default
           ];
+        }
+      ];
+    };
+
+    nixosConfigurations.Niquesse-v4 = nixpkgs.lib.nixosSystem {
+      inherit system;
+      modules = [
+        ./hosts/niquesse/configuration.nix
+        niri-flake.nixosModules.niri
+        noctalia-v4.nixosModules.default
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.backupFileExtension = "hm-bak";
+          home-manager.users.nat = import ./home/nat.nix;
+          home-manager.extraSpecialArgs = {
+            noctalia-pkg = noctalia-v4.packages.${system}.default;
+            noctalia-version = 4;
+          };
         }
       ];
     };

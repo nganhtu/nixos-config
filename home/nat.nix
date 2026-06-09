@@ -1,4 +1,4 @@
-{ config, pkgs, noctalia-pkg, ... }:
+{ config, pkgs, noctalia-pkg, noctalia-version ? 5, ... }:
 
 {
   imports = [
@@ -27,5 +27,6 @@
   home.file.".docker/cli-plugins/docker-compose".source =
     "${pkgs.docker-compose}/libexec/docker/cli-plugins/docker-compose";
 
-  programs.noctalia.enable = true;
+  programs.noctalia.enable = noctalia-version == 5;
+  programs.noctalia-shell.enable = noctalia-version == 4;
 }
