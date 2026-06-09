@@ -12,10 +12,10 @@
     extraConfig = ''
       modify_font cell_height 110%
       modify_font baseline -1
-      font_features MonaspiceArNF-Regular +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNF-Bold +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNF-Italic +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNF-BoldItalic +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceArNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceArNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceRnNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspiceRnNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
     '';
 
     settings = {
@@ -26,8 +26,8 @@
       inactive_border_color = "#ccccff";
 
       bold_font = "auto";
-      italic_font = "auto";
-      bold_italic_font = "auto";
+      italic_font = "MonaspiceRn NFM Regular";
+      bold_italic_font = "MonaspiceRn NFM Bold";
 
       background_opacity = "0.8";
       dynamic_background_opacity = "yes";
