@@ -2,7 +2,9 @@
 
 {
   # xdg.configFile thay programs.fuzzel: giữ `include` top-level cho noctalia push theme.
-  xdg.configFile."fuzzel/fuzzel.ini".text = ''
+  xdg.configFile."fuzzel/fuzzel.ini" = {
+    force = true;
+    text = ''
     [main]
     font=Google Sans Code:size=9,LXGW WenKai TC:weight=bold:size=9,Noto Serif KR:weight=bold:size=9
     prompt="󰅍  Clipboard history: "
@@ -19,4 +21,5 @@
 
     include=~/.config/fuzzel/themes/noctalia
   '';
+  };
 }
