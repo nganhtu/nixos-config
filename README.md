@@ -52,16 +52,18 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 ## Applying the configuration
 
 ```sh
-# Full rebuild (run from repo root)
-sudo nixos-rebuild switch --flake .#<hostname>
+# Full rebuild
+sudo nixos-rebuild switch --flake ~/nixos-config#<hostname>
 
 # Update all inputs then rebuild
-nix flake update && sudo nixos-rebuild switch --flake .#<hostname>
+(cd ~/nixos-config && nix flake update) && sudo nixos-rebuild switch --flake ~/nixos-config#<hostname>
 
 # Garbage collect old generations
 nix-collect-garbage -d
 sudo nix-collect-garbage -d
 ```
+
+> **Note:** Use `~/nixos-config#<hostname>` (absolute path), not `.#<hostname>`. Running with `sudo` from outside the repo directory will fail because `.` resolves to the wrong path.
 
 The shell function `update [hostname]` wraps all of the above (flake update → rebuild → docker prune → journal vacuum → GC).
 
