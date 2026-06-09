@@ -46,6 +46,7 @@
           };
           home-manager.sharedModules = [
             noctalia.homeModules.default
+            { programs.noctalia.enable = true; }
           ];
         }
       ];
@@ -67,6 +68,10 @@
             noctalia-pkg = noctalia-v4.packages.${system}.default;
             noctalia-version = 4;
           };
+          home-manager.sharedModules = [
+            noctalia-v4.homeModules.default
+            { programs.noctalia-shell.enable = true; }
+          ];
         }
       ];
     };
