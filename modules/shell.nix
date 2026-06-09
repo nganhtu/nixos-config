@@ -142,6 +142,12 @@
         echo -e "\n[+] Requesting sudo access..."
         sudo pwd
 
+        echo -e "\n[+] Updating flake inputs..."
+        (cd ~/nixos-config && nix flake update)
+
+        echo -e "\n[+] Rebuilding NixOS with host: $host..."
+        sudo nixos-rebuild switch --flake ~/nixos-config#"$host"
+
         echo -e "\n[+] Pruning Docker system..."
         docker system prune -f --volumes || true
         docker network create srm 2>/dev/null || true
@@ -152,12 +158,6 @@
 
         echo -e "\n[+] Cleaning systemd journal (keeping last 1 week)..."
         sudo journalctl --vacuum-time=1w
-
-        echo -e "\n[+] Updating flake inputs..."
-        (cd ~/nixos-config && nix flake update)
-
-        echo -e "\n[+] Rebuilding NixOS with host: $host..."
-        sudo nixos-rebuild switch --flake ~/nixos-config#"$host"
 
         echo -e "\n[+] Cleaning old generations (giữ 10 bản gần nhất)..."
         sudo nix-env --delete-generations '+10' --profile /nix/var/nix/profiles/system
