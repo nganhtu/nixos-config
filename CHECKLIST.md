@@ -98,7 +98,7 @@
 - [x] adb + fastboot: `android-tools` trong systemPackages.
 - [x] logind lid switch: ignore cả ba (`HandleLidSwitch`, `HandleLidSwitchExternalPower`, `HandleLidSwitchDocked`).
 - [ ] TLP: tạm bỏ qua (máy tản nhiệt tốt, không cần tinh chỉnh CPU). ppd giữ nguyên.
-- [ ] steam: đợi sau khi dựng nvidia proprietary driver.
+- [x] steam (2026-06-10): `programs.steam.enable` + `hardware.graphics.enable32Bit`. Nvidia proprietary (open kernel module Ampere) qua `hosts/niquesse/nvidia.nix` — PRIME offload (`nvidia-offload %command%`), fine-grained power (dGPU tự ngủ). Bỏ blacklist nouveau. BusID: Intel `PCI:0:2:0`, Nvidia `PCI:1:0:0`. Test `nvidia-smi`/offload OK.
 - [x] App GUI (5b): spotify, discord, libreoffice, pavucontrol, ristretto, postman, parsec-bin, vlc. Gỡ obs (wf-recorder thay thế) + vscode (không hoạt động). Thêm asciinema, wf-recorder, vlc.
 - [x] Dev/LSP/formatters (5c): nil+nixfmt (Nix), jdtls+google-java-format (Java), pyright+ruff (Python), rust-analyzer+rustfmt (Rust), gopls (Go), typescript-language-server+vscode-langservers-extracted+prettier (TS/JS/HTML/CSS/JSON), bash-language-server+shfmt (Bash), lua-language-server (Lua), taplo (TOML), yaml-language-server (YAML), marksman (Markdown), clang-tools (C/C++), dockerfile-language-server (Dockerfile), intelephense+php (PHP). Pyright wire vào Helix languages.toml.
 - [x] Bonus: VAAPI Intel iGPU (intel-media-driver), hàm `screenrec` (wf-recorder hardware encode), NIXOS_OZONE_WL=1 (Chrome Wayland + screen-share qua portal), unmask xdg-desktop-portal.
@@ -113,14 +113,14 @@
 - [x] **Test từng keybind noctalia sau rebuild v5** (2026-06-10): launcher/session/lock/clipboard/volume/brightness/media chạy đúng với cú pháp `noctalia msg`. Issue IPC v4 đã hết.
 - [x] Fonts proprietary: Google Sans + Google Sans Code + Windows fonts đóng vào `proprietary-fonts` derivation (`fonts/` trong repo). Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove, corefonts.
 - [x] ~~Noctalia settings/colors/plugins declarative bake~~ → BỎ HẾT (user chốt: noctalia tự update palette + quản plugin lúc runtime; bake `plugins.json` thành symlink read-only sẽ chặn bật/tắt plugin trong app). Chỉ giữ `programs.noctalia-shell.enable`. Wallpaper: home.file (làm sau nếu cần).
-- [ ] Noctalia calendar: evolution-data-server + override calendarSupport (nếu cần).
+- [x] ~~Noctalia calendar: evolution-data-server~~ → BỎ (user chốt 2026-06-10: khung lịch noctalia đã đủ, không cần đổ event thật).
 - [x] Package khó (2026-06-10): tất cả có sẵn nixpkgs, build OK, đã thêm vào systemPackages. `jetbrains.idea` (LƯU Ý: `idea-ultimate` đã bị rename → `idea`, bản này chính là Ultimate), `jetbrains.phpstorm`, `antigravity` (native, KHÔNG fhs) + `antigravity-cli`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`.
 - [x] File manager (2026-06-10): chuyển từ nnn sang **yazi** (`modules/yazi.nix`, `programs.yazi`). Preview ảnh/video/pdf native qua kitty protocol, không cần plugin/FIFO. Gỡ `modules/nnn.nix` + `assets/nnn/` (605 dòng plugin); dời `EDITOR`/`VISUAL=hx` sang `shell.nix`. Thunar giữ làm GUI fallback.
 - [x] Thunar custom action `kitty --directory %f` (uca.xml qua xdg.configFile — `modules/thunar.nix`). uca.xml read-only → không thêm action qua GUI được nữa.
 - [x] helix.desktop override (`kitty hx`, Terminal=false) qua xdg.desktopEntries (`modules/helix.nix`).
-- [ ] Cân nhắc Stylix cho theme toàn hệ thống (tùy chọn).
-- [ ] Cân nhắc btrfs snapper / impermanence (tùy chọn, nếu dùng btrfs).
-- [ ] **Gỡ XFCE — LÀM SAU CÙNG**, sau khi xong Limine (Giai đoạn 7). Bỏ `desktopManager.xfce.enable`, GIỮ lightdm.
+- [x] ~~Stylix theme toàn hệ thống~~ → BỎ (user chốt 2026-06-10: trùng vai noctalia + theme tay đã đủ, dễ đập nhau với cơ chế runtime).
+- [ ] Cân nhắc btrfs snapper / impermanence (tùy chọn, nếu dùng btrfs). ← GIỮ.
+- [x] ~~Gỡ XFCE~~ → BỎ (user chốt 2026-06-10: giữ XFCE làm desktop dự phòng).
 
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
 
