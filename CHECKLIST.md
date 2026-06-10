@@ -110,11 +110,12 @@
 ## GIAI ĐOẠN 6 — Đuôi dài (khó / proprietary)
 
 - [x] **Migrate Noctalia v4.7.7 → v5 (2026-06-09).** flake input → `github:noctalia-dev/noctalia` (bỏ pin); bỏ `noctalia.nixosModules.default` (v5 chỉ có homeModules); `programs.noctalia-shell`→`programs.noctalia` (`home/nat.nix`); `modules/niri.nix`: bỏ `QS_CONFIG_PATH`, spawn `noctalia`, đổi toàn bộ IPC sang `noctalia msg <command>`. Map IPC lấy từ `noctalia msg --help` của binary thật (xem CLAUDE.md mục 9). **file-search bị bỏ ở v5** → Mod+Alt+D thay bằng `fd | fuzzel | xdg-open`.
-- [ ] **Test từng keybind noctalia sau rebuild v5** (launcher Mod+D, session Mod+Shift+Q, lock Mod+Alt+L, clipboard Mod+V, volume/brightness/media). Issue IPC v4 (Mod+Shift+Q/Mod+D không trigger) cần xác nhận đã hết với cú pháp `noctalia msg` mới.
+- [x] **Test từng keybind noctalia sau rebuild v5** (2026-06-10): launcher/session/lock/clipboard/volume/brightness/media chạy đúng với cú pháp `noctalia msg`. Issue IPC v4 đã hết.
 - [x] Fonts proprietary: Google Sans + Google Sans Code + Windows fonts đóng vào `proprietary-fonts` derivation (`fonts/` trong repo). Cài sẵn: fira-code, inconsolata, lxgw-wenkai, noto-cjk, nerd-fonts.caskaydia-cove, corefonts.
 - [x] ~~Noctalia settings/colors/plugins declarative bake~~ → BỎ HẾT (user chốt: noctalia tự update palette + quản plugin lúc runtime; bake `plugins.json` thành symlink read-only sẽ chặn bật/tắt plugin trong app). Chỉ giữ `programs.noctalia-shell.enable`. Wallpaper: home.file (làm sau nếu cần).
 - [ ] Noctalia calendar: evolution-data-server + override calendarSupport (nếu cần).
-- [~] Package khó — verify 2026-06-07: **TẤT CẢ đã có sẵn nixpkgs, không cần wrap/AppImage**. Cài: `jetbrains.idea-ultimate`, `jetbrains.phpstorm`, `antigravity` (native, KHÔNG fhs) + `antigravity-cli`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`.
+- [x] Package khó (2026-06-10): tất cả có sẵn nixpkgs, build OK, đã thêm vào systemPackages. `jetbrains.idea` (LƯU Ý: `idea-ultimate` đã bị rename → `idea`, bản này chính là Ultimate), `jetbrains.phpstorm`, `antigravity` (native, KHÔNG fhs) + `antigravity-cli`, `github-desktop`, `codex`, `universal-android-debloater`. Bỏ: `payload-dumper-go`, `jetbrains.pycharm`, `jetbrains.webstorm`, `android-studio`.
+- [x] File manager (2026-06-10): chuyển từ nnn sang **yazi** (`modules/yazi.nix`, `programs.yazi`). Preview ảnh/video/pdf native qua kitty protocol, không cần plugin/FIFO. Gỡ `modules/nnn.nix` + `assets/nnn/` (605 dòng plugin); dời `EDITOR`/`VISUAL=hx` sang `shell.nix`. Thunar giữ làm GUI fallback.
 - [x] Thunar custom action `kitty --directory %f` (uca.xml qua xdg.configFile — `modules/thunar.nix`). uca.xml read-only → không thêm action qua GUI được nữa.
 - [x] helix.desktop override (`kitty hx`, Terminal=false) qua xdg.desktopEntries (`modules/helix.nix`).
 - [ ] Cân nhắc Stylix cho theme toàn hệ thống (tùy chọn).
