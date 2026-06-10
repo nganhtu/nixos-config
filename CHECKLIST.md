@@ -65,7 +65,6 @@
 
 **Tồn (chuyển sang phase sau / quan sát):**
 - Brightness keys (XF86MonBrightnessUp/Down) không emit trên laptop này — bind vẫn để, im lặng.
-- Mod+Shift+Tab recent-windows.binds chưa thêm (action `previous-window` cần recent-windows mode, niri-flake schema chưa rõ — defer).
 
 **Xong khi:** ✅ niri hành xử giống hệt CachyOS cũ — keybind, layout, animation, screenshot, clipboard, launcher đều chạy.
 
