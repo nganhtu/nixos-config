@@ -147,6 +147,13 @@ in
     clang-tools
     dockerfile-language-server
     intelephense php
+
+    # IDE & tools nặng (Giai đoạn 6)
+    jetbrains.idea jetbrains.phpstorm
+    antigravity antigravity-cli
+    github-desktop
+    codex
+    universal-android-debloater
   ];
 
   programs.thunar = {
