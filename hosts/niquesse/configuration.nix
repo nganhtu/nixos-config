@@ -8,11 +8,7 @@ let
   '';
 in
 {
-  imports = [ ./hardware-configuration.nix ];
-
-  # Nvidia dGPU: nouveau Vulkan deadlock làm treo compositor lúc khởi động.
-  # Tạm tắt cả dGPU; Stage 5 sẽ thay bằng nvidia proprietary nếu cần Steam.
-  boot.blacklistedKernelModules = [ "nouveau" ];
+  imports = [ ./hardware-configuration.nix ./nvidia.nix ];
 
   # Bootloader
   boot.loader.efi.canTouchEfiVariables = true;
@@ -92,6 +88,9 @@ in
 
   # VAAPI cho Intel Alder Lake iGPU: hardware encode (wf-recorder) + decode (VLC/Chrome).
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
+  hardware.graphics.enable32Bit = true;
+
+  programs.steam.enable = true;
 
   # Gập máy không suspend (cả khi dùng pin, cắm sạc, lẫn docked).
   services.logind.settings.Login = {
