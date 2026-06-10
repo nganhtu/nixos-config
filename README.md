@@ -11,7 +11,7 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 | Shell / bar | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) |
 | Terminal | Kitty |
 | Editor | Helix |
-| File manager | nnn (+ preview-tui) / Thunar |
+| File manager | yazi / Thunar |
 | Launcher | Fuzzel |
 | Input method | Fcitx5 + Bamboo (Vietnamese) |
 | GTK theme | adw-gtk3 |
@@ -37,12 +37,11 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 │   ├── theme.nix              # GTK theme, cursor, icon theme, system font
 │   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
 │   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
-│   ├── nnn.nix                # nnn file manager + preview-tui/fzopen/opener plugins
+│   ├── yazi.nix               # yazi file manager (native image preview)
 │   └── claude.nix             # Claude Code statusline
 └── assets/
     ├── shell/themes/          # oh-my-zsh custom theme
     ├── claude/                # statusline script
-    ├── nnn/plugins/           # nnn plugin scripts (preview-tui, fzopen, opener)
     └── fonts/
         ├── google-sans/       # Google Sans (OFL)
         ├── google-sans-code/  # Google Sans Code (OFL)
