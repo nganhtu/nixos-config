@@ -5,7 +5,7 @@
     enable = true;
 
     font = {
-      name = "MonaspiceAr Nerd Font";
+      name = "MonaspiceAR NFM";
       size = 12;
     };
 
@@ -19,7 +19,7 @@
     '';
 
     settings = {
-      # nnn preview-tui: kitty split + icat image preview
+      # kitty remote control (socket riêng mỗi instance)
       allow_remote_control = "yes";
       listen_on = "unix:/tmp/kitty%i";
       active_border_color = "#ccccff";
@@ -34,6 +34,7 @@
       confirm_os_window_close = 0;
 
       cursor_trail = 1;
+      mouse_hide_wait = "-1.0";
 
       linux_display_server = "auto";
 
