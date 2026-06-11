@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'slc-api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      # Native: đổi từ 'slc-be:8080' (tên service docker) sang localhost.
+      - targets: ['localhost:8080']
