@@ -19,9 +19,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, ... }:
+  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, agenix, ... }:
   let
     system = "x86_64-linux";
   in {
@@ -30,6 +35,7 @@
       modules = [
         ./hosts/niquesse/configuration.nix
         niri-flake.nixosModules.niri
+        agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
@@ -37,6 +43,7 @@
           home-manager.users.nat = import ./home/nat.nix;
           home-manager.extraSpecialArgs = {
             noctalia-pkg = noctalia.packages.${system}.default;
+            agenix-pkg = agenix.packages.${system}.default;
           };
           home-manager.sharedModules = [
             noctalia.homeModules.default

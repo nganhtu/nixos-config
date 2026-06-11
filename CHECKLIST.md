@@ -120,6 +120,10 @@
 - [x] ~~Stylix theme toàn hệ thống~~ → BỎ (user chốt 2026-06-10: trùng vai noctalia + theme tay đã đủ, dễ đập nhau với cơ chế runtime).
 - [ ] Cân nhắc btrfs snapper / impermanence (tùy chọn, nếu dùng btrfs). ← GIỮ.
 - [x] ~~Gỡ XFCE~~ → BỎ (user chốt 2026-06-10: giữ XFCE làm desktop dự phòng).
+- [x] Tiện ích (2026-06-11):
+  - **mangohud** — overlay FPS/GPU/nhiệt lúc chơi. Bật trong game: Steam launch option `nvidia-offload mangohud %command%`; toggle overlay `Shift_R+F12`.
+  - **nh** — thay lệnh rebuild hằng ngày: `nh os switch` (hiện diff cây trước khi switch), `nh clean all` (GC). Mặc định trỏ flake này.
+  - **agenix** — khung quản secret mã hoá trong repo (khung dựng sẵn, secret thật thêm sau): điền pubkey vào `secrets/secrets.nix` rồi `agenix -e <tên>.age`.
 
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
 

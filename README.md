@@ -38,7 +38,10 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 │   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
 │   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
 │   ├── yazi.nix               # yazi file manager (native image preview)
+│   ├── mangohud.nix           # in-game FPS / GPU / temp overlay
 │   └── claude.nix             # Claude Code statusline
+├── secrets/
+│   └── secrets.nix            # agenix rules file (recipient pubkeys per secret)
 └── assets/
     ├── shell/themes/          # oh-my-zsh custom theme
     ├── claude/                # statusline script
@@ -65,6 +68,13 @@ sudo nix-collect-garbage -d
 > **Note:** Use `~/nixos-config#<hostname>` (absolute path), not `.#<hostname>`. Running with `sudo` from outside the repo directory will fail because `.` resolves to the wrong path.
 
 The shell function `update [hostname]` wraps all of the above (flake update → rebuild → docker prune → journal vacuum → GC).
+
+[`nh`](https://github.com/nix-community/nh) is also installed for day-to-day rebuilds — `nh os switch` (shows a package diff before activating), `nh clean all` for GC. It defaults to this flake via `programs.nh.flake`.
+
+### Extras
+
+- **[mangohud](https://github.com/flightlessmango/MangoHud)** — in-game FPS/GPU/temperature overlay. Add `mangohud %command%` (or `nvidia-offload mangohud %command%`) to a Steam game's launch options; toggle the overlay with `Shift_R+F12`.
+- **[agenix](https://github.com/ryantm/agenix)** — encrypted secrets committed to the repo. Recipient public keys live in `secrets/secrets.nix`; edit/create a secret with `agenix -e <name>.age`. (No real secrets stored yet — scaffold only.)
 
 ### Noctalia version
 

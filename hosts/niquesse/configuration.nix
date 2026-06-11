@@ -104,6 +104,13 @@ in
 
   programs.zsh.enable = true;
 
+  programs.nh = {
+    enable = true;
+    flake = "/home/nat/nixos-config";
+    clean.enable = true;
+    clean.extraArgs = "--keep 5 --keep-since 7d";
+  };
+
   users.users.nat = {
     isNormalUser = true;
     description = "Natyusha";
