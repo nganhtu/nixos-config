@@ -35,10 +35,13 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 │   ├── btop.nix               # system monitor (nord theme)
 │   ├── fuzzel.nix             # launcher (noctalia runtime colors via include)
 │   ├── theme.nix              # GTK theme, cursor, icon theme, system font
-│   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
+│   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions + zoxide + lazygit (delta pager)
 │   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
 │   ├── yazi.nix               # yazi file manager (native image preview)
+│   ├── mangohud.nix           # in-game FPS / GPU / temp overlay
 │   └── claude.nix             # Claude Code statusline
+├── secrets/
+│   └── secrets.nix            # agenix rules file (recipient pubkeys per secret)
 └── assets/
     ├── shell/themes/          # oh-my-zsh custom theme
     ├── claude/                # statusline script
@@ -66,14 +69,18 @@ sudo nix-collect-garbage -d
 
 The shell function `update [hostname]` wraps all of the above (flake update → rebuild → docker prune → journal vacuum → GC).
 
-### Noctalia version
+[`nh`](https://github.com/nix-community/nh) is also installed for day-to-day rebuilds — `nh os switch` (shows a package diff before activating), `nh clean all` for GC. It defaults to this flake via `programs.nh.flake`.
 
-Two configurations are maintained:
+### Extras
 
-| Config | Noctalia | Command |
-|---|---|---|
-| `Niquesse` | v5 (latest) | `sudo nixos-rebuild switch --flake .#Niquesse` |
-| `Niquesse-v4` | v4.7.7 (pinned) | `sudo nixos-rebuild switch --flake .#Niquesse-v4` |
+- **[mangohud](https://github.com/flightlessmango/MangoHud)** — in-game FPS/GPU/temperature overlay. Add `mangohud %command%` (or `nvidia-offload mangohud %command%`) to a Steam game's launch options; toggle the overlay with `Shift_R+F12`.
+- **[agenix](https://github.com/ryantm/agenix)** — encrypted secrets committed to the repo. Recipient public keys live in `secrets/secrets.nix`; edit/create a secret with `agenix -e <name>.age`. (No real secrets stored yet — scaffold only.)
+
+### Noctalia
+
+Single configuration `Niquesse`, running **Noctalia v5** (`programs.noctalia`, home module
+only). Colors are managed at runtime by Noctalia (auto-derived from wallpaper) and are not baked
+into Nix. The old v4.7.7-pinned `Niquesse-v4` config has been dropped.
 
 ## Key bindings
 

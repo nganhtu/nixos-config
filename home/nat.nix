@@ -1,4 +1,4 @@
-{ config, pkgs, noctalia-pkg, ... }:
+{ config, pkgs, noctalia-pkg, agenix-pkg, ... }:
 
 {
   imports = [
@@ -12,6 +12,7 @@
     ../modules/shell.nix
     ../modules/thunar.nix
     ../modules/yazi.nix
+    ../modules/mangohud.nix
   ];
 
   home.username = "nat";
@@ -20,7 +21,7 @@
 
   programs.home-manager.enable = true;
 
-  home.packages = [ noctalia-pkg ];
+  home.packages = [ noctalia-pkg agenix-pkg ];
 
   # `docker compose` v2 plugin: docker CLI chỉ tìm trong ~/.docker/cli-plugins
   # (các path /usr/... không có trên NixOS).

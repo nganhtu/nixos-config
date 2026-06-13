@@ -35,6 +35,7 @@
   - nvme0n1p3 → vfat 4GB UUID `B34C-B10B` → `/boot` (ESP NixOS, hiện 4% dùng)
   - **(Lịch sử)** Bản cài đầu (2026-05-24) dùng UUID `e99b7bcd-aa2c-4ecf-ba65-c24d65a148b1` (root) + `61DD-4ABF` (boot) + subvol `@`/`@home`. User cài lại NixOS ngày 2026-06-06, layout/UUID thay đổi như trên.
 - ESP Windows (ổ 1 nvme1n1) và bootloader NixOS (ổ 2 nvme0n1) ở **2 ổ vật lý khác nhau** → cô lập tốt. Hiện đang dùng GRUB+os-prober nên không vấn đề.
+- **GRUB cài vào đường dẫn fallback removable** (`efiInstallAsRemovable = true` + `canTouchEfiVariables = false`, từ 2026-06-13): ghi vào `\EFI\BOOT\BOOTX64.EFI` trên ESP NixOS thay vì tạo entry NVRAM tên `nixos`. Lý do: Lenovo Vantage update BIOS có thể xoá sạch NVRAM → mất entry boot; fallback path firmware luôn boot được kể cả khi NVRAM trống. Hai option này loại trừ nhau (removable bỏ qua efibootmgr nên không được phép đụng EFI vars). An toàn vì ESP NixOS ở ổ riêng, không đè lên fallback của Windows (ổ khác).
 - **Tuyệt đối không format/đụng** các phân vùng ntfs (Windows). Chỉ thao tác trên nvme0n1p2 và nvme0n1p3.
 - **Cần làm trong Windows (nhắc user, Claude Code không làm được):** tắt Fast Startup; cân nhắc tắt BitLocker / lưu recovery key.
 - **Đồng hồ lệch dual-boot:** đặt `time.hardwareClockInLocalTime = true;` trong NixOS HOẶC RTC=UTC trong Windows.
