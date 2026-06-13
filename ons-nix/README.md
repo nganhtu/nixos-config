@@ -1,35 +1,42 @@
-# ons-nix — devenv thay cho ons-docker (môi trường dev)
+# ons-nix — môi trường dev cho Onschool (devenv thay ons-docker)
 
-Bản dịch workflow `ons-docker` sang **devenv + direnv** cho máy NixOS. Mỗi project là một
-thư mục self-contained (`.envrc` + `devenv.yaml` + `devenv.nix`), copy đè vào repo tương ứng
-trong `~/src/Onschool` y như cách dùng `ons-docker`.
+Mỗi project Onschool có một thư mục self-contained ở đây: `.envrc` + `devenv.yaml` + `devenv.nix`
+(+ `.env.age` nếu cần secret). Copy thư mục đè vào repo tương ứng trong `~/src/Onschool`, môi
+trường dev (PHP/Node/JDK + deps) **tự dựng bằng Nix khi `cd` vào** — không cần Docker, deps nằm
+thẳng trên host nên LSP chạy luôn.
 
-## Khác gì so với Docker
+Quen tay ons-docker: `docobuild` → khỏi cần · `docodul` → `devenv up` · `docobash` → `cd` là vào sẵn.
 
-| | ons-docker | ons-nix (devenv) |
-|---|---|---|
-| Build | `docobuild` | không cần (Nix tự dựng khi `cd`) |
-| Chạy | `docodul` | `devenv up` |
-| Vào shell | `docobash <svc>` | `cd` là vào sẵn (direnv) |
-| Deps host | `docker cp vendor` ra host | nằm thẳng trên host, uid của bạn → LSP chạy luôn |
+## Yêu cầu
 
-## Dùng thế nào
+- NixOS với `direnv` và `agenix` (đã có trong config Niquesse).
+- `~/.ssh/id_ed25519` — identity để giải mã `.env` (xem [Secrets](#secrets-env)).
+
+## Thiết lập một project
 
 ```bash
-# 1 lần cho mỗi project, sau khi copy file vào repo:
-cd <project>
-direnv allow            # cho phép tự kích hoạt môi trường
+# 1. copy thư mục project vào repo Onschool tương ứng
+cp -rT ons-nix/SRM/general ~/src/Onschool/SRM/general
 
-# Laravel backend — thiết lập lần đầu (key + passport):
-bootstrap               # script định nghĩa trong devenv.nix (chỉ các BE Laravel có)
+# 2. tạo .env từ bản mã hoá (xem Secrets) — hoặc bung cả loạt một lần:
+#    ./decrypt-env.sh ~/src/Onschool
 
-# Chạy dev server (+ service như redis/prometheus/grafana nếu có):
+# 3. kích hoạt môi trường (chỉ cần 1 lần cho mỗi project)
+cd ~/src/Onschool/SRM/general
+direnv allow
+
+# 4. Laravel BE — thiết lập lần đầu (app key + passport); chỉ project có script này
+bootstrap
+
+# 5. chạy dev server (+ redis/prometheus/grafana nếu project khai báo)
 devenv up
 ```
 
-## Project nào Nix, project nào giữ Docker
+Sau bước `direnv allow`, mỗi lần `cd` vào là môi trường tự sẵn sàng.
 
-**→ devenv (trong repo này):**
+## Project & runtime
+
+Dùng devenv (trong repo này):
 
 | Project | Runtime | Nguồn | Cổng |
 |---|---|---|---|
@@ -46,39 +53,23 @@ devenv up
 | SRM/srm-v1-fe | node14 | nixpkgs pin `nixos-22.05` | 3000 |
 | SRM/srm-gpu-v1-fe | node14 | nixpkgs pin `nixos-22.05` | 3000 |
 
-**→ giữ Docker (vẫn dùng `ons-docker`):**
+Giữ Docker (vẫn chạy bằng ons-docker):
 
 | Project | Lý do |
 |---|---|
-| SLC/student-oas-dashboard | stack 9-service (postgres/pgbouncer/valkey/minio/prometheus/grafana/nginx) — compose đúng việc |
+| SLC/student-oas-dashboard | stack 9 service (postgres/pgbouncer/valkey/minio/prometheus/grafana/nginx) — compose hợp hơn |
 
-## Lưu ý
+## Secrets (.env)
 
-- **`.env` carry ở đây dạng mã hoá** (`*.env.age`, agenix) vì `.env.example` trong các repo
-  Onschool đã lỗi thời. Bản đang chạy lấy từ `ons-docker`, mã hoá bằng agenix nên commit được
-  an toàn (chứa `DB_PASSWORD`, `JWT_SECRET`). Recipient key ở `ons-nix/secrets.nix`.
-  `registration-form/web-application` không có (dùng `config.php`).
-- **Giải mã khi triển khai:** chạy `./decrypt-env.sh <đường-dẫn-repo-Onschool>` để bung
-  `.env.age` → `.env` thẳng vào repo đích (hoặc không tham số = giải mã tại chỗ). Cần
-  `~/.ssh/id_ed25519` (identity đã mã hoá). Sửa secret: `agenix -e <proj>/.env.age`.
-- **`.env` plaintext bị `.gitignore`** ở đây — chỉ `.env.age` được track, không bao giờ lọt
-  plaintext vào git.
-- **Thêm vào `.gitignore` của mỗi repo Onschool:** `.devenv*`, `.direnv`, `devenv.local.nix`, `.env`.
-  (Không đặt sẵn `.gitignore` ở đây để khỏi đè `.gitignore` gốc của project khi copy.)
+`.env` thật (chứa `DB_PASSWORD`, `JWT_SECRET`…) được mã hoá bằng **agenix** thành `*.env.age` nên
+commit an toàn. Recipient key khai báo trong `secrets.nix`, giải mã bằng `~/.ssh/id_ed25519`.
 
-## CHECKLIST verify trên máy NixOS (chưa chạy thử được khi scaffold)
+```bash
+./decrypt-env.sh ~/src/Onschool   # bung tất cả .env.age → .env vào cây Onschool
+./decrypt-env.sh                  # bung tại chỗ (trong ons-nix)
+agenix -e SRM/general/.env.age    # sửa / tạo secret (chạy từ thư mục có secrets.nix)
+```
 
-- [ ] **PHP insecure:** php8.0/8.1 bị nixpkgs đánh dấu insecure. Đã xử bằng
-      `config.allowInsecurePredicate = _: true` khi import nixpkgs. Nếu vẫn chặn → kiểm tra
-      `nix-phps` có cung cấp `overlays.default` đúng tên không.
-- [ ] **Tên extension PHP:** `withExtensions` dùng tên `pdo_mysql`, `pdo_pgsql`, `bcmath`,
-      `gd`, `zip`, `mbstring`, `exif`, `pcntl`. Verify khớp attr trong nix-phps.
-- [ ] **composer:** đến từ `languages.php`. Nếu thiếu, thêm vào `packages`.
-- [ ] **node14 attr:** đang dùng `nodejs-14_x` (nixos-22.05). Nếu lỗi → đổi `nodejs_14`.
-- [ ] **node18 attr:** `nodejs_18` (nixos-24.11) — verify build.
-- [ ] **api-gateway:** đã sửa target prometheus `slc-be:8080` → `localhost:8080`. Lệnh grafana
-      (`grafana server …`) cần verify cú pháp với bản grafana trong nixpkgs.
-- [ ] **Cổng artisan serve:** đã đặt theo cổng host docker publish. Đối chiếu lại nếu app
-      đọc cổng từ `.env`.
-- [ ] **frontend deps:** `webpack@4` + `flatpickr` (web-application, srm2-tmu-fe) phải có sẵn
-      trong `package.json` — Docker cũ `npm install --save` thêm lúc build.
+- Plaintext `.env` bị `.gitignore` ở đây — chỉ `.env.age` được track.
+- `registration-form/web-application` không dùng `.env` (cấu hình trong `config.php`).
+- Trong mỗi repo Onschool, nhớ `.gitignore`: `.devenv*`, `.direnv`, `devenv.local.nix`, `.env`.
