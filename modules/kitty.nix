@@ -26,8 +26,8 @@
       inactive_border_color = "#ccccff";
 
       bold_font = "auto";
-      italic_font = "MonaspiceRn NFM Regular";
-      bold_italic_font = "MonaspiceRn NFM Bold";
+      italic_font = "postscript_name=MonaspiceRnNFM-Regular";
+      bold_italic_font = "postscript_name=MonaspiceRnNFM-Bold";
 
       background_opacity = "0.8";
       dynamic_background_opacity = "yes";
