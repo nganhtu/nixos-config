@@ -1,0 +1,2 @@
+# Plaintext secret giải mã ra — chỉ commit .env.age (ciphertext), không bao giờ .env
+.env

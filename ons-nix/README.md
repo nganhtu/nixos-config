@@ -54,9 +54,16 @@ devenv up
 
 ## Lưu ý
 
-- **`.env` không quản ở đây.** Vẫn để như cũ (file copy kèm, quản ở `ons-docker`). ons-nix
-  không carry `.env` nên không đè lên `.env` sẵn có trong repo.
-- **Thêm vào `.gitignore` của mỗi repo Onschool:** `.devenv*`, `.direnv`, `devenv.local.nix`.
+- **`.env` carry ở đây dạng mã hoá** (`*.env.age`, agenix) vì `.env.example` trong các repo
+  Onschool đã lỗi thời. Bản đang chạy lấy từ `ons-docker`, mã hoá bằng agenix nên commit được
+  an toàn (chứa `DB_PASSWORD`, `JWT_SECRET`). Recipient key ở `ons-nix/secrets.nix`.
+  `registration-form/web-application` không có (dùng `config.php`).
+- **Giải mã khi triển khai:** chạy `./decrypt-env.sh <đường-dẫn-repo-Onschool>` để bung
+  `.env.age` → `.env` thẳng vào repo đích (hoặc không tham số = giải mã tại chỗ). Cần
+  `~/.ssh/id_ed25519` (identity đã mã hoá). Sửa secret: `agenix -e <proj>/.env.age`.
+- **`.env` plaintext bị `.gitignore`** ở đây — chỉ `.env.age` được track, không bao giờ lọt
+  plaintext vào git.
+- **Thêm vào `.gitignore` của mỗi repo Onschool:** `.devenv*`, `.direnv`, `devenv.local.nix`, `.env`.
   (Không đặt sẵn `.gitignore` ở đây để khỏi đè `.gitignore` gốc của project khi copy.)
 
 ## CHECKLIST verify trên máy NixOS (chưa chạy thử được khi scaffold)
