@@ -5,8 +5,6 @@ Mỗi project Onschool có một thư mục self-contained ở đây: `.envrc` +
 trường dev (PHP/Node/JDK + deps) **tự dựng bằng Nix khi `cd` vào** — không cần Docker, deps nằm
 thẳng trên host nên LSP chạy luôn.
 
-Quen tay ons-docker: `docobuild` → khỏi cần · `docodul` → `devenv up` · `docobash` → `cd` là vào sẵn.
-
 ## Yêu cầu
 
 - NixOS với `direnv` và `agenix` (đã có trong config Niquesse).
@@ -33,6 +31,25 @@ devenv up
 ```
 
 Sau bước `direnv allow`, mỗi lần `cd` vào là môi trường tự sẵn sàng.
+
+## Lệnh thường ngày (quen tay ons-docker)
+
+Khác mô hình: `devenv up` chạy **foreground** (không như `docodul` = `up -d`), dùng
+**process-compose** làm trình quản process — bật lên là thấy TUI với log của mọi process.
+
+| ons-docker | devenv | Ghi chú |
+|---|---|---|
+| `docobuild` | — | Nix tự dựng khi `cd` vào, không có bước build |
+| `docodul` (`up -d`) | `devenv up` | foreground + TUI log; thêm `-d` để chạy nền |
+| `doco logs -f` | (có sẵn) | `devenv up` đã stream log trong TUI; nếu chạy `-d` thì `process-compose attach` để vào lại |
+| `doco down` | `Ctrl+C` *hoặc* `devenv processes down` | foreground: Ctrl+C; chạy nền: `processes down` |
+| `docobash <svc>` | `cd` | direnv đưa vào sẵn shell môi trường |
+
+Trong TUI process-compose: chọn từng process xem/scroll log riêng, restart lẻ một process.
+
+`down` của devenv chỉ **dừng process**, không xoá gì. State của service (redis/postgres trong
+`services.*`) nằm ở `.devenv/state/…`. Muốn reset sạch (tương đương `down -v`): tắt rồi
+`rm -rf .devenv`.
 
 ## Project & runtime
 
