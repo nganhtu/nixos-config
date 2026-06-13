@@ -10,13 +10,16 @@ in
 {
   imports = [ ./hardware-configuration.nix ./nvidia.nix ];
 
-  # Bootloader
-  boot.loader.efi.canTouchEfiVariables = true;
+  # Bootloader — cài vào đường dẫn fallback removable (\EFI\BOOT\BOOTX64.EFI) để
+  # vẫn boot được nếu Lenovo Vantage update BIOS xoá sạch NVRAM. Removable loại trừ
+  # với canTouchEfiVariables nên phải tắt cái sau.
+  boot.loader.efi.canTouchEfiVariables = false;
   boot.loader.timeout = 3;
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
+    efiInstallAsRemovable = true;
     useOSProber = true;
     configurationLimit = 10;
     default = "saved";
@@ -131,7 +134,7 @@ in
     android-tools
 
     # CLI tools (Giai đoạn 4)
-    lsd bat tealdeer dust gdu ncdu fzf ripgrep fd fastfetch tmux htop glab
+    lsd bat tealdeer dust gdu ncdu fzf ripgrep fd fastfetch tmux htop glab delta
     nvtopPackages.intel
     asciinema wf-recorder vlc
     ueberzugpp imagemagick

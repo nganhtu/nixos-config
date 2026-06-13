@@ -35,7 +35,7 @@ NixOS configuration for a laptop running **niri** (tiling Wayland compositor) wi
 │   ├── btop.nix               # system monitor (nord theme)
 │   ├── fuzzel.nix             # launcher (noctalia runtime colors via include)
 │   ├── theme.nix              # GTK theme, cursor, icon theme, system font
-│   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions
+│   ├── shell.nix              # zsh + oh-my-zsh (natys theme) + aliases + functions + zoxide + lazygit (delta pager)
 │   ├── thunar.nix             # Thunar custom action "Open Kitty Here"
 │   ├── yazi.nix               # yazi file manager (native image preview)
 │   ├── mangohud.nix           # in-game FPS / GPU / temp overlay

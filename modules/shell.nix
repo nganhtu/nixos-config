@@ -6,6 +6,16 @@
     VISUAL = "hx";
   };
 
+  programs.zoxide.enable = true;
+
+  programs.lazygit = {
+    enable = true;
+    settings.git.paging = {
+      colorArg = "always";
+      pager = "delta --paging=never";
+    };
+  };
+
   programs.zsh = {
     enable = true;
 
