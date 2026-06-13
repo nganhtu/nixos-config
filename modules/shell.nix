@@ -10,10 +10,12 @@
 
   programs.lazygit = {
     enable = true;
-    settings.git.paging = {
-      colorArg = "always";
-      pager = "delta --paging=never";
-    };
+    settings.git.pagers = [
+      {
+        colorArg = "always";
+        pager = "delta --paging=never";
+      }
+    ];
   };
 
   programs.zsh = {
