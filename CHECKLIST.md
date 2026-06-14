@@ -129,15 +129,15 @@
 
 ---
 
-## GIAI ĐOẠN 7 — (Tùy chọn) Quay lại Limine
+## GIAI ĐOẠN 7 — Bootloader modern (Limine / systemd-boot)
 
-- [ ] Chỉ làm nếu user muốn bỏ GRUB. Hiện GRUB+os-prober chạy tốt, không bắt buộc.
-- [ ] Đọc `/boot` config GRUB sinh ra để hiểu layout, rồi `sudo cat` file limine.conf mẫu để lấy đúng cú pháp path.
-- [ ] Limine chainload Windows: thử `protocol: efi_chainload`, path theo PARTUUID (lấy `lsblk -o NAME,PARTUUID /dev/nvme0n1`) thay vì FS UUID `1EC6-4D7E`. Verify cú pháp bằng file limine.conf thật, KHÔNG đoán.
-- [ ] `maxGenerations` giới hạn (/boot 4GB).
-- [ ] Test boot cả NixOS lẫn Windows. Đường lui: F12 firmware menu luôn boot Windows được.
+- [x] **CHỐT 2026-06-14: GIỮ GRUB.** Đã cân nhắc cả Limine lẫn systemd-boot; cả hai đều thua GRUB cho layout 2 ESP ở 2 ổ:
+  - **Limine:** lần trước chainload Windows → **panic** (xem CLAUDE.md mục 2).
+  - **systemd-boot:** chỉ quét ESP của chính nó (+ XBOOTLDR) → **KHÔNG thấy Windows** vì Windows ESP ở ổ riêng `nvme1n1`. Đổi sang = mất entry Windows trong menu (phải F12). Chainload Windows ở ổ khác từ systemd-boot rất lằng nhằng.
+  - **GRUB + os-prober** quét cross-disk → tự thấy Windows; đúng việc nhất. "Modern" không bù lại được mất Windows trong menu.
+- [ ] (Để ngỏ) Nếu sau này gỡ Windows / dồn về 1 ESP → cân nhắc lại systemd-boot.
 
-**Xong khi:** menu Limine chọn được cả 2 OS, HOẶC user quyết định giữ GRUB.
+**Xong khi:** ✅ user quyết định giữ GRUB (2026-06-14).
 
 ---
 

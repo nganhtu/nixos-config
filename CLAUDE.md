@@ -199,4 +199,4 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 5. JetBrains/Antigravity: có license không, có cần canary/EAP không, hay tạm bỏ?
 6. File font proprietary (Google Sans, MS, Cascadia) trên Drive — user cung cấp file để đóng gói.
 7. Username thật (cho `users.users.<u>` và `home-manager.users.<u>`).
-8. Giai đoạn 7 (quay lại Limine): có muốn làm không, hay giữ GRUB?
+8. ~~Giai đoạn 7 (quay lại Limine): có muốn làm không, hay giữ GRUB?~~ → **ĐÃ CHỐT (2026-06-14): GIỮ GRUB.** Limine từng panic; systemd-boot không thấy Windows cross-disk (Windows ESP ở ổ riêng `nvme1n1`). GRUB+os-prober quét cross-disk là đúng việc cho layout 2 ESP/2 ổ.
