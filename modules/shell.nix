@@ -159,13 +159,8 @@
         echo -e "\n[+] Cleaning systemd journal (keeping last 1 week)..."
         sudo journalctl --vacuum-time=1w
 
-        echo -e "\n[+] Cleaning old generations (giữ 10 bản gần nhất)..."
-        sudo nix-env --delete-generations '+10' --profile /nix/var/nix/profiles/system
-        nix-env --delete-generations '+10' --profile "$HOME/.local/state/nix/profiles/home-manager" 2>/dev/null || true
-
-        echo -e "\n[+] Collecting nix garbage (store paths không tham chiếu)..."
-        nix-collect-garbage
-        sudo nix-collect-garbage
+        echo -e "\n[+] Dọn generation cũ + GC (nh clean, giữ 10 bản)..."
+        nh clean all --keep 10
 
         echo -e "\n[✔] All tasks completed successfully."
       }

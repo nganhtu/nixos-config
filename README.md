@@ -67,9 +67,11 @@ sudo nix-collect-garbage -d
 
 > **Note:** Use `~/nixos-config#<hostname>` (absolute path), not `.#<hostname>`. Running with `sudo` from outside the repo directory will fail because `.` resolves to the wrong path.
 
-The shell function `update [hostname]` wraps all of the above (flake update → rebuild → docker prune → journal vacuum → GC).
+The shell functions `nrs` and `update` both rebuild via `nh os switch`. `update` also wraps flake update → rebuild → docker prune → journal vacuum → GC (`nh clean all`).
 
-[`nh`](https://github.com/nix-community/nh) is also installed for day-to-day rebuilds — `nh os switch` (shows a package diff before activating), `nh clean all` for GC. It defaults to this flake via `programs.nh.flake`.
+[`nh`](https://github.com/nix-community/nh) wraps nixos-rebuild: `nh os switch` shows a package diff before activating and renders build output with nix-output-monitor; `nh clean all` is unified GC (also run weekly by `programs.nh.clean`). Defaults to this flake via `programs.nh.flake`.
+
+**Debugging a failed build:** nh doesn't hide logs — nix still prints the failing derivation's last log lines, and the full log is always retrievable with `nix log <drv>`. If the nix-output-monitor live tree gets in the way, add `--no-nom` for plain output (`nh os switch --no-nom`), `-v`/`-vv` for more verbosity, or fall back to `sudo nixos-rebuild switch --flake ~/nixos-config#<hostname>`.
 
 ### Extras
 

@@ -111,7 +111,7 @@ in
     enable = true;
     flake = "/home/nat/nixos-config";
     clean.enable = true;
-    clean.extraArgs = "--keep 5 --keep-since 7d";
+    clean.extraArgs = "--keep 10";
   };
 
   users.users.nat = {
