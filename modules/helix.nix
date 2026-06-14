@@ -43,10 +43,27 @@
     };
 
     languages = {
-      # Helix 25.07 mặc định python dùng ty/ruff, không có pyright → wire lại.
-      language-server.pyright = {
-        command = "pyright-langserver";
-        args = [ "--stdio" ];
+      language-server = {
+        # Helix 25.07 mặc định python dùng ty/ruff, không có pyright → wire lại.
+        pyright = {
+          command = "pyright-langserver";
+          args = [ "--stdio" ];
+        };
+        nixd.command = "nixd";
+        phpactor = {
+          command = "phpactor";
+          args = [ "language-server" ];
+        };
+        tailwindcss = {
+          command = "tailwindcss-language-server";
+          args = [ "--stdio" ];
+        };
+        vuels = {
+          command = "vue-language-server";
+          args = [ "--stdio" ];
+          config.typescript.tsdk = "${pkgs.typescript}/lib/node_modules/typescript/lib";
+          config.vue.hybridMode = false;
+        };
       };
 
       language = [
@@ -55,9 +72,45 @@
           language-servers = [ "pyright" "ruff" ];
         }
         {
-          # nil tự được nhận làm LSP; Helix không có formatter nix mặc định.
+          # nixd thay nil (hiểu được option NixOS/flake); nixfmt làm formatter.
           name = "nix";
+          language-servers = [ "nixd" ];
           formatter.command = "nixfmt";
+        }
+        {
+          # intelephense (free) thiếu rename → ghép phpactor lo riêng rename-symbol.
+          name = "php";
+          language-servers = [
+            "intelephense"
+            {
+              name = "phpactor";
+              only-features = [ "rename-symbol" ];
+            }
+          ];
+        }
+        {
+          name = "html";
+          language-servers = [ "vscode-html-language-server" "tailwindcss" ];
+        }
+        {
+          name = "css";
+          language-servers = [ "vscode-css-language-server" "tailwindcss" ];
+        }
+        {
+          name = "jsx";
+          language-servers = [ "typescript-language-server" "tailwindcss" ];
+        }
+        {
+          name = "tsx";
+          language-servers = [ "typescript-language-server" "tailwindcss" ];
+        }
+        {
+          name = "svelte";
+          language-servers = [ "svelteserver" "tailwindcss" ];
+        }
+        {
+          name = "vue";
+          language-servers = [ "vuels" "tailwindcss" ];
         }
       ];
     };

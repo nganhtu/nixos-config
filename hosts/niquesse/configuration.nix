@@ -144,18 +144,19 @@ in
     ristretto postman parsec-bin
 
     # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH
-    nodejs
-    nil nixfmt
+    nodejs typescript
+    nixd nixfmt
     jdt-language-server google-java-format
     pyright ruff
     rust-analyzer rustfmt
     gopls
     typescript-language-server vscode-langservers-extracted prettier
+    tailwindcss-language-server vue-language-server svelte-language-server
     bash-language-server shfmt
     lua-language-server taplo yaml-language-server marksman
     clang-tools
     dockerfile-language-server
-    intelephense php
+    intelephense phpactor php
 
     # IDE & tools nặng (Giai đoạn 6)
     jetbrains.idea jetbrains.phpstorm
