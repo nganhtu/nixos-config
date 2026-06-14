@@ -135,7 +135,7 @@
       }
 
       nrs() {
-        sudo nixos-rebuild switch --flake ~/nixos-config#Niquesse
+        nh os switch
       }
 
       update() {
@@ -146,7 +146,7 @@
         (cd ~/nixos-config && nix flake update)
 
         echo -e "\n[+] Rebuilding NixOS..."
-        sudo nixos-rebuild switch --flake ~/nixos-config#Niquesse
+        nh os switch
 
         echo -e "\n[+] Pruning Docker system..."
         docker system prune -f --volumes || true
