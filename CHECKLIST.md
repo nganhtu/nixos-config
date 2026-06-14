@@ -75,7 +75,7 @@
 - [x] `programs.zsh.enable` + oh-my-zsh + autosuggestion + syntaxHighlighting. Theme fork từ `ys` → `natys` (sao file vào `shell/themes/`, `oh-my-zsh.custom = ../shell`).
 - [x] Bỏ plugin `archlinux`.
 - [x] Bê alias dùng được: lsd, `cat=bat`, `vi=nvim`/`suvi`, `suhx`, docker (`doco/docodul/docobuild`), `gitcfX`, `cdc`, `upsync`, fzf, history 10000.
-- [x] Viết lại `update` cho NixOS: docker prune + tldr update + journal vacuum + `nix flake update` + `nixos-rebuild switch` + `nix-collect-garbage --delete-older-than 14d` (giữ 14 ngày để có đường lui khi rebuild fail).
+- [x] Viết lại `update` cho NixOS: `nix flake update` + rebuild qua `nh os switch` + docker prune + tldr update + journal vacuum + `nh clean all --keep 10`. (2026-06-14: `nrs`/`update` chuyển sang `nh os switch`; GC dùng `nh clean`, giữ 10 generation đồng bộ với `programs.nh.clean` timer + GRUB.)
 - [x] fastfetch đổi `-l Arch` → `-l NixOS`.
 - [x] `syncdotfiles`/bare-repo: bỏ hẳn (user chốt).
 - [x] nvim: giữ `alias vi=nvim` (chưa cài, dùng khi cần thì cài).
@@ -99,7 +99,7 @@
 - [ ] TLP: tạm bỏ qua (máy tản nhiệt tốt, không cần tinh chỉnh CPU). ppd giữ nguyên.
 - [x] steam (2026-06-10): `programs.steam.enable` + `hardware.graphics.enable32Bit`. Nvidia proprietary (open kernel module Ampere) qua `hosts/niquesse/nvidia.nix` — PRIME offload (`nvidia-offload %command%`), fine-grained power (dGPU tự ngủ). Bỏ blacklist nouveau. BusID: Intel `PCI:0:2:0`, Nvidia `PCI:1:0:0`. Test `nvidia-smi`/offload OK.
 - [x] App GUI (5b): spotify, discord, libreoffice, pavucontrol, ristretto, postman, parsec-bin, vlc. Gỡ obs (wf-recorder thay thế) + vscode (không hoạt động). Thêm asciinema, wf-recorder, vlc.
-- [x] Dev/LSP/formatters (5c): nil+nixfmt (Nix), jdtls+google-java-format (Java), pyright+ruff (Python), rust-analyzer+rustfmt (Rust), gopls (Go), typescript-language-server+vscode-langservers-extracted+prettier (TS/JS/HTML/CSS/JSON), bash-language-server+shfmt (Bash), lua-language-server (Lua), taplo (TOML), yaml-language-server (YAML), marksman (Markdown), clang-tools (C/C++), dockerfile-language-server (Dockerfile), intelephense+php (PHP). Pyright wire vào Helix languages.toml.
+- [x] Dev/LSP/formatters (5c): nixd+nixfmt (Nix), jdtls+google-java-format (Java), pyright+ruff (Python), rust-analyzer+rustfmt (Rust), gopls (Go), typescript-language-server+vscode-langservers-extracted+prettier (TS/JS/HTML/CSS/JSON), tailwindcss-language-server + vue-language-server (Volar) + svelte-language-server (frontend), bash-language-server+shfmt (Bash), lua-language-server (Lua), taplo (TOML), yaml-language-server (YAML), marksman (Markdown), clang-tools (C/C++), dockerfile-language-server (Dockerfile), intelephense+phpactor (PHP). Helix `languages.toml`: pyright, nixd, phpactor (chỉ rename-symbol), tailwind (html/css/jsx/tsx/vue/svelte), vuels (tsdk=`pkgs.typescript`). (2026-06-14: đổi nil→nixd; thêm phpactor + frontend LSP.)
 - [x] Bonus: VAAPI Intel iGPU (intel-media-driver), hàm `screenrec` (wf-recorder hardware encode), NIXOS_OZONE_WL=1 (Chrome Wayland + screen-share qua portal), unmask xdg-desktop-portal.
 
 **Xong khi (5a+5b+5c ✅):** docker/tailscale/adb chạy, app GUI mở được, LSP đầy đủ cho 14 ngôn ngữ, screen-share + quay màn hình hoạt động.
@@ -122,7 +122,7 @@
 - [x] ~~Gỡ XFCE~~ → BỎ (user chốt 2026-06-10: giữ XFCE làm desktop dự phòng).
 - [x] Tiện ích (2026-06-11):
   - **mangohud** — overlay FPS/GPU/nhiệt lúc chơi. Bật trong game: Steam launch option `nvidia-offload mangohud %command%`; toggle overlay `Shift_R+F12`.
-  - **nh** — thay lệnh rebuild hằng ngày: `nh os switch` (hiện diff cây trước khi switch), `nh clean all` (GC). Mặc định trỏ flake này.
+  - **nh** — lệnh rebuild mặc định (hàm `nrs`/`update` đều gọi `nh os switch`; hiện diff package trước khi activate). GC qua `nh clean all --keep 10`; số generation giữ lại đồng bộ **10** ở `programs.nh.clean` timer + `update()` + GRUB `configurationLimit`. Debug build fail: `--no-nom` ra output phẳng, `nix log <drv>` lấy full log. (cập nhật 2026-06-14)
   - **agenix** — khung quản secret mã hoá trong repo (khung dựng sẵn, secret thật thêm sau): điền pubkey vào `secrets/secrets.nix` rồi `agenix -e <tên>.age`.
 
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
