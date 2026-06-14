@@ -59,6 +59,10 @@ in
 
   services.printing.enable = true;
 
+  services.btrfs.autoScrub.enable = true;
+  services.fstrim.enable = true;
+  zramSwap.enable = true;
+
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -182,6 +186,7 @@ in
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
     substituters = [ "https://noctalia.cachix.org" ];
     trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="

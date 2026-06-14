@@ -131,6 +131,8 @@
   - **Nếu HẾT treo** sau nhiều lần đăng nhập (≥5, gồm sau suspend) → xác nhận đúng nguyên nhân. Bước kế: lấy lại pin bằng cách **bật lại `finegrained`** + ép kernel bỏ qua bảng nguồn SBIOS (`boot.extraModprobeConfig` với `NVreg_DynamicPowerManagement`), rồi test.
   - **Nếu VẪN treo** → `finegrained = false` là **HƯỚNG SAI**: revert về `true` (đỡ tốn pin) rồi đào nguyên nhân khác (Xorg/lightdm greeter, modeset, version kernel/driver). Đừng để mặc `false` mà ăn pin oan.
 
+- [x] Tinh chỉnh hệ thống (2026-06-14): `services.btrfs.autoScrub.enable` (scrub btrfs root định kỳ, bắt bitrot sớm), `zramSwap.enable` (đệm OOM — RAM 16GB chạy IDE nặng, trước không có swap), `nix.settings.auto-optimise-store` (dedup store bằng hardlink → đổi chút CPU lúc build lấy GB đĩa), `services.fstrim.enable` khai báo tường minh (vốn đã bật mặc định). Cân nhắc rồi BỎ: thermald, fwupd, battery charge-limit, đổi `description` (chưa cần).
+
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
 
 ---
