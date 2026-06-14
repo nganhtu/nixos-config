@@ -79,11 +79,9 @@
 
       alias watch_cpu="watch -n 1 \"grep '^[c]pu MHz' /proc/cpuinfo\""
 
+      # gdu interactive — mặc định duyệt cả cây / (gồm /home, /nix); truyền path để soi riêng, vd: diskusage ~
       diskusage() {
-        findmnt -t btrfs -o TARGET -n -l | sort | while IFS= read -r mp; do
-          echo "\n=== $mp ==="
-          sudo dust -x "$mp"
-        done
+        sudo gdu "''${1:-/}"
       }
 
       check_hmwon() {
