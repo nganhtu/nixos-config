@@ -98,7 +98,7 @@
 - [x] logind lid switch: ignore cả ba (`HandleLidSwitch`, `HandleLidSwitchExternalPower`, `HandleLidSwitchDocked`).
 - [ ] TLP: tạm bỏ qua (máy tản nhiệt tốt, không cần tinh chỉnh CPU). ppd giữ nguyên.
 - [x] steam (2026-06-10): `programs.steam.enable` + `hardware.graphics.enable32Bit`. Nvidia proprietary (open kernel module Ampere) qua `hosts/niquesse/nvidia.nix` — PRIME offload (`nvidia-offload %command%`), fine-grained power (dGPU tự ngủ). Bỏ blacklist nouveau. BusID: Intel `PCI:0:2:0`, Nvidia `PCI:1:0:0`. Test `nvidia-smi`/offload OK.
-- [x] App GUI (5b): spotify, discord, libreoffice, pavucontrol, ristretto, postman, parsec-bin, vlc, **vscode** (cài lại 2026-06-14 — trước gỡ vì "không hoạt động" do Electron Wayland; nay đã có `NIXOS_OZONE_WL=1`/`ELECTRON_OZONE_PLATFORM_HINT` nên chạy được). Gỡ obs (wf-recorder thay thế). Thêm asciinema, wf-recorder, vlc.
+- [x] App GUI (5b): spotify, discord, libreoffice, pavucontrol, ristretto, postman, parsec-bin, vlc, **vscode** (cài lại 2026-06-14 — trước gỡ vì "không hoạt động" do Electron Wayland; nay đã có `NIXOS_OZONE_WL=1`/`ELECTRON_OZONE_PLATFORM_HINT` nên chạy được; gotcha: extension ship binary prebuilt như Todo-Tree (`vscode-ripgrep`) lỗi trên NixOS → trỏ `todo-tree.ripgrep` = `/run/current-system/sw/bin/rg`). Gỡ obs (wf-recorder thay thế). Thêm asciinema, wf-recorder, vlc.
 - [x] Dev/LSP/formatters (5c): nixd+nixfmt (Nix), jdtls+google-java-format (Java), pyright+ruff (Python), rust-analyzer+rustfmt (Rust), gopls (Go), typescript-language-server+vscode-langservers-extracted+prettier (TS/JS/HTML/CSS/JSON), tailwindcss-language-server + vue-language-server (Volar) + svelte-language-server (frontend), bash-language-server+shfmt (Bash), lua-language-server (Lua), taplo (TOML), yaml-language-server (YAML), marksman (Markdown), clang-tools (C/C++), dockerfile-language-server (Dockerfile), intelephense+phpactor (PHP). Helix `languages.toml`: pyright, nixd, phpactor (chỉ rename-symbol), tailwind (html/css/jsx/tsx/vue/svelte), vuels (tsdk=`pkgs.typescript`). (2026-06-14: đổi nil→nixd; thêm phpactor + frontend LSP.)
 - [x] Bonus: VAAPI Intel iGPU (intel-media-driver), hàm `screenrec` (wf-recorder hardware encode), NIXOS_OZONE_WL=1 (Chrome Wayland + screen-share qua portal), unmask xdg-desktop-portal.
 
@@ -124,6 +124,9 @@
   - **mangohud** — overlay FPS/GPU/nhiệt lúc chơi. Bật trong game: Steam launch option `nvidia-offload mangohud %command%`; toggle overlay `Shift_R+F12`.
   - **nh** — lệnh rebuild mặc định (hàm `nrs`/`update` đều gọi `nh os switch`; hiện diff package trước khi activate). GC qua `nh clean all --keep 10`; số generation giữ lại đồng bộ **10** ở `programs.nh.clean` timer + `update()` + GRUB `configurationLimit`. Debug build fail: `--no-nom` ra output phẳng, `nix log <drv>` lấy full log. (cập nhật 2026-06-14)
   - **agenix** — khung quản secret mã hoá trong repo (khung dựng sẵn, secret thật thêm sau): điền pubkey vào `secrets/secrets.nix` rồi `agenix -e <tên>.age`.
+- [x] Tiện ích (2026-06-14):
+  - **Disk:** `gdu` là công cụ chính (`diskusage()` mở `gdu` interactive, mặc định duyệt cả cây `/`); `nix-tree` soi closure/store (vì sao path bị giữ). Gỡ `ncdu` + `dua` (trùng use case với gdu); `dust` giữ cho xem nhanh tĩnh. Cleanup store thật = `nh clean`.
+  - **yazi:** linemode `size_and_mtime` (custom `modules/yazi-init.lua`) hiện size+ngày cạnh mỗi file; bỏ flavor noctalia tạo tay, về màu mặc định.
 
 **Xong khi:** môi trường đầy đủ ngang CachyOS cũ; chỉ còn tinh chỉnh.
 
