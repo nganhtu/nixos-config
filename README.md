@@ -71,4 +71,4 @@ sudo nixos-rebuild switch --flake ~/nixos-config#<hostname>  # plain fallback
 
 ## Fonts
 
-`assets/fonts/windows/` is an empty placeholder — drop your own Windows fonts there (Segoe UI, Calibri, …) and the `proprietary-fonts` derivation in `hosts/<hostname>/configuration.nix` bundles them. None are shipped here (not redistributable). `google-sans/` and `google-sans-code/` are under the SIL Open Font License (see each directory's `OFL.txt`).
+`assets/fonts/windows/` holds Windows fonts (Segoe UI, Calibri, …) bundled by the `proprietary-fonts` derivation in `hosts/<hostname>/configuration.nix` — personal copies kept in this private repo, not for redistribution. `google-sans/` and `google-sans-code/` are under the SIL Open Font License (see each directory's `OFL.txt`).
