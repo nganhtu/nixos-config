@@ -75,7 +75,7 @@ The shell function `update [hostname]` wraps all of the above (flake update → 
 
 - **[mangohud](https://github.com/flightlessmango/MangoHud)** — in-game FPS/GPU/temperature overlay. Add `mangohud %command%` (or `nvidia-offload mangohud %command%`) to a Steam game's launch options; toggle the overlay with `Shift_R+F12`.
 - **[agenix](https://github.com/ryantm/agenix)** — encrypted secrets committed to the repo. Recipient public keys live in `secrets/secrets.nix`; edit/create a secret with `agenix -e <name>.age`. (No real secrets stored yet — scaffold only.)
-- **[ons-nix](https://github.com/nganhtu/ons-nix)** *(private)* — devenv-based dev environments for Onschool projects. Lives in its own repo (clone separately); not part of this flake.
+- **[ons-nix](https://github.com/nganhtu/ons-nix)** *(private)* — devenv-based dev environments for Onschool projects. Its own repo; **does not come with this clone** — on a new machine clone it separately (convention: `~/ons-nix`) and follow its README to place the decryption identity. Not part of this flake.
 
 ### Noctalia
 
