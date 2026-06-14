@@ -35,7 +35,6 @@
       modules = [
         ./hosts/niquesse/configuration.nix
         niri-flake.nixosModules.niri
-        agenix.nixosModules.default
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
