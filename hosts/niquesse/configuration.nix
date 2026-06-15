@@ -51,11 +51,16 @@ in
     fcitx5.addons = with pkgs; [ fcitx5-bamboo fcitx5-gtk ];
   };
 
-  # Desktop tạm thời — sẽ gỡ ở Giai đoạn 6 sau khi niri ổn định
-  services.xserver.enable = true;
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.xfce.enable = true;
-  services.xserver.xkb = { layout = "us"; variant = ""; };
+  # Login Wayland-native: greetd + tuigreet vào thẳng niri. Không X server →
+  # không có handoff X→Wayland để race gây hard-lock lúc đăng nhập trên GPU lai.
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --time-format '%H:%M  %A %d/%m/%Y' --greeting '${config.networking.hostName}' --asterisks --remember --cmd niri-session";
+      user = "greeter";
+    };
+  };
+  console.keyMap = "us";
 
   services.printing.enable = true;
 
