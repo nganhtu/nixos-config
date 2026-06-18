@@ -190,6 +190,26 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 
 ---
 
+## 9b. Waydroid (cài 2026-06-18, GApps) — 2 fix non-obvious + giới hạn
+
+Bật `virtualisation.waydroid.enable`. Image init bằng tay (imperative, không tránh được vì Nix không đóng gói AOSP image): `sudo waydroid init -s GAPPS -f`. Trên kernel/systemd hiện tại phải có **2 fix**, nếu không container không boot:
+
+1. **net.sh treo (`iptables-legacy: table does not exist`).** Kernel chỉ build `nf_tables`, không có `ip_tables`; systemd 258 đã bỏ cgroup v1 nên `unified_cgroup_hierarchy=0` vô tác dụng (đừng thử lại). Fix: `virtualisation.waydroid.package = pkgs.waydroid.override { withNftables = true; }` → net.sh sinh với `LXC_USE_NFT=true` + `nft` trong PATH. Kèm `networking.nftables.enable = true` (để `use_nft()` thấy ruleset).
+2. **surfaceflinger/zygote crash-loop (`createProcessGroup: Read-only file system`).** Host cgroup v2-only → Android không tạo nổi `/acct`. Fix: `overrideAttrs` append `lxc.mount.entry = none acct cgroup2 rw,...nsdelegate,memory_recursiveprot` vào `config_base` + `systemd.services.waydroid-container.serviceConfig.Delegate = true`. (waydroid#1065)
+
+→ Cả hai gộp trong let-binding `waydroid-fixed` ở `configuration.nix`.
+
+**LXC config CHỈ regen lúc init/upgrade, KHÔNG mỗi lần start.** Sau khi đổi package/`config_base` rồi `nrs`, phải chạy `sudo waydroid upgrade -o` (offline, không tải lại image) để config trên đĩa `/var/lib/waydroid/lxc/waydroid/config` cập nhật. Bỏ bước này = config cũ, fix không có tác dụng.
+
+**Giới hạn cố hữu (KHÔNG sửa bằng .nix, fix đều imperative — đừng đề xuất trừ khi user xin):**
+- Camera: image GApps không có camera HAL → "lỗi thiết lập phiên". 
+- App ARM-only (vd TikTok): image chỉ ABI `x86_64,x86`, không libndk/houdini → Play Store lọc "không tương thích".
+- Wallpaper picker thỉnh thoảng crash: preview render software-GL nặng, máy yếu. Máy cũ cũng vậy.
+
+Dung lượng: `/var/lib/waydroid` ~5.8 GB (system.img 2.4G + vendor.img 536M + data còn lại).
+
+---
+
 ## 10. Các điểm cần HỎI USER (đừng đoán)
 
 1. Filesystem root thực tế đang là gì (`lsblk -f`)? btrfs hay ext4?

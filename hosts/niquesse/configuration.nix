@@ -6,6 +6,15 @@ let
     find ${../../assets/fonts} -type f \( -name '*.ttf' -o -name '*.ttc' -o -name '*.otf' \) \
       -exec cp -L {} $out/share/fonts/truetype/ \;
   '';
+
+  # Kernel nft-only + cgroup v2: withNftables (net.sh dùng nft, không iptables-legacy)
+  # + mount cgroup2 rw vào /acct cho libprocessgroup. waydroid#1065.
+  waydroid-fixed = (pkgs.waydroid.override { withNftables = true; }).overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      echo 'lxc.mount.entry = none acct cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot 0 0' \
+        >> $out/lib/waydroid/data/configs/config_base
+    '';
+  });
 in
 {
   imports = [ ./hardware-configuration.nix ./nvidia.nix ];
@@ -27,6 +36,7 @@ in
 
   networking.hostName = "Niquesse";
   networking.networkmanager.enable = true;
+  networking.nftables.enable = true;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
   time.hardwareClockInLocalTime = true;
@@ -112,6 +122,9 @@ in
   };
 
   virtualisation.docker.enable = true;
+  virtualisation.waydroid.enable = true;
+  virtualisation.waydroid.package = waydroid-fixed;
+  systemd.services.waydroid-container.serviceConfig.Delegate = true;
   services.tailscale.enable = true;
 
   programs.zsh.enable = true;
