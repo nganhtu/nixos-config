@@ -92,7 +92,7 @@ Nội dung đã backup:
 - `.config/kitty/` — kitty.conf + themes/noctalia.conf.
 - `.config/helix/` — config.toml + themes/transparent_focus_nova.toml.
 - `.config/btop/` — btop.conf + themes/nord.theme.
-- `.config/fuzzel/` — fuzzel.ini + themes/noctalia. Font: `CaskaydiaCove NF`, `LXGW WenKai TC`, `Noto Serif KR`. icon-theme Papirus.
+- `.config/fuzzel/` — fuzzel.ini + themes/noctalia. icon-theme Papirus. Font fallback (đã dịch sang tên family thật trong nixpkgs, các tên `*TC`/`Noto Serif KR` repo cũ KHÔNG tồn tại): `Google Sans Code` → `LXGW WenKai` (Trung) → `Noto Sans CJK KR` (Hàn) → `Noto Sans CJK JP` (Nhật). Kitty dùng `symbol_map` ép dải Unicode: CJK→`LXGW WenKai Mono`, Hangul→`Noto Sans Mono CJK KR`, kana→`Noto Sans Mono CJK JP`, Hy Lạp+Cyrillic→`CaskaydiaCove Nerd Font Mono`. Han unification: kanji dùng chung codepoint chữ Hán nên hiện glyph kiểu Trung (LXGW), chỉ kana tách được sang font Nhật.
 - `.zshrc`, `.zprofile` — oh-my-zsh theme `ys`, plugins (git, archlinux, zsh-autosuggestions, zsh-syntax-highlighting), RẤT NHIỀU alias/function công việc.
 
 ### Chi tiết niri cần dịch sang `programs.niri.settings` (Nix)

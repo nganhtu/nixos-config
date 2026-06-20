@@ -6,7 +6,7 @@
     force = true;
     text = ''
     [main]
-    font=Google Sans Code:size=9,LXGW WenKai TC:weight=bold:size=9,Noto Serif KR:weight=bold:size=9
+    font=Google Sans Code:size=9,LXGW WenKai:weight=bold:size=9,Noto Sans CJK KR:weight=bold:size=9,Noto Sans CJK JP:weight=bold:size=9
     prompt="󰅍  Clipboard history: "
     icon-theme=Papirus
 
