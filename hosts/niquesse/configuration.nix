@@ -89,6 +89,16 @@ in
 
   programs.niri.enable = true;
 
+  # niri-flake bật portal gnome (cho screencast) nhưng config.common rỗng + thiếu
+  # backend gtk → Electron/VSCode gọi FileChooser không có impl, dialog mở ra im lặng.
+  xdg.portal = {
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common = {
+      default = [ "gnome" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+    };
+  };
+
   fonts.fontconfig.defaultFonts.monospace = [ "Google Sans Code" ];
 
   fonts.packages = with pkgs; [
