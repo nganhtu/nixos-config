@@ -145,6 +145,10 @@
         matches = [ { app-id = "swappy"; } ];
         open-floating = true;
       }
+      {
+        matches = [ { app-id = "^xdg-desktop-portal-gtk$"; } ];
+        open-floating = true;
+      }
     ];
 
     layer-rules = [

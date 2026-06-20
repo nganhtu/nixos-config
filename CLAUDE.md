@@ -216,6 +216,8 @@ niri-flake tự bật `xdg.portal` với **chỉ backend gnome** (cho screencast
 
 Fix ở `configuration.nix` (`xdg.portal`): thêm `pkgs.xdg-desktop-portal-gtk`, đặt `config.common.default = ["gnome"]` (giữ screencast), ép `config.common."org.freedesktop.impl.portal.FileChooser" = ["gtk"]`. Sau rebuild phải `systemctl --user restart xdg-desktop-portal*` (portal là user service, cache config cũ) rồi mở lại app.
 
+File chooser là cửa sổ riêng app-id `xdg-desktop-portal-gtk`; niri tile mặc định nên nó chiếm nguyên cột → thêm window-rule `open-floating` cho app-id này ở `modules/niri.nix` (phủ cả VSCode lẫn Chrome vì chung backend gtk).
+
 Lưu ý VSCode: config để **imperative** ở `~/.config/Code/User/settings.json`, KHÔNG đưa vào HM `programs.vscode` (HM symlink read-only → GUI không sửa được settings, settings-sync gãy). Font đã chỉnh khớp kitty (fallback CJK/Hàn/Nhật/Hy Lạp, ss01–ss10, tắt calt). VSCode KHÔNG có option baseline lẫn font-nghiêng-riêng (Radon cursive) → 2 thứ này của kitty không tái tạo được.
 
 ---
