@@ -210,6 +210,16 @@ Dung lượng: `/var/lib/waydroid` ~5.8 GB (system.img 2.4G + vendor.img 536M + 
 
 ---
 
+## 9c. xdg-desktop-portal (fix VSCode/Electron, 2026-06-20)
+
+niri-flake tự bật `xdg.portal` với **chỉ backend gnome** (cho screencast) và để `xdg.portal.config.common` **rỗng**. Hệ quả: `XDG_CURRENT_DESKTOP=niri` không khớp backend nào, interface `FileChooser` không có impl → mọi dialog "Open Folder"/chọn file của Electron (VSCode...) **mở ra im lặng, không có gì hiện**.
+
+Fix ở `configuration.nix` (`xdg.portal`): thêm `pkgs.xdg-desktop-portal-gtk`, đặt `config.common.default = ["gnome"]` (giữ screencast), ép `config.common."org.freedesktop.impl.portal.FileChooser" = ["gtk"]`. Sau rebuild phải `systemctl --user restart xdg-desktop-portal*` (portal là user service, cache config cũ) rồi mở lại app.
+
+Lưu ý VSCode: config để **imperative** ở `~/.config/Code/User/settings.json`, KHÔNG đưa vào HM `programs.vscode` (HM symlink read-only → GUI không sửa được settings, settings-sync gãy). Font đã chỉnh khớp kitty (fallback CJK/Hàn/Nhật/Hy Lạp, ss01–ss10, tắt calt). VSCode KHÔNG có option baseline lẫn font-nghiêng-riêng (Radon cursive) → 2 thứ này của kitty không tái tạo được.
+
+---
+
 ## 10. Các điểm cần HỎI USER (đừng đoán)
 
 1. Filesystem root thực tế đang là gì (`lsblk -f`)? btrfs hay ext4?
