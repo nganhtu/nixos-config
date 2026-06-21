@@ -13,6 +13,8 @@
     ../modules/thunar.nix
     ../modules/yazi.nix
     ../modules/mangohud.nix
+    ../modules/direnv.nix
+    ../modules/git.nix
   ];
 
   home.username = "nat";

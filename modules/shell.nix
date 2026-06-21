@@ -56,6 +56,10 @@
       docodul = "docker compose down && docker compose up -d && docker compose logs -f";
       docobuild = "COMPOSE_BAKE=true docker compose build";
 
+      dv = "devenv";
+      dvu = "devenv up";
+      dvpr = "devenv processes";
+
       gitcfnganhtu = ''git config user.name "nganhtu" && git config user.email "ng.anh.tu.1123@gmail.com"'';
       gitcfashytuna = ''git config user.name "ashytuna" && git config user.email "ashytuna@gmail.com"'';
       gitcftuna = ''git config user.name "tuna" && git config user.email "tuna@onschool.edu.vn"'';
@@ -130,6 +134,18 @@
         local container="$1"
         shift
         docker compose exec -it --user 1000 "$container" sh "$@"
+      }
+
+      # `devenv processes logs` không có -f; theo dõi realtime bằng tail -F file log
+      # (.devenv/run = symlink ổn định tới runtime dir). Không tên → mọi process.
+      dvlog() {
+        setopt local_options null_glob
+        local files=(.devenv/run/processes/logs/''${1:-*}.*.log)
+        if (( ''${#files} == 0 )); then
+          echo "Không thấy log — devenv đang chạy chưa? (cần .devenv/run/processes/logs)"
+          return 1
+        fi
+        tail -F "''${files[@]}"
       }
 
       nrs() {

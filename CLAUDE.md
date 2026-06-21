@@ -222,6 +222,32 @@ Lưu ý VSCode: config để **imperative** ở `~/.config/Code/User/settings.js
 
 ---
 
+## 9d. direnv + devenv (ons-nix) — TRUSTED-USER bắt buộc (2026-06-21)
+
+Môi trường dev Onschool (repo riêng `~/ons-nix`) dựng bằng **devenv** qua **direnv**: mỗi project có `.envrc` chỉ ghi `use devenv`. Chuỗi mắc xích:
+
+- `use devenv` KHÔNG phải hàm có sẵn của direnv lẫn nix-direnv. devenv tự in ra qua `devenv direnvrc` (146 dòng, định nghĩa `use_devenv`). Phải nạp vào **global direnvrc**.
+- `modules/direnv.nix`: `programs.direnv.enable` (tự hook zsh) + `nix-direnv.enable` (cho `use flake` ad-hoc) + `stdlib = ''eval "$(${pkgs.devenv}/bin/devenv direnvrc)"''`. `devenv` vào `home.packages`. Thứ tự direnv nạp: builtin → `lib/*.sh` (nix-direnv) → `direnvrc` (devenv) → helper `_nix_*` của devenv thắng, nhưng tương thích vì devenv chép từ nix-direnv. Cả `use flake` lẫn `use devenv` chạy.
+
+**`nix.settings.trusted-users = [ "root" "nat" ]` LÀ BẮT BUỘC, không phải tùy chọn.** devenv ép setting restricted `system` khi gọi daemon; nat không trusted → daemon từ chối (`ignoring the client-specified setting 'system', because it is a restricted setting and you are not a trusted user`) → `Failed to get drvPath`. Khác substituter (có `trusted-substituters` để whitelist), setting `system` **không whitelist được** — chỉ mở qua `trusted-users`, all-or-nothing. Đây cũng là yêu cầu cứng trong docs cài devenv trên NixOS. KHÔNG có cách chạy devenv mà giữ nat non-trusted.
+
+**Hệ quả bảo mật (cân nhắc kỹ trước khi nhân rộng):** trusted-user ≈ **root không cần mật khẩu** cho MỌI tiến trình chạy dưới nat — kể cả coding agent, kể cả `.envrc`/`devenv.yaml` từ repo lạ vừa `cd` vào. Quyền *thực* của nat không tăng (nat vốn có `sudo`/`wheel`/`nixos-rebuild`), cái mất là **lưới an toàn** chống build-input độc hại + đường root giờ passwordless. Trên laptop cá nhân 1 người, tự review repo của mình → chấp nhận được. Giảm blast radius: chỉ `direnv allow` repo tin tưởng, review `.envrc`/`devenv.yaml` trước khi allow.
+
+**Substituter:** khi đã trusted, devenv tự thêm `devenv.cachix.org` runtime → **KHÔNG khai** trong `nix.settings.substituters` (khai vào sẽ ra cảnh báo `already present`). nixpkgs/nix-phps nằm sẵn trên `cache.nixos.org`.
+
+**Lỗi transient `.links`:** `auto-optimise-store = true` thỉnh thoảng fail hardlink dedup khi devenv đổ nhiều path song song (`linking ... to /nix/store/.links/...`). Chạy lại `direnv allow`/`devenv build` là qua.
+
+---
+
+## 9e. Git config declarative qua HM (2026-06-21)
+
+`~/.gitconfig` giờ do Home Manager quản: `modules/git.nix` (`programs.git`) → sinh `~/.config/git/config` (XDG). Identity mặc định `ashytuna`. Credential helper PATH-based: `!gh auth git-credential` (github + gist), `!glab auth git-credential` (gitlab.onschool.edu.vn).
+
+- **`~/.gitconfig` global ĐÃ XÓA** — vì nó override file XDG. **ĐỪNG tạo lại bằng tay**, **ĐỪNG chạy `gh auth setup-git`/`glab auth` setup-git** — chúng ghi credential helper bằng **absolute `/nix/store` path** vào `~/.gitconfig`, path đó chết sau GC + version bump → push/pull gãy (đã dính 2 lần: gh rồi glab). Helper PATH-based trong HM miễn nhiễm việc này.
+- Đổi danh tính **per-repo** vẫn dùng alias `gitcfnganhtu`/`gitcfashytuna`/`gitcftuna` (shell.nix) — chúng `git config` (KHÔNG `--global`) → ghi `.git/config` của repo, không đụng global HM-managed nên không gãy.
+
+---
+
 ## 10. Các điểm cần HỎI USER (đừng đoán)
 
 1. Filesystem root thực tế đang là gì (`lsblk -f`)? btrfs hay ext4?

@@ -215,6 +215,9 @@ in
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    # devenv ép setting restricted `system` → cần trusted-user (không whitelist
+    # được trong config như substituter). devenv tự thêm cache runtime khi đã trusted.
+    trusted-users = [ "root" "nat" ];
     substituters = [ "https://noctalia.cachix.org" ];
     trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
