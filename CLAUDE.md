@@ -163,7 +163,7 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobuild, docobash, docosh), git config aliases (gitcfnganhtu/ashytuna/tuna), `syncdotfiles`/`dotfiles` (NHƯNG bare-repo workflow này mâu thuẫn với Home Manager thuần — hỏi user có còn muốn giữ không, hay bỏ vì giờ config quản bằng Nix), `upsync`/`update_and_merge_sync`, `cdc`, fzf keybindings, history settings, BAT_THEME.
 
 **PHẢI sửa/bỏ (Arch-specific):**
-- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 10`** (giữ 10 generation, đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
+- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 25`** (giữ 25 generation, đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
 - oh-my-zsh plugin `archlinux` → bỏ.
 - fastfetch `-l Arch` → đổi logo NixOS.
 - `alias ssh="kitten ssh"`, `alias cat='bat'`, `alias vi='nvim'` (CHÚ Ý: note cũ cài `vi` + helix, nhưng zshrc alias vi→nvim; xác nhận user dùng nvim hay không, nvim chưa thấy trong package list).

@@ -174,7 +174,7 @@
         sudo journalctl --vacuum-time=1w
 
         echo -e "\n[+] Dọn generation cũ + GC (nh clean, giữ 10 bản)..."
-        nh clean all --keep 10
+        nh clean all --keep 25
 
         echo -e "\n[✔] All tasks completed successfully."
       }

@@ -30,7 +30,7 @@ in
     efiSupport = true;
     efiInstallAsRemovable = true;
     useOSProber = true;
-    configurationLimit = 10;
+    configurationLimit = 25;
     default = "saved";
   };
 
@@ -143,7 +143,7 @@ in
     enable = true;
     flake = "/home/nat/nixos-config";
     clean.enable = true;
-    clean.extraArgs = "--keep 10";
+    clean.extraArgs = "--keep 25";
   };
 
   users.users.nat = {
