@@ -149,6 +149,10 @@
         matches = [ { app-id = "^xdg-desktop-portal-gtk$"; } ];
         open-floating = true;
       }
+      {
+        matches = [ { app-id = "thunar"; title = "^Rename "; } ];
+        open-floating = true;
+      }
     ];
 
     layer-rules = [
