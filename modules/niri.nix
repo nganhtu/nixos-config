@@ -153,6 +153,10 @@
         matches = [ { app-id = "thunar"; title = "^Rename "; } ];
         open-floating = true;
       }
+      {
+        matches = [ { app-id = "^org\\.gnome\\.FileRoller$"; } ];
+        open-floating = true;
+      }
     ];
 
     layer-rules = [
