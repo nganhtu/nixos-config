@@ -66,7 +66,7 @@ in
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --time-format '%H:%M  %A %d/%m/%Y' --greeting '${config.networking.hostName}' --asterisks --remember --cmd niri-session";
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --time-format '%H:%M  %A %d/%m/%Y' --greeting '${config.networking.hostName}' --asterisks --remember --cmd niri-session";
       user = "greeter";
     };
   };
@@ -104,6 +104,7 @@ in
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
     nerd-fonts.monaspace
+    nerd-fonts.symbols-only
     lxgw-wenkai
     noto-fonts
     noto-fonts-cjk-sans
