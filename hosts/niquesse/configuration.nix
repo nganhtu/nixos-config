@@ -154,7 +154,11 @@ in
     extraGroups = [ "networkmanager" "wheel" "docker" "kvm" ];
   };
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    # Required by vue-language-server 3.2.9 on this nixpkgs revision.
+    permittedInsecurePackages = [ "pnpm-10.34.0" ];
+  };
 
   environment.systemPackages = with pkgs; [
     vim wget google-chrome helix claude-code kitty brightnessctl
