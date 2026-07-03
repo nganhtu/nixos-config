@@ -45,7 +45,6 @@
       sulla = "sudo lsd -la";
       sult = "sudo lsd --tree";
 
-      ssh = "kitten ssh";
       cat = "bat";
 
       vi = "nvim";

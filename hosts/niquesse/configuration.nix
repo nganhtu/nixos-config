@@ -171,7 +171,7 @@ in
     android-tools
 
     # CLI tools (Giai đoạn 4)
-    lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab delta
+    lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab delta herdr
     nix-tree
     nvtopPackages.intel
     asciinema wf-recorder vlc
