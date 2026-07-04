@@ -179,7 +179,7 @@ in
 
     # App GUI (Giai đoạn 5b)
     spotify discord libreoffice-fresh pavucontrol
-    ristretto postman parsec-bin vscode figma-linux
+    ristretto postman parsec-bin vscode
 
     # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH
     nodejs typescript
