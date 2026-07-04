@@ -224,7 +224,7 @@ Lưu ý VSCode: config để **imperative** ở `~/.config/Code/User/settings.js
 
 ## 9d. direnv + devenv (ons-nix) — TRUSTED-USER bắt buộc (2026-06-21)
 
-Môi trường dev Onschool (repo riêng `~/ons-nix`) dựng bằng **devenv** qua **direnv**: mỗi project có `.envrc` chỉ ghi `use devenv`. Chuỗi mắc xích:
+Môi trường dev Onschool (repo riêng `~/src/nganhtu/ons-nix`) dựng bằng **devenv** qua **direnv**: mỗi project có `.envrc` chỉ ghi `use devenv`. Chuỗi mắc xích:
 
 - `use devenv` KHÔNG phải hàm có sẵn của direnv lẫn nix-direnv. devenv tự in ra qua `devenv direnvrc` (146 dòng, định nghĩa `use_devenv`). Phải nạp vào **global direnvrc**.
 - `modules/direnv.nix`: `programs.direnv.enable` (tự hook zsh) + `nix-direnv.enable` (cho `use flake` ad-hoc) + `stdlib = ''eval "$(${pkgs.devenv}/bin/devenv direnvrc)"''`. `devenv` vào `home.packages`. Thứ tự direnv nạp: builtin → `lib/*.sh` (nix-direnv) → `direnvrc` (devenv) → helper `_nix_*` của devenv thắng, nhưng tương thích vì devenv chép từ nix-direnv. Cả `use flake` lẫn `use devenv` chạy.
