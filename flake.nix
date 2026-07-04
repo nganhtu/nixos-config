@@ -37,6 +37,16 @@
         niri-flake.nixosModules.niri
         home-manager.nixosModules.home-manager
         {
+          # niri-stable (niri-flake) còn ghim cứng ở v25.08, thiếu fix IME-trong-popup
+          # (GTK4 popup có ô nhập liệu đóng ngay khi mở nếu đang chạy fcitx5 — do
+          # Smithay chỉ cho 1 keyboard grab, popup grab với IME grab đụng nhau).
+          # Fix nằm trong v26.04+. Dùng niri-unstable (theo dõi main) để có fix này.
+          nixpkgs.overlays = [ niri-flake.overlays.niri ];
+        }
+        ({ pkgs, ... }: {
+          programs.niri.package = pkgs.niri-unstable;
+        })
+        {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.nat = import ./home/nat.nix;

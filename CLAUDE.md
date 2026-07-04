@@ -76,7 +76,7 @@ nixos-config/
 ### Flake inputs cần có
 - `nixpkgs` → **nixos-unstable** (Noctalia/Quickshell cần unstable; desktop bits đổi nhanh).
 - `home-manager` (follows nixpkgs).
-- `niri` → `github:sodiboo/niri-flake` (bleeding-edge + module).
+- `niri` → `github:sodiboo/niri-flake` (bleeding-edge + module). **Dùng `niri-unstable` chứ không phải mặc định `niri-stable`** (2026-07-04): niri-flake ghim `niri-stable` cứng ở tag `v25.08`, thiếu fix "IME trong popup" (GTK4 popup có ô nhập liệu — vd rename trong Nautilus/Thunar, dialog tìm kiếm — đóng ngay khi mở nếu đang chạy fcitx5, do Smithay chỉ cho 1 keyboard grab và popup-grab đụng IME-grab). Fix nằm trong v26.04+. Cấu hình ở `flake.nix`: thêm `nixpkgs.overlays = [ niri-flake.overlays.niri ];` rồi `programs.niri.package = pkgs.niri-unstable;`. Cache riêng `niri.cachix.org` (host cả stable lẫn unstable) do niri-flake's nixosModule tự bật, không cần khai substituter tay. **Đổi package niri KHÔNG có tác dụng ngay** — niri đang chạy không tự thay binary giữa chừng, phải đăng xuất/đăng nhập lại (hoặc reboot) mới nhận bản mới.
 - `noctalia` → **v5** (`github:noctalia-dev/noctalia`, follows nixpkgs). Đã migrate từ v4.7.7 sang v5 ngày 2026-06-09. Docs v5: https://docs.noctalia.dev/v5/getting-started/nixos/ — chỉ còn `homeModules.default` (KHÔNG có `nixosModules`), option `programs.noctalia`, binary `noctalia`, IPC `noctalia msg <command>`. Xem mục 9.
 - **Cachix:** thêm substituter `https://noctalia.cachix.org` + trusted-public-key `noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=` để KHỎI build Qt/Quickshell từ source.
 
