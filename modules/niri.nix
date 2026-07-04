@@ -1,7 +1,33 @@
-{ config, pkgs, ... }:
+{ config, pkgs, options, ... }:
 
 {
   home.packages = [ pkgs.apple-cursor ];
+
+  # open-maximized-to-edges chưa có trong schema niri-flake (PR #1382 chưa merge)
+  # → nối node KDL thô vào config render từ settings. Ristretto xin maximize lúc
+  # mở; niri unstable map maximize sang "maximized-to-edges" (sát mép, không
+  # gaps/bo góc) và chỉ rule này chặn được — open-maximized giờ chỉ là full-width.
+  programs.niri.config = options.programs.niri.config.default ++ [
+    {
+      name = "window-rule";
+      arguments = [ ];
+      properties = { };
+      children = [
+        {
+          name = "match";
+          arguments = [ ];
+          properties.app-id = "^org\\.xfce\\.ristretto$";
+          children = [ ];
+        }
+        {
+          name = "open-maximized-to-edges";
+          arguments = [ false ];
+          properties = { };
+          children = [ ];
+        }
+      ];
+    }
+  ];
 
   programs.niri.settings = {
     prefer-no-csd = true;
@@ -156,6 +182,12 @@
       {
         matches = [ { app-id = "^org\\.gnome\\.FileRoller$"; } ];
         open-floating = true;
+      }
+      {
+        # Ristretto tự xin fullscreen/maximize lúc mở; open-maximized-to-edges
+        # (phần chặn maximize) nằm ở block programs.niri.config phía trên.
+        matches = [ { app-id = "^org\\.xfce\\.ristretto$"; } ];
+        open-fullscreen = false;
       }
     ];
 

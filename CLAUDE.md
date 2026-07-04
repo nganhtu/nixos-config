@@ -106,6 +106,11 @@ Nội dung đã backup:
 - **autostart.kdl:** `qs -c noctalia-shell` (noctalia), `fcitx5 -d`, `wl-paste --watch cliphist store`. → chuyển thành `spawn-at-startup` trong niri settings. KHÔNG chạy noctalia qua systemd (docs cảnh báo lag + IPC bug).
 - **keybinds.kdl:** ~100 bind. Format Nix: action là LIST không phải string (vd `spawn = ["kitty"]`; ipc call = `["qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"]`). Binds tham chiếu binary: `kitty`, `google-chrome-stable`, `thunar`, `grim`/`slurp`/`swappy`, `cliphist`, `fuzzel`, `wl-copy` → đảm bảo các package được cài, nếu thiếu bind gãy.
 
+### Ristretto tự mở maximized (2026-07-04) — window-rule cho app xin maximize/fullscreen lúc mở
+Ristretto (Image Viewer) xin maximize ngay khi mở, khiến cửa sổ chiếm hết màn hình mà không có gaps/bo góc (nhìn giống fullscreen dù `niri msg windows` không báo `is_floating`/fullscreen). Root cause xác nhận qua thực nghiệm (`niri msg action fullscreen-window` toggle qua lại + so kích thước tile): trên niri unstable, yêu cầu `xdg_toplevel maximize` của client được map sang trạng thái **"maximized-to-edges"** (sát mép, không gaps/bo góc) — khác với "full-width" thường (`open-maximized`, giờ chỉ còn nghĩa 100% chiều rộng nhưng vẫn giữ gaps/bo góc). Chỉ rule `open-maximized-to-edges false` mới chặn được trạng thái sát-mép này; `open-fullscreen false` (chặn true wayland-fullscreen) không đủ.
+
+**Vấn đề:** `open-maximized-to-edges` CHƯA có trong schema niri-flake tại thời điểm này (niri-flake PR #1382 thêm option này chưa merge) → không thể viết qua `programs.niri.settings.window-rules`. Workaround: nối thẳng node KDL thô vào `programs.niri.config` (mặc định = `options.programs.niri.config.default`, tức bản KDL render sẵn từ `settings`), dùng cấu trúc `kdl.nix` (`{ name; arguments; properties; children; }`) — xem `modules/niri.nix`. Khi niri-flake merge option này vào schema, nên dọn về lại `window-rules` bình thường cho gọn.
+
 ---
 
 ## 6. Map imperative → declarative (từ note cài CachyOS cũ)
