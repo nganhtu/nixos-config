@@ -99,7 +99,8 @@ in
     };
   };
 
-  fonts.fontconfig.defaultFonts.monospace = [ "Google Sans Code" ];
+  fonts.fontconfig.defaultFonts.monospace = [ "SF Mono" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "SF Pro Text" ];
 
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove

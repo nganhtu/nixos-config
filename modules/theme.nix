@@ -13,7 +13,7 @@
     enable = true;
     gtk4.theme = null;
     font = {
-      name = "Google Sans";
+      name = "SF Pro Text";
       size = 11;
     };
     cursorTheme = {

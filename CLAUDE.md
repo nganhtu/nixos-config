@@ -111,6 +111,13 @@ Ristretto (Image Viewer) xin maximize ngay khi mở, khiến cửa sổ chiếm 
 
 **Vấn đề:** `open-maximized-to-edges` CHƯA có trong schema niri-flake tại thời điểm này (niri-flake PR #1382 thêm option này chưa merge) → không thể viết qua `programs.niri.settings.window-rules`. Workaround: nối thẳng node KDL thô vào `programs.niri.config` (mặc định = `options.programs.niri.config.default`, tức bản KDL render sẵn từ `settings`), dùng cấu trúc `kdl.nix` (`{ name; arguments; properties; children; }`) — xem `modules/niri.nix`. Khi niri-flake merge option này vào schema, nên dọn về lại `window-rules` bình thường cho gọn.
 
+### Extract .dmg trong Thunar (2026-07-05)
+`.dmg` (Apple disk image) không phải archive libarchive/file-roller đọc được → `thunar-archive-plugin` không tự nhận diện, không có sẵn "Extract Here". `modules/thunar.nix` định nghĩa 2 script qua `pkgs.writeShellApplication` (có shellcheck, tự wrap PATH runtime deps) rồi gắn vào 2 custom action Thunar (pattern `*.dmg`):
+- **`thunar-extract-dmg`** — generic, gọi `pkgs.undmg` (chỉ giải nén, không mount/convert img như `dmg2img`), extract ra thư mục con cùng tên file.
+- **`thunar-extract-apple-fonts`** — riêng cho dmg font Apple (SF Pro/SF Mono/SF Compact/New York...): bên trong dmg font Apple KHÔNG phải font rời mà là 1 file `.pkg` (flat package, định dạng `xar`, khác archive thường). Chuỗi bóc: `undmg` → `xar -xf` ra `<Component>.pkg/Payload` → Payload nén gzip (file nhỏ) hoặc pbzx (file lớn, tự phát hiện qua 4 byte magic `1f8b0800`) → giải nén rồi `cpio -id` → lọc `*.ttf`/`*.otf`/`*.ttc` gom vào `<tên dmg> Fonts/`. Cần `pkgs.xar` + `pkgs.cpio` + `pkgs.pbzx` (đều có sẵn nixpkgs). Đã test full pipeline với cả 4 file thật (NY 50 font, SF-Mono 12, SF-Compact 38, SF-Pro 47) — chạy đúng, kể cả chọn nhiều file `.dmg` cùng lúc.
+
+**Cả 2 action dùng `%F` (không phải `%f`)** trong `<command>` — Thunar ẩn action khỏi menu khi multi-select nếu command chỉ chứa placeholder số ít (`%f`/`%d`/`%n`); script nhận nhiều đường dẫn qua `"$@"` và loop. Bên trong mỗi script còn phải tự `readlink -f` lại `$f` trước khi `cd` sang thư mục tạm — nếu không, đường dẫn tương đối (Thunar luôn truyền tuyệt đối nên không gặp thực tế, nhưng khi tự test bằng glob tương đối thì `undmg` segfault thẳng thay vì báo lỗi rõ ràng).
+
 ---
 
 ## 6. Map imperative → declarative (từ note cài CachyOS cũ)
@@ -158,6 +165,8 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 - Google Sans (font hệ thống user muốn), Segoe UI variable (`ttf-segoe-ui-variable`), MS fonts (`ttf-ms-fonts` → thử `corefonts`/`vistafonts` trước; phần còn lại tự thêm). Cascadia/CaskaydiaCove → `nerd-fonts.caskaydia-cove` (có sẵn).
 - File font Windows + Google Sans + Cascadia user lưu trên Google Drive — user phải cung cấp file, Claude Code đóng vào derivation hoặc đặt `home.file.".local/share/fonts/..."`.
 - Có sẵn: fira-code, inconsolata, lxgw-wenkai, noto-fonts, noto-fonts-cjk-sans, noto-fonts-cjk-serif (Korean nằm trong cjk).
+- **Apple fonts (2026-07-05):** SF Pro, SF Compact, SF Mono, New York — giải nén từ `.dmg` gốc (xem mục "Extract .dmg trong Thunar") vào `assets/fonts/apple/`. Derivation `proprietary-fonts` (`hosts/niquesse/configuration.nix`) tự `find` mọi `.ttf/.otf/.ttc` dưới `assets/fonts/` nên KHÔNG cần sửa gì để cài thêm — chỉ cần `git add` file mới rồi rebuild (flake chỉ thấy file đã git-tracked). Đã verify bằng fontTools: cả 4 họ phủ đầy đủ tiếng Việt (90/90 ký tự dấu tổ hợp sẵn + dấu rời), KHÔNG có Trung/Nhật/Hàn (CJK do Apple tách riêng qua PingFang/Hiragino/Apple SD Gothic Neo, không nằm trong các file này — fontconfig tự fallback sang Noto/LXGW đã cài cho phần CJK). Chỉ **SF Mono** là monospace thật (`isFixedPitch`); SF Pro/SF Compact/New York đều proportional.
+  - Áp dụng làm default: `modules/theme.nix` `gtk.font.name` = `"SF Pro Text"` (thay Google Sans, áp cho app GTK3 như Thunar). `fonts.fontconfig.defaultFonts.sansSerif = ["SF Pro Text"]` + `.monospace = ["SF Mono"]` (thay Google Sans Code) ở `hosts/niquesse/configuration.nix` — cho app dùng generic "sans-serif"/"monospace". **Cố ý KHÔNG đổi kitty** (vẫn `MonaspiceXe NFM`, có symbol_map/ligature riêng, đổi dễ gãy) — quyết định của user 2026-07-05.
 
 **Bỏ hẳn (CachyOS-specific, vô nghĩa trên NixOS):** mọi `cachyos-*` (cachyos-niri-noctalia, cachyos-alacritty-config, cachyos-fish-config...), paru, fish + cachyos-fish-config (user đã gỡ fish bên cũ).
 
