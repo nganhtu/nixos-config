@@ -30,4 +30,15 @@
   home.file.".docker/cli-plugins/docker-compose".source =
     "${pkgs.docker-compose}/libexec/docker/cli-plugins/docker-compose";
 
+  # figma-linux upstream không khai MimeType → portal không nhận ra handler cho figma://.
+  # Override desktop entry để thêm, rồi đăng ký default.
+  xdg.desktopEntries.figma-linux = {
+    name = "Figma Linux";
+    exec = "figma-linux %U";
+    icon = "figma-linux";
+    comment = "Unofficial Figma desktop application for Linux";
+    mimeType = [ "x-scheme-handler/figma" ];
+  };
+  xdg.mimeApps.defaultApplications."x-scheme-handler/figma" = "figma-linux.desktop";
+
 }
