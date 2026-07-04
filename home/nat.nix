@@ -15,6 +15,7 @@
     ../modules/mangohud.nix
     ../modules/direnv.nix
     ../modules/git.nix
+    ../modules/fcitx5.nix
   ];
 
   home.username = "nat";
