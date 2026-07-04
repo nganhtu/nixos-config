@@ -91,7 +91,7 @@ Nội dung đã backup:
 - `.config/niri/` — config.kdl (include 8 file) + cfg/{animation,autostart,keybinds,input,display,layout,rules,misc}.kdl + noctalia.kdl. **Đây là phần dịch tốn công nhất.**
 - `.config/kitty/` — kitty.conf + themes/noctalia.conf.
 - `.config/helix/` — config.toml + themes/transparent_focus_nova.toml.
-- `.config/btop/` — btop.conf + themes/nord.theme.
+- `.config/btop/` — btop.conf + themes/nord.theme. **LƯU Ý kiểu dịch (2026-07-04):** btop.conf và fcitx5 (config/bamboo.conf) là file do TOOL TỰ GHI (dump đủ mọi key kể cả default) chứ không phải config tay → trong Nix CHỈ giữ key khác default (đã verify từng key với source đúng version: btop 1.4.7 btop_config.cpp, fcitx5 5.1.21 globalconfig.cpp, fcitx5-bamboo 1.0.10 bambooconfig.h). Cả hai app đều fallback default cho key thiếu (đã kiểm chứng thực nghiệm với fcitx5). Riêng fcitx5 `profile` là DATA (danh sách IM) không phải setting — giữ nguyên khối, không trim.
 - `.config/fuzzel/` — fuzzel.ini + themes/noctalia. icon-theme Papirus. Font fallback (đã dịch sang tên family thật trong nixpkgs, các tên `*TC`/`Noto Serif KR` repo cũ KHÔNG tồn tại): `Google Sans Code` → `LXGW WenKai` (Trung) → `Noto Sans CJK KR` (Hàn) → `Noto Sans CJK JP` (Nhật). Kitty dùng `symbol_map` ép dải Unicode: CJK→`LXGW WenKai Mono`, Hangul→`Noto Sans Mono CJK KR`, kana→`Noto Sans Mono CJK JP`, Hy Lạp+Cyrillic→`CaskaydiaCove Nerd Font Mono`. Han unification: kanji dùng chung codepoint chữ Hán nên hiện glyph kiểu Trung (LXGW), chỉ kana tách được sang font Nhật.
 - `.zshrc`, `.zprofile` — oh-my-zsh theme `ys`, plugins (git, archlinux, zsh-autosuggestions, zsh-syntax-highlighting), RẤT NHIỀU alias/function công việc.
 

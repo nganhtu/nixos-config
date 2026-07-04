@@ -1,96 +1,32 @@
 { ... }:
 
-# Dịch cấu hình fcitx5-configtool đã chỉnh tay: bamboo Telex 2 làm mặc định,
-# trigger đổi thành Super+space, bỏ hẳn AltTriggerKeys (temporarily toggle),
-# Share Input State = All để trạng thái bật/tắt + IM đang chọn dùng chung
-# giữa các cửa sổ.
+# Chỉ ghi setting KHÁC default (đối chiếu source fcitx5 5.1.21 globalconfig.cpp
+# + fcitx5-bamboo 1.0.10 bambooconfig.h). Key thiếu → fcitx5 tự dùng default
+# biên dịch sẵn (đã kiểm chứng thực nghiệm: key thiếu lẫn key lạ đều êm).
 #
-# LƯU Ý: HM symlink các file này read-only. Sửa qua fcitx5-configtool GUI sau
-# khi rebuild sẽ KHÔNG lưu được — đổi setting thì sửa file này, không dùng GUI.
+# LƯU Ý: HM symlink read-only → chỉnh qua fcitx5-configtool GUI sẽ không lưu
+# được; đổi setting thì sửa file này.
 {
   xdg.configFile."fcitx5/config".text = ''
     [Hotkey]
-    # Enumerate when holding modifier of Toggle key
-    EnumerateWithTriggerKeys=True
-    # Temporarily Toggle Input Method
+    # Temporarily Toggle Input Method (default Shift_L — bỏ, hay bấm nhầm)
     AltTriggerKeys=
-    # Enumerate Input Method Forward
-    EnumerateForwardKeys=
-    # Enumerate Input Method Backward
-    EnumerateBackwardKeys=
-    # Skip first input method while enumerating
-    EnumerateSkipFirst=False
-    # Enumerate Input Method Group Forward
+    # Default Super+space — phải bỏ để nhường phím cho TriggerKeys
     EnumerateGroupForwardKeys=
-    # Time limit in milliseconds for triggering modifier key shortcuts
-    ModifierOnlyKeyTimeout=250
 
+    # Default Control+space; list thay nguyên khối (không merge) nên giữ cả
+    # 2 phím JP/KR của default để không mất
     [Hotkey/TriggerKeys]
     0=Super+space
     1=Zenkaku_Hankaku
     2=Hangul
 
-    [Hotkey/ActivateKeys]
-    0=Hangul_Hanja
-
-    [Hotkey/DeactivateKeys]
-    0=Hangul_Romaja
-
-    [Hotkey/EnumerateGroupBackwardKeys]
-    0=Shift+Super+space
-
-    [Hotkey/PrevPage]
-    0=Up
-
-    [Hotkey/NextPage]
-    0=Down
-
-    [Hotkey/PrevCandidate]
-    0=Shift+Tab
-
-    [Hotkey/NextCandidate]
-    0=Tab
-
-    [Hotkey/TogglePreedit]
-    0=Control+Alt+P
-
     [Behavior]
-    # Activate input method by default
-    ActiveByDefault=False
-    # Reset state on Focus In
-    resetStateWhenFocusIn=No
-    # Share Input State
+    # Default No — All để trạng thái bật/tắt + IM dùng chung mọi cửa sổ
     ShareInputState=All
-    # Show preedit in application
-    PreeditEnabledByDefault=True
-    # Show Input Method Information when switch input method
-    ShowInputMethodInformation=True
-    # Show Input Method Information when changing focus
-    showInputMethodInformationWhenFocusIn=False
-    # Show compact input method information
-    CompactInputMethodInformation=True
-    # Show first input method information
-    ShowFirstInputMethodInformation=True
-    # Default Candidates per page
-    DefaultPageSize=5
-    # Override XKB Option
-    OverrideXkbOption=False
-    # Custom XKB Option
-    CustomXkbOption=
-    # Force Enabled Addons
-    EnabledAddons=
-    # Force Disabled Addons
-    DisabledAddons=
-    # Preload input method to be used by default
-    PreloadInputMethod=True
-    # Allow input method in the password field
-    AllowInputMethodForPassword=False
-    # Show preedit text when typing password
-    ShowPreeditForPassword=False
-    # Interval of saving user data in minutes
-    AutoSavePeriod=30
   '';
 
+  # Danh sách IM của group — là data đầy đủ, không phải setting, không trim.
   xdg.configFile."fcitx5/profile".text = ''
     [Groups/0]
     # Group Name
@@ -117,25 +53,10 @@
   '';
 
   xdg.configFile."fcitx5/conf/bamboo.conf".text = ''
-    # Restore Key Stroke
-    RestoreKeyStroke=
-    # Input Method
+    # Default "Telex"
     InputMethod="Telex 2"
-    # Output Charset
-    OutputCharset=Unicode
-    # Enable spell check
+    # Default True cả hai
     SpellCheck=False
-    # Enable Macro
     Macro=False
-    # Capitalize Macro
-    CapitalizeMacro=True
-    # Auto restore keys with invalid words
-    AutoNonVnRestore=True
-    # Use oà, _uý (instead of òa, úy)
-    ModernStyle=False
-    # Allow type with more freedom
-    FreeMarking=True
-    # Underline the preedit text
-    DisplayUnderline=True
   '';
 }
