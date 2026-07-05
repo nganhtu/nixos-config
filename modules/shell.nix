@@ -83,7 +83,7 @@
       # trong pane) → vẽ ảnh bằng chafa symbols (chỉ cần cell, không cần
       # pixel) bơm qua --logo-type data-raw; đường cùng mới về NixOS ascii.
       ff() {
-        local dir=~/Pictures/mhy_birthday_pics
+        local dir=~/Pictures/square
         local cache=~/.cache/fastfetch-thumbs
         local cfg=~/.config/fastfetch/ff.jsonc
         local chafacfg=~/.config/fastfetch/chafa.jsonc
@@ -91,12 +91,14 @@
           cfg=~/.config/fastfetch/ssh.jsonc
           chafacfg=$cfg
         fi
-        local pics=("$dir"/*.(jpg|jpeg|png|webp)(N))
+        # Quét đệ quy mọi thư mục con; cache giữ nguyên cấu trúc con để tên
+        # file trùng nhau giữa các folder không đè thumbnail của nhau.
+        local pics=("$dir"/**/*.(jpg|jpeg|png|webp)(N))
         if (( ''${#pics} > 0 )); then
           local pic=''${pics[RANDOM % ''${#pics} + 1]}
-          local thumb="$cache/''${pic:t:r}.png"
+          local thumb="$cache/''${''${pic#$dir/}:r}.png"
           if [[ ! -f $thumb ]]; then
-            mkdir -p "$cache"
+            mkdir -p "''${thumb:h}"
             magick "$pic" -resize 512x512 "$thumb" 2>/dev/null || thumb=$pic
           fi
           # --logo-recache: né bug fastfetch (≤2.65.1, master chưa sửa) — đường
@@ -135,15 +137,15 @@
 
       # Resize sẵn toàn bộ ảnh về thumbnail 512px cho ff (chạy trong update).
       ffcache() {
-        local dir=~/Pictures/mhy_birthday_pics
+        local dir=~/Pictures/square
         local cache=~/.cache/fastfetch-thumbs
         [[ -d $dir ]] || return 0
-        mkdir -p "$cache"
         local pic thumb
         local n=0
-        for pic in "$dir"/*.(jpg|jpeg|png|webp)(N); do
-          thumb="$cache/''${pic:t:r}.png"
+        for pic in "$dir"/**/*.(jpg|jpeg|png|webp)(N); do
+          thumb="$cache/''${''${pic#$dir/}:r}.png"
           if [[ ! -f $thumb || $pic -nt $thumb ]]; then
+            mkdir -p "''${thumb:h}"
             magick "$pic" -resize 512x512 "$thumb" && (( n += 1 ))
           fi
         done
