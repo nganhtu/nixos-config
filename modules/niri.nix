@@ -176,7 +176,12 @@
         open-floating = true;
       }
       {
-        matches = [ { app-id = "thunar"; title = "^Rename "; } ];
+        # app-id thực tế là "Thunar" (T hoa) — match không phân biệt hoa/thường
+        # cho chắc. Gom cả dialog copy/move (File Operation Progress).
+        matches = [
+          { app-id = "(?i)^thunar$"; title = "^Rename "; }
+          { app-id = "(?i)^thunar$"; title = "^File Operation Progress$"; }
+        ];
         open-floating = true;
       }
       {
