@@ -26,7 +26,7 @@ zsh + oh-my-zsh (`natys` theme), defined in [`modules/shell.nix`](../modules/she
 |---|---|
 | `nrs` | Rebuild the system: `nh os switch` |
 | `update` | Full maintenance pass: flake update → rebuild → docker prune → tldr update → fastfetch thumbnails (`ffcache`) → journal vacuum (1 week) → GC (`nh clean all --keep 25`) |
-| `ff` | fastfetch with a random square photo as the logo (runs on every new shell). Real image in kitty — also over ssh (kitty-icat); colored chafa block-art where graphics don't work (herdr); NixOS ascii as last resort |
+| `ff` | fastfetch with a random square photo as the logo (runs on every new shell). Real image in kitty — also over ssh (kitty-icat); colored chafa block-art where graphics don't work (herdr, virtual tty); NixOS ascii as last resort |
 | `ffcache` | Pre-resize every photo to a 512px thumbnail in `~/.cache/fastfetch-thumbs` (also a step of `update`) |
 | `diskusage [path]` | Interactive disk usage with [gdu](https://github.com/dundee/gdu) (defaults to `/`) |
 | `screenrec [-r] [-a\|-m]` | Screen recording, VAAPI h264 @ 60fps → `~/Videos/`. `-r` pick an area (slurp), `-a` capture app audio, `-m` capture mic |

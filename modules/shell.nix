@@ -99,16 +99,34 @@
             mkdir -p "$cache"
             magick "$pic" -resize 512x512 "$thumb" 2>/dev/null || thumb=$pic
           fi
+          # --logo-recache: né bug fastfetch (≤2.65.1, master chưa sửa) — đường
+          # cache ảnh tính logoHeight thừa 1 (thiếu -1 so với đường render mới)
+          # → ảnh nào trúng cache là cả block chữ nhảy lên đè dòng lệnh.
           if [[ $TERM == xterm-kitty* ]]; then
-            fastfetch --config "$cfg" --logo "$thumb"
+            fastfetch --config "$cfg" --logo-recache --logo "$thumb"
             return
           fi
           # 33x15 --stretch: 15 dòng art + 1 padding = 16 dòng chữ (chafa.jsonc
           # thêm mem bù chỗ tfnt mất trong herdr); 33 cột vì cell font hiện tại
           # hẹp hơn tỉ lệ 1:2 chafa giả định — ép khung cho ảnh vuông ra vuông.
+          # tty (TERM=linux): font kernel chỉ có 8 glyph khối CP437 (▀▄▌▐█░▒▓)
+          # — ép chafa đúng bộ đó kẻo ra rừng #; cell 8x16 chuẩn 1:2 nên 30x15
+          # vuông thật không cần --stretch; module GUI chết trong tty nên mượn
+          # luôn ssh.jsonc (toàn module phần cứng). Override qua CLI: padding
+          # của ssh.jsonc (top/left=0, chỉnh cho kitty-icat) làm ảnh sát mép,
+          # còn width=32 kế thừa từ logo gốc > art 30 làm hở thêm 2 cột gap.
           if (( ''${+commands[chafa]} )); then
-            fastfetch --config "$chafacfg" --logo-type data-raw \
-              --logo "$(chafa -f symbols --symbols block --stretch -s 33x15 "$thumb")"
+            local cargs=(--symbols block --stretch -s 33x15)
+            local fargs=()
+            if [[ $TERM == linux ]]; then
+              chafacfg=~/.config/fastfetch/ssh.jsonc
+              cargs=(--symbols vhalf+hhalf+solid+stipple -c 16 -s 30x15)
+              fargs=(--logo-width 30 --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3)
+            fi
+            # --polite on: bỏ cặp ESC[?25l/h (giấu/hiện con trỏ) — fastfetch
+            # không parse được escape dạng ?25l nên đếm nhầm bề rộng art +3 cột.
+            fastfetch --config "$chafacfg" --logo-type data-raw "''${fargs[@]}" \
+              --logo "$(chafa -f symbols --polite on "''${cargs[@]}" "$thumb")"
             return
           fi
         fi
