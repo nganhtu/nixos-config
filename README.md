@@ -42,10 +42,11 @@ A laptop NixOS setup built around **niri** (scrollable-tiling Wayland compositor
 │   └── nvidia.nix                         # PRIME offload + power management
 ├── home/<user>.nix                        # Home Manager entry point
 ├── modules/                               # shared HM modules
-│   ├── niri.nix      kitty.nix   helix.nix
-│   ├── shell.nix     yazi.nix    thunar.nix
-│   ├── fuzzel.nix    btop.nix    theme.nix
-│   └── mangohud.nix  claude.nix
+│   ├── niri.nix      kitty.nix    helix.nix
+│   ├── shell.nix     yazi.nix     thunar.nix
+│   ├── fuzzel.nix    btop.nix     theme.nix
+│   ├── fastfetch.nix direnv.nix   git.nix
+│   └── mangohud.nix  claude.nix   fcitx5.nix
 └── assets/
     ├── shell/themes/                      # oh-my-zsh custom theme
     ├── claude/                            # statusline script

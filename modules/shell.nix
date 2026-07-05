@@ -74,7 +74,65 @@
 
       setopt appendhistory
 
-      fastfetch -l NixOS -s title:separator:os:kernel:uptime:packages:localip:locale:wm:shell:terminal:break:theme:icons:cursor:font:terminalfont:break:colors
+      # fastfetch với ảnh vuông ngẫu nhiên. Config của ta ở ff.jsonc/ssh.jsonc
+      # (modules/fastfetch.nix) — cố ý KHÔNG dùng config.jsonc để `fastfetch`
+      # trần giữ nguyên bản gốc. Qua ssh dùng ssh.jsonc (module GUI chết qua
+      # ssh → thay block phần cứng, logo kitty-icat để kitten tự stream ảnh).
+      # Terminal không có kitty graphics (herdr không passthrough, cũng không
+      # trả lời query pixel — đã probe bằng `kitten icat --detect-support`
+      # trong pane) → vẽ ảnh bằng chafa symbols (chỉ cần cell, không cần
+      # pixel) bơm qua --logo-type data-raw; đường cùng mới về NixOS ascii.
+      ff() {
+        local dir=~/Pictures/mhy_birthday_pics
+        local cache=~/.cache/fastfetch-thumbs
+        local cfg=~/.config/fastfetch/ff.jsonc
+        local chafacfg=~/.config/fastfetch/chafa.jsonc
+        if [[ -n $SSH_CONNECTION ]]; then
+          cfg=~/.config/fastfetch/ssh.jsonc
+          chafacfg=$cfg
+        fi
+        local pics=("$dir"/*.(jpg|jpeg|png|webp)(N))
+        if (( ''${#pics} > 0 )); then
+          local pic=''${pics[RANDOM % ''${#pics} + 1]}
+          local thumb="$cache/''${pic:t:r}.png"
+          if [[ ! -f $thumb ]]; then
+            mkdir -p "$cache"
+            magick "$pic" -resize 512x512 "$thumb" 2>/dev/null || thumb=$pic
+          fi
+          if [[ $TERM == xterm-kitty* ]]; then
+            fastfetch --config "$cfg" --logo "$thumb"
+            return
+          fi
+          # 33x15 --stretch: 15 dòng art + 1 padding = 16 dòng chữ (chafa.jsonc
+          # thêm mem bù chỗ tfnt mất trong herdr); 33 cột vì cell font hiện tại
+          # hẹp hơn tỉ lệ 1:2 chafa giả định — ép khung cho ảnh vuông ra vuông.
+          if (( ''${+commands[chafa]} )); then
+            fastfetch --config "$chafacfg" --logo-type data-raw \
+              --logo "$(chafa -f symbols --symbols block --stretch -s 33x15 "$thumb")"
+            return
+          fi
+        fi
+        fastfetch --config "$cfg" --logo-type builtin --logo NixOS
+      }
+
+      # Resize sẵn toàn bộ ảnh về thumbnail 512px cho ff (chạy trong update).
+      ffcache() {
+        local dir=~/Pictures/mhy_birthday_pics
+        local cache=~/.cache/fastfetch-thumbs
+        [[ -d $dir ]] || return 0
+        mkdir -p "$cache"
+        local pic thumb
+        local n=0
+        for pic in "$dir"/*.(jpg|jpeg|png|webp)(N); do
+          thumb="$cache/''${pic:t:r}.png"
+          if [[ ! -f $thumb || $pic -nt $thumb ]]; then
+            magick "$pic" -resize 512x512 "$thumb" && (( n += 1 ))
+          fi
+        done
+        echo "ffcache: thêm $n thumbnail mới ($cache)"
+      }
+
+      ff
 
       if command -v fzf >/dev/null 2>&1; then
         source <(fzf --zsh)
@@ -168,6 +226,9 @@
 
         echo -e "\n[+] Updating tldr pages..."
         tldr --update || true
+
+        echo -e "\n[+] Caching fastfetch thumbnails..."
+        ffcache || true
 
         echo -e "\n[+] Cleaning systemd journal (keeping last 1 week)..."
         sudo journalctl --vacuum-time=1w

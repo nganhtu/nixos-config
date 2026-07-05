@@ -7,6 +7,7 @@
     ../modules/helix.nix
     ../modules/btop.nix
     ../modules/fuzzel.nix
+    ../modules/fastfetch.nix
     ../modules/theme.nix
     ../modules/claude.nix
     ../modules/shell.nix

@@ -118,6 +118,14 @@ Ristretto (Image Viewer) xin maximize ngay khi mở, khiến cửa sổ chiếm 
 
 **Cả 2 action dùng `%F` (không phải `%f`)** trong `<command>` — Thunar ẩn action khỏi menu khi multi-select nếu command chỉ chứa placeholder số ít (`%f`/`%d`/`%n`); script nhận nhiều đường dẫn qua `"$@"` và loop. Bên trong mỗi script còn phải tự `readlink -f` lại `$f` trước khi `cd` sang thư mục tạm — nếu không, đường dẫn tương đối (Thunar luôn truyền tuyệt đối nên không gặp thực tế, nhưng khi tự test bằng glob tương đối thì `undmg` segfault thẳng thay vì báo lỗi rõ ràng).
 
+### fastfetch ảnh vuông — ff/ffcache (2026-07-05)
+Bố cục: ảnh vuông random (`~/Pictures/mhy_birthday_pics`, 366 ảnh ~2500px) bên trái → key viết tắt 6 ký tự nhiều màu (thay block `colors`) → info; tổng ≤93 cột. `modules/fastfetch.nix` sinh **3 config**: `ff.jsonc` (kitty local), `chafa.jsonc` (= ff + `mem`, cho terminal không graphics — `tfnt` không detect được ở đó), `ssh.jsonc` (bỏ module GUI vì chết qua ssh, thay block phần cứng `hw/cpu/mem/loc/bat/ip`, cpu `format={name}` kẻo tràn 93 cột). **CỐ Ý không dùng `config.jsonc`** — `fastfetch` trần giữ nguyên bản gốc; chỉ hàm `ff` (shell.nix, chạy mỗi lần mở shell) gọi config qua `--config`. `ffcache` resize sẵn toàn bộ về 512px PNG (`~/.cache/fastfetch-thumbs`, ~150MB), là một bước trong `update`; `ff` cũng tự cache lười từng ảnh (magick).
+
+Gotchas đã kiểm chứng (đừng thử lại đường cũ):
+- `display.key.width` KHÔNG tác dụng với logo ảnh (chỉ logo ascii mới nhảy cột `ESC[nG`) → pad space thẳng vào chuỗi key.
+- Logo type `kitty` = gửi in-band qua tty; `kitty-direct` gửi path (chết ssh chắc chắn). Thực tế qua tailscale ssh type `kitty` vẫn tịt (đo pixel-cell qua pty fail → chừa khoảng trống rỗng) → ssh dùng `kitty-icat`. icat tự định vị ảnh lần nữa sau khi fastfetch đã dời con trỏ theo padding → ssh.jsonc phải đặt `top=0,left=0`, dồn khoảng cách vào `right` kẻo lệch kép.
+- **herdr không hiển thị ảnh thật được, cả local lẫn --remote** (đã probe `kitten icat --detect-support` trong pane thật: herdr không trả lời cả query pixel — điều kiện tiên quyết của mọi giao thức ảnh; binary đóng/nén, không có option nào). herdr đặt `TERM=xterm-256color` nhưng KITTY_* vẫn leak vào env — detect bằng TERM, đừng dùng KITTY_*. Fallback: **chafa CLI** render block-art màu bơm qua `--logo-type data-raw` (type `chafa` builtin của fastfetch KHÔNG dùng được — chung đường tính pixel nên cũng chết trong herdr). `--stretch -s 33x15` vì cell font hiện tại hẹp hơn tỉ lệ 1:2 chafa giả định (để tự tính thì ảnh vuông ra hình gầy).
+
 ---
 
 ## 6. Map imperative → declarative (từ note cài CachyOS cũ)
