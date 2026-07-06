@@ -124,6 +124,12 @@
               chafacfg=~/.config/fastfetch/ssh.jsonc
               cargs=(--symbols vhalf+hhalf+solid+stipple -c 16 -s 30x15)
               fargs=(--logo-width 30 --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3)
+            elif [[ -n $SSH_CONNECTION ]]; then
+              # ssh.jsonc để padding top/left=0, right=5 riêng cho path kitty-icat
+              # thật (icat tự định vị lại con trỏ nên bù trừ khác); nhánh
+              # data-raw/chafa này không qua icat nên không dính quirk đó — cần
+              # padding thường như local.
+              fargs=(--logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3)
             fi
             # --polite on: bỏ cặp ESC[?25l/h (giấu/hiện con trỏ) — fastfetch
             # không parse được escape dạng ?25l nên đếm nhầm bề rộng art +3 cột.
