@@ -140,17 +140,29 @@
         local dir=~/Pictures/square
         local cache=~/.cache/fastfetch-thumbs
         [[ -d $dir ]] || return 0
+        local pics=("$dir"/**/*.(jpg|jpeg|png|webp)(N))
+        local total=''${#pics}
+        (( total == 0 )) && { echo "ffcache: không có ảnh trong $dir"; return 0; }
         local pic thumb
-        local n=0
+        local n=0 i=0
+        local width=30                                # bề rộng thanh tiến trình
         typeset -A valid                              # tập đường thumb hợp lệ
-        for pic in "$dir"/**/*.(jpg|jpeg|png|webp)(N); do
+        for pic in "''${pics[@]}"; do
+          (( i += 1 ))
           thumb="$cache/''${''${pic#$dir/}:r}.png"
           valid[$thumb]=1
           if [[ ! -f $thumb || $pic -nt $thumb ]]; then
             mkdir -p "''${thumb:h}"
             magick "$pic" -resize 512x512 "$thumb" && (( n += 1 ))
           fi
+          # Thanh tiến trình cập nhật tại chỗ, chỉ vẽ khi stdout là terminal.
+          if [[ -t 1 ]]; then
+            local filled=$(( i * width / total ))
+            printf '\r\e[Kffcache [%s%s] %3d%% (%d/%d)' \
+              "''${(l:filled::#:)}" "''${(l:width-filled:)}" $(( i * 100 / total )) $i $total
+          fi
         done
+        [[ -t 1 ]] && printf '\r\e[K'                 # xóa dòng progress trước khi in kết quả
         # Prune: xóa thumb mồ côi (nguồn đã biến mất) + dọn thư mục con rỗng.
         local p=0
         if [[ -d $cache ]]; then
