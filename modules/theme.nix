@@ -13,8 +13,8 @@
     enable = true;
     gtk4.theme = null;
     font = {
-      name = "SF Pro Text";
-      size = 12;
+      name = "SF Pro";
+      size = 11;
     };
     cursorTheme = {
       package = pkgs.apple-cursor;

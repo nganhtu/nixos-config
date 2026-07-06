@@ -100,7 +100,7 @@ in
   };
 
   fonts.fontconfig.defaultFonts.monospace = [ "SF Mono" ];
-  fonts.fontconfig.defaultFonts.sansSerif = [ "SF Pro Text" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "SF Pro" ];
 
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
