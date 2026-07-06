@@ -142,14 +142,24 @@
         [[ -d $dir ]] || return 0
         local pic thumb
         local n=0
+        typeset -A valid                              # tập đường thumb hợp lệ
         for pic in "$dir"/**/*.(jpg|jpeg|png|webp)(N); do
           thumb="$cache/''${''${pic#$dir/}:r}.png"
+          valid[$thumb]=1
           if [[ ! -f $thumb || $pic -nt $thumb ]]; then
             mkdir -p "''${thumb:h}"
             magick "$pic" -resize 512x512 "$thumb" && (( n += 1 ))
           fi
         done
-        echo "ffcache: thêm $n thumbnail mới ($cache)"
+        # Prune: xóa thumb mồ côi (nguồn đã biến mất) + dọn thư mục con rỗng.
+        local p=0
+        if [[ -d $cache ]]; then
+          for thumb in "$cache"/**/*.png(N); do
+            [[ -z ''${valid[$thumb]} ]] && rm -f "$thumb" && (( p += 1 ))
+          done
+          find "$cache" -mindepth 1 -type d -empty -delete 2>/dev/null
+        fi
+        echo "ffcache: thêm $n, xóa $p thumbnail mồ côi ($cache)"
       }
 
       ff
