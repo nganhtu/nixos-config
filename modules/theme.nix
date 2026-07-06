@@ -22,12 +22,12 @@
       size = 24;
     };
     iconTheme = {
-      package = pkgs.papirus-icon-theme;
-      name = "Papirus";
+      package = pkgs.adwaita-icon-theme;
+      name = "Adwaita";
     };
     theme = {
-      package = pkgs.adw-gtk3;
-      name = "adw-gtk3";
+      package = pkgs.gnome-themes-extra;
+      name = "Adwaita";
     };
   };
 }
