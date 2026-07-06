@@ -20,10 +20,6 @@
     0=Super+space
     1=Zenkaku_Hankaku
     2=Hangul
-
-    [Behavior]
-    # Default No — All để trạng thái bật/tắt + IM dùng chung mọi cửa sổ
-    ShareInputState=All
   '';
 
   # Danh sách IM của group — là data đầy đủ, không phải setting, không trim.
