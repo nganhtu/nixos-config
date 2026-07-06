@@ -55,6 +55,13 @@ let
     text = ''nmcli -t -f NAME,TYPE connection show --active | awk -F: '$2~/wireless/{v[n++]=$1} $2~/ethernet/{v[n++]="ethernet"} END{for(i=0;i<n;i++) printf "%s%s", (i?" + ":""), v[i]; print ""}' '';
   };
 
+  # tfnt (terminalfont) tách riêng khỏi localModules: chỉ detect được trên
+  # kitty local (query font qua escape code) — herdr không trả lời được nên
+  # chafa.jsonc thay bằng battery thay vì nối thêm (giữ nguyên 13 module để
+  # màu cuối tự chan đúng pha với ff.jsonc, không lệch màu do lệch số lượng).
+  tfnt = { type = "terminalfont"; key = "tfnt  "; };
+  battery = { type = "battery"; key = "bat   "; };
+
   localModules = [ title "break" ] ++ info ++ [
     { type = "wm"; key = "wm    "; }
     { type = "shell"; key = "sh    "; }
@@ -65,7 +72,6 @@ let
     { type = "icons"; key = "ico   "; }
     { type = "cursor"; key = "cur   "; }
     { type = "font"; key = "fnt   "; }
-    { type = "terminalfont"; key = "tfnt  "; }
   ];
 in
 {
@@ -82,17 +88,16 @@ in
   xdg.configFile."fastfetch/ff.jsonc".text = builtins.toJSON {
     inherit logo;
     display.separator = "";
-    modules = colorize localModules;
+    modules = colorize (localModules ++ [ tfnt ]);
   };
 
   # Bản cho nhánh chafa (herdr/terminal không graphics): tfnt không detect
-  # được ở đó → thêm mem bù dòng, CHỈ bản này (kitty giữ nguyên).
+  # được ở đó → thay bằng battery (không phải nối thêm), CHỈ bản này (kitty
+  # giữ nguyên tfnt).
   xdg.configFile."fastfetch/chafa.jsonc".text = builtins.toJSON {
     inherit logo;
     display.separator = "";
-    modules = colorize (localModules ++ [
-      { type = "memory"; key = "mem   "; }
-    ]);
+    modules = colorize (localModules ++ [ battery ]);
   };
 
   # Config cho phiên ssh (ff tự chọn khi có $SSH_CONNECTION) và tty: các module
