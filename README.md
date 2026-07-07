@@ -54,6 +54,8 @@ A laptop NixOS setup built around **niri** (scrollable-tiling Wayland compositor
         ├── apple/                         # SF Pro, SF Compact, SF Mono, New York
         ├── google-sans/
         ├── google-sans-code/
+        ├── monaspace/                     # Argon/Krypton/Neon/Radon/Xenon — kitty + default monospace
+        ├── symbol-nerd-fonts/             # Nerd Font glyph fallback
         └── windows/                       # Segoe UI, Calibri, …
 ```
 
@@ -76,4 +78,4 @@ sudo nixos-rebuild switch --flake ~/nixos-config#<hostname>  # plain fallback
 
 ## Fonts
 
-`assets/fonts/windows/` (Segoe UI, Calibri, …) and `apple/` (SF Pro, SF Compact, SF Mono, New York — system default sans/mono) hold proprietary fonts bundled by the `proprietary-fonts` derivation in `hosts/<hostname>/configuration.nix` — personal copies kept in this private repo, not for redistribution. `google-sans/` and `google-sans-code/` are under the SIL Open Font License (see each directory's `OFL.txt`).
+`assets/fonts/windows/` (Segoe UI, Calibri, …), `apple/` (SF Pro, SF Compact, SF Mono, New York — system default sans), `monaspace/` (kitty's font + system default monospace) and `symbol-nerd-fonts/` hold fonts bundled by the `proprietary-fonts` derivation in `hosts/<hostname>/configuration.nix` — it `find`s every `.ttf`/`.otf`/`.ttc` under `assets/fonts/`, so adding a new font is just dropping files in and `git add`-ing them (the flake only sees tracked files). Personal copies kept in this private repo, not for redistribution. `google-sans/` and `google-sans-code/` are under the SIL Open Font License (see each directory's `OFL.txt`).

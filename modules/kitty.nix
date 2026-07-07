@@ -5,33 +5,37 @@
     enable = true;
 
     font = {
-      name = "MonaspiceAR NFM";
+      name = "Monaspace Argon NF";
       size = 12;
     };
 
+    # Bản tải thẳng từ source (assets/fonts/monaspace) — mỗi family chỉ có 1
+    # variant NF (đã monospace sẵn, không còn hậu tố NFM/NFP như bản
+    # nerd-fonts.monaspace cũ của nixpkgs) → postscript name đổi từ
+    # Monaspice<Ar|Kr|Ne|Rn|Xe>NFM-* sang Monaspace<FullName>NF-*.
     extraConfig = ''
       modify_font cell_height 110%
       modify_font baseline -1
-      font_features MonaspiceArNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNFM-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceArNFM-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceKrNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceKrNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceKrNFM-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceKrNFM-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceNeNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceNeNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceNeNFM-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceNeNFM-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceRnNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceRnNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceRnNFM-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceRnNFM-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceXeNFM-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceXeNFM-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceXeNFM-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
-      font_features MonaspiceXeNFM-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceArgonNF-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceArgonNF-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceArgonNF-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceArgonNF-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceKryptonNF-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceKryptonNF-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceKryptonNF-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceKryptonNF-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceNeonNF-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceNeonNF-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceNeonNF-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceNeonNF-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceRadonNF-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceRadonNF-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceRadonNF-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceRadonNF-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceXenonNF-Regular -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceXenonNF-Bold -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceXenonNF-Italic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
+      font_features MonaspaceXenonNF-BoldItalic -calt +ss01 +ss02 +ss03 +ss04 +ss05 +ss07 +ss08 +ss09 +ss10 +case
 
       symbol_map U+23FB-U+23FE,U+2630,U+2665,U+26A1,U+276C-U+2771,U+2B58,U+E000-U+E00A,U+E0A0-U+E0A3,U+E0B0-U+E0C8,U+E0CA,U+E0CC-U+E0D2,U+E0D4,U+E0D6-U+E0D7,U+E200-U+E2A9,U+E300-U+E3E3,U+E5FA-U+E6B8,U+E700-U+E8EF,U+EA60-U+EA88,U+EA8A-U+EA8C,U+EA8F-U+EAC7,U+EAC9,U+EACC-U+EB09,U+EB0B-U+EB4E,U+EB50-U+EC1E,U+ED00-U+EFCE,U+F000-U+F381,U+F400-U+F533,U+F0001-U+F1AF0 Symbols Nerd Font Mono
       symbol_map U+3000-U+303F,U+3400-U+4DBF,U+4E00-U+9FFF,U+F900-U+FAFF,U+FF00-U+FFEF LXGW WenKai Mono
@@ -47,8 +51,8 @@
       inactive_border_color = "#ccccff";
 
       bold_font = "auto";
-      italic_font = "postscript_name=MonaspiceRnNFM-Regular";
-      bold_italic_font = "postscript_name=MonaspiceRnNFM-Bold";
+      italic_font = "postscript_name=MonaspaceRadonNF-Regular";
+      bold_italic_font = "postscript_name=MonaspaceRadonNF-Bold";
 
       background_opacity = "0.8";
       dynamic_background_opacity = "yes";

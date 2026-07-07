@@ -99,13 +99,14 @@ in
     };
   };
 
-  fonts.fontconfig.defaultFonts.monospace = [ "SF Mono" ];
-  fonts.fontconfig.defaultFonts.sansSerif = [ "SF Pro" ];
+  fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI" ];
 
+  # Monaspace + Symbols Nerd Font: bản tải thẳng từ source (assets/fonts/monaspace,
+  # assets/fonts/symbol-nerd-fonts), KHÔNG dùng nerd-fonts.monaspace/symbols-only
+  # của nixpkgs nữa — proprietary-fonts tự find mọi ttf/otf dưới assets/fonts/.
   fonts.packages = with pkgs; [
     nerd-fonts.caskaydia-cove
-    nerd-fonts.monaspace
-    nerd-fonts.symbols-only
     lxgw-wenkai
     noto-fonts
     noto-fonts-cjk-sans
