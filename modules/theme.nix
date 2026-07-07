@@ -11,10 +11,9 @@
 
   gtk = {
     enable = true;
-    gtk4.theme = null;
     font = {
-      name = "SF Pro";
-      size = 11;
+      name = "Segoe UI";
+      size = 12;
     };
     cursorTheme = {
       package = pkgs.apple-cursor;
