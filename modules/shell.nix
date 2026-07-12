@@ -87,9 +87,50 @@
         # WJ (U+2060, zero-width, kh\u00f4ng ph\u1ea3i whitespace) ch\u1ed1t cu\u1ed1i gi\u1eef l\u1ea1i space
         # \u2192 sidebar hi\u1ec7n ">_ \u00b7 <l\u1ec7nh>" thay v\u00ec ">_\u00b7 <l\u1ec7nh>".
         _herdr_glyph=$'\uf120 \u2060'
+        # `herdr integration` \u2014 herdr t\u1ef1 nh\u1eadn di\u1ec7n c\u00e1c agent n\u00e0y v\u00e0 t\u1ef1 qu\u1ea3n
+        # label + state c\u1ee7a ch\u00fang. 1 pane ch\u1ec9 gi\u1eef 1 agent record, n\u00ean v\u1edbi ch\u00fang
+        # shell ch\u1ec9 \u0111\u01b0\u1ee3c g\u00f3p custom_status (report-metadata), TUY\u1ec6T \u0110\u1ed0I kh\u00f4ng
+        # report-agent \u2014 s\u1ebd \u0111\u00e8 m\u1ea5t label, state th\u1eadt l\u1eabn notification.
+        _herdr_agents=(claude codex copilot cursor devin droid hermes kilo kimi
+                       mastracode omp opencode pi qodercli)
 
         _herdr_report()  { herdr pane report-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" --state "$1" --custom-status "$2" &>/dev/null; }
         _herdr_release() { herdr pane release-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" &>/dev/null; }
+        _herdr_meta()    { herdr pane report-metadata "$HERDR_PANE_ID" --source shell "$@" &>/dev/null; }
+        _herdr_focused() { [[ "$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.focused')" == true ]]; }
+
+        # Lệnh đang chặn chờ ta gõ vào. Điều kiện: tty ở chế độ canonical (TUI
+        # như helix/btop đặt raw → loại ngay), VÀ một trong hai:
+        #   -echo       → prompt mật khẩu. sudo là setuid root nên /proc/<pid>/wchan
+        #                 bị che (=0), termios là tín hiệu DUY NHẤT bắt được nó.
+        #   wait_woken  → tiến trình foreground kẹt trong read() trên tty (y/N…).
+        #                 Hiếm gặp ngoài ca này: zle/TUI/poll đều ra poll_schedule_timeout.
+        _herdr_waiting() {
+          [[ -n $TTY ]] || return 1
+          local flags=(''${(f)"$(stty -F $TTY -a 2>/dev/null | tr ' ;' '\n\n')"})
+          (( $flags[(Ie)icanon] )) || return 1
+          (( $flags[(Ie)-echo] )) && return 0
+          ps -t ''${TTY#/dev/} -o stat=,wchan:20= 2>/dev/null | grep -q '+.*wait_woken'
+        }
+
+        _herdr_watch() {
+          local state=
+          sleep 1
+          while :; do
+            local now=working
+            _herdr_waiting && now=blocked
+            if [[ $now != $state ]]; then
+              state=$now
+              _herdr_report $now "$1"
+              # --sound none: herdr đã tự phát tiếng khi agent đổi state ở space
+              # nền ([ui.sound]); toast này chỉ để đọc lệnh nào đang chờ.
+              if [[ $state == blocked ]] && ! _herdr_focused; then
+                herdr notification show "$1" --body "đang chờ nhập · ''${PWD:t}" --sound none &>/dev/null
+              fi
+            fi
+            sleep 2
+          done
+        }
 
         _herdr_preexec() {
           # lệnh mới → dẹp nháy-lỗi còn treo của lệnh trước (kẻo timer của nó
@@ -101,16 +142,26 @@
           fi
           local cmd=$1
           (( ''${#cmd} > 31 )) && cmd="''${cmd[1,30]}…"
+          if (( $_herdr_agents[(Ie)''${''${1%% *}:t}] )); then
+            _herdr_agent_cmd=$cmd
+            _herdr_meta --custom-status "$cmd"
+            return
+          fi
           _herdr_cmd=$cmd
           _herdr_start=$SECONDS
-          ( sleep 1 && _herdr_report working "$cmd" ) &!
-          _herdr_timer=$!
+          _herdr_watch "$cmd" &!
+          _herdr_watcher=$!
         }
 
         _herdr_precmd() {
           local ret=$?
+          if [[ -n $_herdr_agent_cmd ]]; then
+            _herdr_meta --clear-custom-status
+            _herdr_agent_cmd=
+            return $ret
+          fi
           [[ -n $_herdr_cmd ]] || return $ret
-          [[ -n $_herdr_timer ]] && kill $_herdr_timer 2>/dev/null
+          [[ -n $_herdr_watcher ]] && kill $_herdr_watcher 2>/dev/null
           local elapsed=$(( SECONDS - _herdr_start ))
           if (( elapsed >= 1 )); then
             if (( ret != 0 )); then
@@ -120,11 +171,11 @@
             else
               _herdr_release
             fi
-            if (( elapsed >= 20 )) && [[ "$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.focused')" != true ]]; then
+            if (( elapsed >= 20 )) && ! _herdr_focused; then
               herdr notification show "$_herdr_cmd" --body "xong sau ''${elapsed}s · ''${PWD:t}" --sound done &>/dev/null
             fi
           fi
-          _herdr_cmd= _herdr_timer=
+          _herdr_cmd= _herdr_watcher=
           return $ret
         }
 
