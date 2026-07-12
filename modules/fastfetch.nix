@@ -6,7 +6,7 @@ let
   title = {
     type = "title";
     color = {
-      user = "95";
+      user = "35";
       at = "92";
       host = "94";
     };
@@ -15,7 +15,7 @@ let
   # Màu key chia vòng 6 màu bright theo đúng thứ tự hiển thị của từng config —
   # thêm/bớt/đảo module thoải mái, màu tự chan đều lại. Title không có key nên
   # giữ nguyên màu riêng ở trên.
-  palette = [ "91" "92" "93" "94" "95" "96" ];
+  palette = [ "31" "32" "33" "34" "35" "36" ];
   colorize = mods:
     (builtins.foldl'
       (acc: m:
