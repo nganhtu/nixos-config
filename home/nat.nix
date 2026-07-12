@@ -19,6 +19,7 @@
     ../modules/fcitx5.nix
     ../modules/tuxedo.nix
     ../modules/tuxedo-sync.nix
+    ../modules/noctalia.nix
   ];
 
   home.username = "nat";
