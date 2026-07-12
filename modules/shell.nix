@@ -74,6 +74,66 @@
 
       setopt appendhistory
 
+      # ── herdr: hiện lệnh đang chạy dở lên sidebar (phần AGENTS) ──
+      # Shell trần KHÔNG phải "agent" nên custom_status của nó không render;
+      # report-agent "phong" pane thành agent tạm → lúc đó mới hiện. LABEL cố
+      # định = glyph terminal (nf U+F120) để phân biệt với AI agent thật (claude,
+      # …); custom_status = dòng lệnh. Đang chạy = chấm working cạnh space + 1
+      # entry ở AGENTS; xong thì release (tắt). Lệnh LỖI nháy blocked 3s rồi tắt.
+      # preexec set SAU ~1s để lệnh chớp nhoáng không kịp hiện. Chỉ trong herdr.
+      if [[ -n $HERDR_PANE_ID ]]; then
+        autoload -Uz add-zsh-hook
+        # glyph + space + word-joiner: herdr c\u1eaft trailing whitespace c\u1ee7a label,
+        # WJ (U+2060, zero-width, kh\u00f4ng ph\u1ea3i whitespace) ch\u1ed1t cu\u1ed1i gi\u1eef l\u1ea1i space
+        # \u2192 sidebar hi\u1ec7n ">_ \u00b7 <l\u1ec7nh>" thay v\u00ec ">_\u00b7 <l\u1ec7nh>".
+        _herdr_glyph=$'\uf120 \u2060'
+
+        _herdr_report()  { herdr pane report-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" --state "$1" --custom-status "$2" &>/dev/null; }
+        _herdr_release() { herdr pane release-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" &>/dev/null; }
+
+        _herdr_preexec() {
+          # lệnh mới → dẹp nháy-lỗi còn treo của lệnh trước (kẻo timer của nó
+          # release nhầm, hoặc kẹt blocked nếu lệnh này chớp nhoáng < 1s).
+          if [[ -n $_herdr_blocked_timer ]]; then
+            kill $_herdr_blocked_timer 2>/dev/null
+            _herdr_blocked_timer=
+            _herdr_release
+          fi
+          local cmd=$1
+          (( ''${#cmd} > 31 )) && cmd="''${cmd[1,30]}…"
+          _herdr_cmd=$cmd
+          _herdr_start=$SECONDS
+          ( sleep 1 && _herdr_report working "$cmd" ) &!
+          _herdr_timer=$!
+        }
+
+        _herdr_precmd() {
+          local ret=$?
+          [[ -n $_herdr_cmd ]] || return $ret
+          [[ -n $_herdr_timer ]] && kill $_herdr_timer 2>/dev/null
+          local elapsed=$(( SECONDS - _herdr_start ))
+          if (( elapsed >= 1 )); then
+            if (( ret != 0 )); then
+              _herdr_report blocked "✗ $_herdr_cmd"
+              ( sleep 3 && _herdr_release ) &!
+              _herdr_blocked_timer=$!
+            else
+              _herdr_release
+            fi
+            if (( elapsed >= 20 )) && [[ "$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.focused')" != true ]]; then
+              herdr notification show "$_herdr_cmd" --body "xong sau ''${elapsed}s · ''${PWD:t}" --sound done &>/dev/null
+            fi
+          fi
+          _herdr_cmd= _herdr_timer=
+          return $ret
+        }
+
+        add-zsh-hook preexec _herdr_preexec
+        # precmd chạy TRƯỚC các precmd khác để $? còn nguyên exit status của lệnh;
+        # hàm trả lại $ret nên precmd sau (theme...) vẫn thấy đúng exit status.
+        precmd_functions=(_herdr_precmd ''${precmd_functions:#_herdr_precmd})
+      fi
+
       # fastfetch với ảnh vuông ngẫu nhiên. Config của ta ở ff.jsonc/ssh.jsonc
       # (modules/fastfetch.nix) — cố ý KHÔNG dùng config.jsonc để `fastfetch`
       # trần giữ nguyên bản gốc. Qua ssh dùng ssh.jsonc (module GUI chết qua
