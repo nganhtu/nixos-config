@@ -1,10 +1,18 @@
-# Bliss palette — nguồn màu CHUNG cho kitty (modules/kitty.nix) và custom theme
-# tuxedo (modules/tuxedo.nix). Sửa ở đây, cả hai đổi theo khi nrs. Không khai lại
-# màu ở nơi khác. Tên theo ANSI: black/red/.../white + bright*.
+# Bliss palette — nguồn màu CHUNG, DUY NHẤT của repo: kitty (modules/kitty.nix),
+# theme tuxedo (modules/tuxedo.nix), focus-ring niri (modules/niri.nix). Sửa ở
+# đây, tất cả đổi theo khi nrs. KHÔNG viết mã hex ở bất kỳ file nào khác.
+# Tên theo ANSI: black/red/.../white + bright*.
 {
   background  = "#16181f";
   foreground  = "#eaeaea";
   selectionBg = "#55596d";
+
+  # Màu UI ngoài bảng ANSI.
+  border        = "#8080ff";  # viền cửa sổ kitty (active = inactive)
+  focusRing     = "#ccccff";  # focus-ring niri
+  cursorText    = "#2b2b2b";  # chữ nằm dưới con trỏ kitty
+  url           = "#005bbb";
+  tabInactiveFg = "#676767";
 
   black         = "#000000";
   red           = "#ff6f8d";

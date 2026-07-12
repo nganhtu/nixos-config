@@ -1,5 +1,8 @@
 { config, pkgs, options, ... }:
 
+let
+  palette = import ./palette.nix;
+in
 {
   home.packages = [ pkgs.apple-cursor ];
 
@@ -214,7 +217,7 @@
       ];
       focus-ring = {
         width = 2;
-        active.color = "#CCCCFF";
+        active.color = palette.focusRing;
       };
     };
 

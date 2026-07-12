@@ -128,8 +128,10 @@ Gotchas đã kiểm chứng (đừng thử lại đường cũ):
 - **Cache ảnh của fastfetch lệch 1 dòng (bug upstream, ≤2.65.1 và master 2026-07):** đường cache (`printCachedPixel`) tính `logoHeight = height + paddingTop` còn đường render mới (`printImagePixels`) là `... - 1` → ảnh nào đã có trong `~/.cache/fastfetch/images/` là cursor-up thừa 1, cả block chữ đè lên dòng lệnh + thừa 1 dòng trống cuối. Biểu hiện "lúc bị lúc không" khi spam `ff` = ảnh random lúc trúng cache lúc không, KHÔNG phải race. Fix: `--logo-recache` (ép đường render mới, luôn nhất quán) trong nhánh kitty của `ff`. Chuỗi giấu/hiện con trỏ của chafa cũng làm fastfetch đo data-raw sai +3 cột → mọi lời gọi chafa trong `ff` phải có `--polite on`.
 - **tty ảo (`TERM=linux`, fbcon):** font kernel (VGA 8x16, 256 glyph CP437) KHÔNG có khối 1/8 của `--symbols block` (▅▆▔▊...) → ra rừng `#`. Nhánh tty trong `ff` ép `--symbols vhalf+hhalf+solid+stipple -c 16` (chỉ 8 glyph CP437: ▀▄▌▐█░▒▓, tty vẽ được thật) + `-s 30x15` KHÔNG --stretch (cell 8x16 chuẩn 1:2). Config mượn luôn `ssh.jsonc` — module GUI (wm/thm/ico/cur/fnt) chết trong tty y như qua ssh, block phần cứng thì chạy đủ — NHƯNG phải override qua CLI `--logo-width 30 --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3`: padding gốc (`top/left=0`, chỉnh cho kitty-icat) làm ảnh sát mép, còn `width=32` kế thừa > art 30 làm hở thêm 2 cột gap (data-raw lấy max(width, art) làm bề rộng logo). Muốn đẹp hơn nữa chỉ còn `services.kmscon` (thay cả console) — không đáng.
 
-### palette.nix — nguồn màu Bliss chung kitty + tuxedo (2026-07-12)
-`modules/palette.nix` = attrset màu đặt tên theo ANSI (`black`/`red`/…/`brightWhite` + `background`/`foreground`/`selectionBg`). Cả `kitty.nix` lẫn `tuxedo.nix` `import ./palette.nix` → sửa 1 chỗ, cả hai đổi khi nrs, KHÔNG khai màu hai lần. Trong kitty, KEY option vẫn là `color0..15` nhưng VALUE trỏ palette theo tên ANSI. `selectionBg` (#55596d) dùng cho kitty `selection_background` + tuxedo highlight.
+### palette.nix — nguồn màu DUY NHẤT của repo (2026-07-12)
+`modules/palette.nix` = attrset màu đặt tên theo ANSI (`black`/`red`/…/`brightWhite` + `background`/`foreground`/`selectionBg`) **+ nhóm UI ngoài ANSI** (`border`, `focusRing`, `cursorText`, `url`, `tabInactiveFg`). `kitty.nix`, `tuxedo.nix`, `niri.nix` đều `import ./palette.nix`.
+
+**QUY TẮC: KHÔNG viết mã hex ở bất kỳ file nào khác.** Thêm màu mới thì thêm vào palette rồi trỏ tới, đừng hardcode tại chỗ dùng. Kiểm bằng `grep -rniE '#[0-9a-f]{6}' --include='*.nix' .` — chỉ được ra `palette.nix`. Trong kitty, KEY option vẫn là `color0..15` nhưng VALUE trỏ palette theo tên ANSI.
 
 ### tuxedo — todo TUI + theme Bliss + sync gist 2 máy (2026-07-12)
 `modules/tuxedo.nix` + `modules/tuxedo-sync.nix`. tuxedo = TUI todo.txt.
@@ -144,7 +146,10 @@ Gotchas đã kiểm chứng (đừng thử lại đường cũ):
 - **Phải dùng `report-agent`, KHÔNG phải `report-metadata`:** shell trần không phải "agent" → `custom_status` set qua report-metadata KHÔNG render (đã test, vô hình). `herdr pane report-agent <pane> --source shell --agent <LABEL> --state working|blocked --custom-status <lệnh>` "phong" pane thành agent tạm → mới hiện: chấm cạnh space (phần SPACES) + entry `<LABEL> · <custom_status>` (phần AGENTS, dưới). `release-agent` (cùng source+label) để tắt. `--state` phải thuộc enum idle/working/blocked/unknown.
 - **LABEL = glyph terminal U+F120** (nf-fa-terminal, cố định mọi lệnh) để phân biệt với AI agent thật (claude…, hiện ở phần AGENTS với tên riêng); custom_status = dòng lệnh (rút gọn ≤30).
 - **herdr CẮT trailing whitespace của LABEL** → muốn dấu cách trước separator `·` (herdr tự chèn giữa label và custom_status) phải chèn **word-joiner U+2060** (zero-width, KHÔNG phải whitespace) làm chốt cuối: label = `$'\uf120 \u2060'` → hiện `>_ · lệnh` thay vì `>_· lệnh`. release phải dùng ĐÚNG label này (herdr match theo source+label).
-- Lifecycle: preexec set working SAU ~1s (lệnh <1s không kịp hiện, không nhấp nháy); precmd release khi OK, hoặc nháy blocked 3s rồi release khi lỗi ($?≠0). Race guard: lệnh mới hủy timer nháy-lỗi còn treo + release ngay (kẻo release nhầm lệnh mới / kẹt blocked). Giữ notification khi lệnh ≥20s xong ở space KHÔNG focus.
+- **1 PANE CHỈ GIỮ 1 AGENT RECORD** — `report-agent` không cộng thêm entry, nó THAY. Chạy `claude` trong pane thì herdr tự nhận diện (không cần hook; `~/.claude/settings.json` rỗng vẫn nhận) và tự quản label + state; shell mà cũng `report-agent` thì đè mất label (thành `>_`), state kẹt `working` (với shell, `claude -c` chỉ là lệnh foreground đang chạy) và **mất luôn notification** của claude. → preexec so lệnh với danh sách `herdr integration` (claude, codex, cursor, opencode…); trúng thì **chỉ** `report-metadata --custom-status <lệnh>` (herdr giữ nguyên agent/state, chỉ nhận custom_status), rồi `--clear-custom-status` khi agent thoát. Detector của herdr KHÔNG tự set custom_status — muốn thấy `claude · claude -c` thì phần `claude -c` phải do shell góp vào.
+- **Phát hiện lệnh đang CHỜ NHẬP** (watcher nền 2s/lần, chỉ gọi herdr khi state đổi): tty ở chế độ **canonical** (`icanon` — TUI như helix/btop đặt raw nên loại được ngay, dù chúng cũng luôn "chờ phím") VÀ một trong hai: (a) **tắt echo** → prompt mật khẩu — **`sudo` là setuid root nên `/proc/<pid>/wchan` bị che (=0)**, còn `ptrace_scope=1` chặn `/proc/<pid>/syscall` từ tiến trình anh em, nên **termios là tín hiệu DUY NHẤT** bắt được nó; (b) tiến trình foreground có `wchan == wait_woken` → kẹt trong `read()` trên tty (prompt y/N). `wait_woken` hiếm gặp: zle/TUI/poll đều ra `poll_schedule_timeout`.
+- **Đừng tự phát tiếng khi báo blocked** — herdr đã tự phát khi agent đổi state ở space nền (`[ui.sound] enabled = true` mặc định). Toast của ta phải `--sound none`, không thì kêu 2 lần.
+- Lifecycle: preexec bật watcher (report working sau ~1s để lệnh <1s không kịp nhấp nháy); precmd release khi OK, hoặc nháy blocked 3s rồi release khi lỗi ($?≠0). Race guard: lệnh mới hủy timer nháy-lỗi còn treo + release ngay (kẻo release nhầm lệnh mới / kẹt blocked). Giữ notification khi lệnh ≥20s xong ở space KHÔNG focus.
 
 ---
 
@@ -230,6 +235,22 @@ Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobu
 - **Không bake settings/colors.** User chốt (2026-06-06): noctalia auto-update palette từ wallpaper, bake vào Nix sẽ chết chức năng này. Chỉ giữ `programs.noctalia.enable = true;`. Không set `.settings`.
 - Để widget wifi/bt/power/battery chạy: cần `networking.networkmanager.enable`, `hardware.bluetooth.enable`, `services.upower.enable`, và ppd HOẶC tuned (xung đột TLP — xem mục 6).
 - Calendar / wallpaper: cú pháp v5 có thể khác v4 — verify trước khi cấu hình (chưa làm).
+
+### 9a. Config v5: 2 tầng TOML, và settings.json là RÁC (2026-07-12)
+- **`~/.config/noctalia/settings.json` KHÔNG được đọc nữa** (di sản v4/Quickshell, mtime đứng im từ trước ngày migrate). Đừng đọc nó để suy ra hành vi — mọi key trong đó (`respectExpireTimeout`, `normalUrgencyDuration`…) **không tồn tại trong source v5**. Đã mất công đi nhầm đường vì file này.
+- v5 đọc **TOML**, 2 tầng: **config đọc-chỉ** = `~/.config/noctalia/*.toml` (mọi file .toml, sort theo tên) → **state runtime** = `~/.local/state/noctalia/settings.toml` (noctalia TỰ GHI: màu từ wallpaper, toggle trong bar) đè lên. Hai file KHÁC NHAU → symlink read-only vào `~/.config/noctalia/` **an toàn**, không đóng băng state (khác hẳn ca `tuxedo config.toml`). Đây là lý do `modules/noctalia.nix` không phạm luật "không bake settings" ở trên: nó chỉ đặt tầng config, không đụng tầng state.
+- Debug notification: log `~/.cache/noctalia/noctalia.log` ghi từng cái — `notification added #N origin=external from="<app>" urgency=<u> timeout=<ms>ms` + `notification expired #N`. Đủ để xác minh mà KHÔNG cần nhìn màn hình. Dump config đang hiệu lực: `noctalia config export merged|full`; kiểm cú pháp: `noctalia config validate`; nạp lại: `noctalia msg config-reload`.
+
+### 9a-bis. Notification Chrome không tự tắt — filter allow_permanent (2026-07-12)
+Chrome gửi web notification (YouTube…) với **`urgency=critical` + `expire_timeout=0`**; theo spec freedesktop `0` = *never expire* → nằm lì tới khi bấm x. KHÔNG phải bug noctalia. Fix ở `modules/noctalia.nix`:
+```toml
+[notification.filter.chrome-no-permanent]
+match = "chrome"
+allow_permanent = false     # ép timeout 0 → mặc định 6s
+```
+- **Cú pháp BẮT BUỘC là bảng có tên `[notification.filter.<tên>]`** (schema dùng `namedMap`, tên filter lấy từ KEY). Viết `[[notification.filter]]` (array-of-tables) thì noctalia **bỏ qua trong im lặng** mà `noctalia config validate` vẫn báo "Config is valid" — bẫy đã dính.
+- `match` = lowercase+trim, so exact với app_name/desktop-entry/category **hoặc substring của app_name** → `"chrome"` trúng `"Google Chrome"`.
+- `allow_permanent=false` chỉ đụng notification có `timeout==0`; loại khác của Chrome (timeout 6000) không bị ảnh hưởng. Muốn đổi thời gian thì dùng `override_duration` (ms) — nhưng nó áp cho MỌI notification khớp filter, không chỉ cái vĩnh viễn.
 
 ---
 

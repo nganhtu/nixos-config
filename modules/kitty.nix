@@ -50,8 +50,8 @@ in
       # kitty remote control (socket riêng mỗi instance)
       allow_remote_control = "yes";
       listen_on = "unix:/tmp/kitty%i";
-      active_border_color = "#8080ff";
-      inactive_border_color = "#8080ff";
+      active_border_color = palette.border;
+      inactive_border_color = palette.border;
 
       bold_font = "auto";
       italic_font = "postscript_name=MonaspaceRadonNF-Regular";
@@ -80,14 +80,14 @@ in
       selection_background = palette.selectionBg;
 
       cursor = palette.white;
-      cursor_text_color = "#2b2b2b";
+      cursor_text_color = palette.cursorText;
 
-      url_color = "#005bbb";
+      url_color = palette.url;
 
       tab_bar_background = palette.black;
       active_tab_foreground = palette.brightWhite;
       active_tab_background = palette.white;
-      inactive_tab_foreground = "#676767";
+      inactive_tab_foreground = palette.tabInactiveFg;
       inactive_tab_background = palette.black;
 
       color0  = palette.black;
