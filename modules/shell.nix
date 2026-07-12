@@ -65,6 +65,8 @@
 
       cdc = "cd ~/src/Onschool/SLC";
 
+      sshup = "sudo systemctl start sshd";
+      sshdown = "sudo systemctl stop sshd";
 
       upsync = "update_and_merge_sync";
     };
@@ -331,6 +333,26 @@
         for hwmon in /sys/class/hwmon/hwmon*/name; do
           echo "$hwmon: $(cat $hwmon)"
         done
+      }
+
+      # netstatus — đường vào máy từ xa. 3 tầng RIÊNG BIỆT, đừng lẫn:
+      #   daemon tailscaled · kết nối tailnet (up/down) · Tailscale SSH (chiếm port 22)
+      # sshd ở port 2222 nên sống chung với Tailscale SSH, không giẫm chân.
+      _netrow() { print -P "  %B''${(r:14:)1}%b ''${(r:16:)2} $3"; }
+      netstatus() {
+        local prefs=$(tailscale debug prefs 2>/dev/null)
+        # sshd đọc CẢ /etc/ssh/authorized_keys.d/nat (khai trong Nix) lẫn
+        # ~/.ssh/authorized_keys (authorizedKeysInHomedir mặc định true).
+        local keys=$(grep -hvE '^[[:space:]]*($|#)' /etc/ssh/authorized_keys.d/nat ~/.ssh/authorized_keys 2>/dev/null | wc -l)
+        _netrow tailscaled    "boot=$(systemctl is-enabled tailscaled 2>&1)" "now=$(systemctl is-active tailscaled 2>&1)"
+        _netrow tailnet       "nối=$(jq -r '.WantRunning // false' <<< $prefs)" "ip=$(tailscale ip -4 2>/dev/null || echo -)"
+        _netrow tailscale-ssh "bật=$(jq -r '.RunSSH // false' <<< $prefs)" "port=22 · xác thực bằng danh tính tailnet, bỏ qua key"
+        # `systemctl is-enabled sshd` trả "linked" (unit NixOS không có [Install])
+        # → vô nghĩa. Hỏi thẳng multi-user.target có kéo nó lên lúc boot không.
+        local sshboot="không · mở tay bằng sshup"
+        [[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]] && sshboot="TỰ BẬT lúc boot"
+        _netrow sshd          "now=$(systemctl is-active sshd 2>&1)" "port=2222, chỉ tailscale0 · boot: $sshboot"
+        _netrow authorized    "$keys khoá" "(0 = chưa ai vào được, password auth đã tắt)"
       }
 
       # screenrec — quay màn hình chất lượng cao (VAAPI hardware encode trên Intel iGPU, 60fps).

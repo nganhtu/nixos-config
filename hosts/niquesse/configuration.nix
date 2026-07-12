@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   proprietary-fonts = pkgs.runCommand "proprietary-fonts" { } ''
@@ -139,6 +139,34 @@ in
   virtualisation.waydroid.package = waydroid-fixed;
   systemd.services.waydroid-container.serviceConfig.Delegate = true;
   services.tailscale.enable = true;
+
+  # CỐ Ý KHÔNG dùng port 22: Tailscale SSH (đang bật) chiếm sẵn port 22 trên IP
+  # tailnet và xác thực bằng danh tính tailnet, bỏ qua authorized_keys → client
+  # dùng key sẽ treo rồi lỗi. Các port khác đi thẳng vào network stack như thường
+  # nên 2222 sống chung được: máy khác trong tailnet vẫn ssh port 22 không cần
+  # key, còn client dùng key thì vào 2222.
+  #
+  # Chỉ key, và openFirewall = false + chỉ mở trên tailscale0 — KHÔNG hở ra
+  # wifi/LAN. Đừng nới hai điều này.
+  services.openssh = {
+    enable = true;
+    ports = [ 2222 ];
+    openFirewall = false;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+    };
+  };
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 2222 ];
+
+  # KHÔNG chạy lúc boot — cổng đóng sẵn, mở tay bằng `sshup` khi cần (shell.nix).
+  # wantedBy rỗng ⇒ unit thành "static": vẫn `systemctl start` được, chỉ không tự
+  # bật. (KHÔNG dùng startWhenNeeded: socket-activation vẫn để cổng lắng nghe.)
+  systemd.services.sshd.wantedBy = lib.mkForce [ ];
+
+  # Public key của client muốn SSH vào (sshd đọc cả ~/.ssh/authorized_keys).
+  # Rỗng + PasswordAuthentication=false ⇒ chưa ai vào được.
+  users.users.nat.openssh.authorizedKeys.keys = [ ];
 
   programs.zsh.enable = true;
 

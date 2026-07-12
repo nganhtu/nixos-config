@@ -318,6 +318,24 @@ Môi trường dev Onschool (repo riêng `~/src/nganhtu/ons-nix`) dựng bằng 
 
 ---
 
+## 9f. SSH vào máy — sshd port 2222, đóng sẵn (2026-07-12)
+
+**BA TẦNG khác nhau, đừng lẫn** (đã lẫn một lần rồi):
+
+| tầng | là gì | công tắc |
+|---|---|---|
+| daemon `tailscaled` | tiến trình nền | `systemctl start/stop tailscaled` |
+| **kết nối tailnet** | máy có trong mạng riêng không (IP `100.x`, MagicDNS) | `tailscale up` / `down` |
+| **Tailscale SSH** | tailscaled **chiếm port 22**, xác thực bằng danh tính tailnet, **bỏ qua `authorized_keys`** | `tailscale set --ssh=true/false` |
+
+- **sshd ở port 2222, KHÔNG phải 22** — vì Tailscale SSH (đang bật) đã chiếm 22 trên IP tailnet. Client dùng key mà trỏ vào 22 sẽ **treo ~60s rồi lỗi auth**, không phải bug của ta. Các port khác đi thẳng vào network stack như thường → 2222 sống chung được với Tailscale SSH: **không phải tắt cái nào cả**. (Docs của các app terminal mobile hay bảo "tắt Tailscale SSH đi" là vì họ mặc định port 22.)
+- **KHÔNG tự bật lúc boot:** `systemd.services.sshd.wantedBy = lib.mkForce [ ];` → unit thành "static", `systemctl start` vẫn được. **KHÔNG dùng `startWhenNeeded`** (socket-activation) nếu muốn "đóng": nó vẫn để cổng lắng nghe. Mở/đóng: `sshup` / `sshdown` (shell.nix).
+- **`systemctl is-enabled sshd` trả `linked`** (unit NixOS không có `[Install]`) → vô dụng để biết có tự bật hay không. Hỏi thẳng: `[[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]]`. `netstatus` (shell.nix) in đủ 3 tầng + sshd + số khoá.
+- Chỉ key (`PasswordAuthentication = false`), `openFirewall = false` + `networking.firewall.interfaces.tailscale0.allowedTCPPorts` → **không hở ra wifi/LAN**. Đừng nới.
+- sshd đọc **cả hai** nguồn khoá: `/etc/ssh/authorized_keys.d/nat` (từ `users.users.nat.openssh.authorizedKeys.keys`) **lẫn** `~/.ssh/authorized_keys` (`authorizedKeysInHomedir` mặc định `true`) → tool ngoài ghi vào `~/.ssh/` vẫn có tác dụng.
+
+---
+
 ## 10. Các điểm cần HỎI USER (đừng đoán)
 
 1. Filesystem root thực tế đang là gì (`lsblk -f`)? btrfs hay ext4?
