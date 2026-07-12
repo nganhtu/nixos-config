@@ -83,10 +83,14 @@
       # preexec set SAU ~1s để lệnh chớp nhoáng không kịp hiện. Chỉ trong herdr.
       if [[ -n $HERDR_PANE_ID ]]; then
         autoload -Uz add-zsh-hook
-        # glyph + space + word-joiner: herdr c\u1eaft trailing whitespace c\u1ee7a label,
-        # WJ (U+2060, zero-width, kh\u00f4ng ph\u1ea3i whitespace) ch\u1ed1t cu\u1ed1i gi\u1eef l\u1ea1i space
-        # \u2192 sidebar hi\u1ec7n ">_ \u00b7 <l\u1ec7nh>" thay v\u00ec ">_\u00b7 <l\u1ec7nh>".
-        _herdr_glyph=$'\uf120 \u2060'
+        # LABEL = "$" (d\u00f2ng l\u1ec7nh shell), ph\u00e2n bi\u1ec7t v\u1edbi AI agent th\u1eadt (claude\u2026).
+        # KH\u00d4NG d\u00f9ng glyph Nerd Font (vd U+F120 ">_"): n\u00f3 n\u1eb1m trong Private Use
+        # Area, font sans m\u1eb7c \u0111\u1ecbnh (Segoe UI Variable \u2014 noctalia l\u1ea5y qua fc-match
+        # cho notification) KH\u00d4NG c\u00f3 n\u00f3 \u2192 ph\u1ea3i fallback, ra sai advance width
+        # (sidebar tr\u00f4ng d\u00ednh v\u00e0o "\u00b7") v\u00e0 nu\u1ed1t lu\u00f4n d\u1ea5u c\u00e1ch quanh label
+        # (notification th\u00e0nh ">_needs attention"). "$" c\u00f3 trong c\u1ea3 Monaspace l\u1eabn
+        # Segoe UI Variable n\u00ean kh\u00f4ng c\u1ea7n ch\u00e8n g\u00ec th\u00eam. K\u00fd t\u1ef1 kh\u00e1c c\u0169ng an to\u00e0n: \u00bb.
+        _herdr_glyph='$'
         # `herdr integration` \u2014 herdr t\u1ef1 nh\u1eadn di\u1ec7n c\u00e1c agent n\u00e0y v\u00e0 t\u1ef1 qu\u1ea3n
         # label + state c\u1ee7a ch\u00fang. 1 pane ch\u1ec9 gi\u1eef 1 agent record, n\u00ean v\u1edbi ch\u00fang
         # shell ch\u1ec9 \u0111\u01b0\u1ee3c g\u00f3p custom_status (report-metadata), TUY\u1ec6T \u0110\u1ed0I kh\u00f4ng
@@ -99,29 +103,47 @@
         _herdr_meta()    { herdr pane report-metadata "$HERDR_PANE_ID" --source shell "$@" &>/dev/null; }
         _herdr_focused() { [[ "$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.focused')" == true ]]; }
 
-        # Lệnh đang chặn chờ ta gõ vào. Điều kiện: tty ở chế độ canonical (TUI
-        # như helix/btop đặt raw → loại ngay), VÀ một trong hai:
-        #   -echo       → prompt mật khẩu. sudo là setuid root nên /proc/<pid>/wchan
-        #                 bị che (=0), termios là tín hiệu DUY NHẤT bắt được nó.
-        #   wait_woken  → tiến trình foreground kẹt trong read() trên tty (y/N…).
-        #                 Hiếm gặp ngoài ca này: zle/TUI/poll đều ra poll_schedule_timeout.
-        _herdr_waiting() {
-          [[ -n $TTY ]] || return 1
+        # Cắt cho vừa sidebar (mặc định 26 cột; trừ chấm + label + " · " + lề).
+        # herdr KHÔNG tự thêm "…", nó cắt cụt → phải tự cắt ngắn hơn bề rộng.
+        _herdr_max=16
+        _herdr_fit() {
+          REPLY=$1
+          (( ''${#REPLY} > _herdr_max )) && REPLY="''${REPLY[1,_herdr_max-1]}…"
+        }
+
+        # Trạng thái của lệnh foreground, đọc từ termios + wchan:
+        #   idle    = tty ở chế độ raw → một TUI (helix, tuxedo, btop) đã chiếm
+        #             terminal và đang sẵn sàng nhận phím. KHÔNG chặn ta.
+        #   blocked = canonical VÀ (tắt echo | fg kẹt read tty) → đang chờ ta gõ.
+        #             -echo là prompt mật khẩu; sudo setuid root nên /proc/<pid>/wchan
+        #             bị che (=0) → termios là tín hiệu DUY NHẤT bắt được nó.
+        #             wait_woken = kẹt trong read() trên tty (prompt y/N). Hiếm gặp
+        #             ngoài ca này: zle/TUI/poll đều ra poll_schedule_timeout.
+        #   working = còn lại: lệnh batch đang chạy. nom (nrs) giữ tty canonical
+        #             suốt lúc vẽ tiến độ nên KHÔNG bị nhận nhầm thành idle.
+        _herdr_state() {
           local flags=(''${(f)"$(stty -F $TTY -a 2>/dev/null | tr ' ;' '\n\n')"})
-          (( $flags[(Ie)icanon] )) || return 1
-          (( $flags[(Ie)-echo] )) && return 0
-          ps -t ''${TTY#/dev/} -o stat=,wchan:20= 2>/dev/null | grep -q '+.*wait_woken'
+          if (( ''${#flags} == 0 )); then
+            REPLY=working
+          elif (( ! $flags[(Ie)icanon] )); then
+            REPLY=idle
+          elif (( $flags[(Ie)-echo] )); then
+            REPLY=blocked
+          elif ps -t ''${TTY#/dev/} -o stat=,wchan:20= 2>/dev/null | grep -q '+.*wait_woken'; then
+            REPLY=blocked
+          else
+            REPLY=working
+          fi
         }
 
         _herdr_watch() {
           local state=
           sleep 1
           while :; do
-            local now=working
-            _herdr_waiting && now=blocked
-            if [[ $now != $state ]]; then
-              state=$now
-              _herdr_report $now "$1"
+            _herdr_state
+            if [[ $REPLY != $state ]]; then
+              state=$REPLY
+              _herdr_report $state "$1"
               # --sound none: herdr đã tự phát tiếng khi agent đổi state ở space
               # nền ([ui.sound]); toast này chỉ để đọc lệnh nào đang chờ.
               if [[ $state == blocked ]] && ! _herdr_focused; then
@@ -140,8 +162,8 @@
             _herdr_blocked_timer=
             _herdr_release
           fi
-          local cmd=$1
-          (( ''${#cmd} > 31 )) && cmd="''${cmd[1,30]}…"
+          _herdr_fit "$1"
+          local cmd=$REPLY
           if (( $_herdr_agents[(Ie)''${''${1%% *}:t}] )); then
             _herdr_agent_cmd=$cmd
             _herdr_meta --custom-status "$cmd"
@@ -165,7 +187,8 @@
           local elapsed=$(( SECONDS - _herdr_start ))
           if (( elapsed >= 1 )); then
             if (( ret != 0 )); then
-              _herdr_report blocked "✗ $_herdr_cmd"
+              _herdr_fit "✗ $_herdr_cmd"   # tiền tố ✗ có thể đẩy quá bề rộng → cắt lại
+              _herdr_report blocked "$REPLY"
               ( sleep 3 && _herdr_release ) &!
               _herdr_blocked_timer=$!
             else
