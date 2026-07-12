@@ -100,7 +100,7 @@ in
   };
 
   fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" ];
-  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI Variable" ];
 
   # Monaspace + Symbols Nerd Font: bản tải thẳng từ source (assets/fonts/monaspace,
   # assets/fonts/symbol-nerd-fonts), KHÔNG dùng nerd-fonts.monaspace/symbols-only
