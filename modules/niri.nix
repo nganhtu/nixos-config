@@ -243,6 +243,10 @@
         hotkey-overlay.title = "Session Menu: noctalia sessionMenu";
         action.spawn = [ "noctalia" "msg" "panel-toggle" "session" ];
       };
+      "Mod+P" = {
+        hotkey-overlay.title = "Color Picker: hyprpicker";
+        action.spawn = [ "bash" "-c" "hyprpicker -a" ];
+      };
       "Mod+E" = {
         hotkey-overlay.title = "File Manager: Thunar";
         action.spawn = [ "thunar" ];

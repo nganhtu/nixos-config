@@ -17,6 +17,8 @@
     ../modules/direnv.nix
     ../modules/git.nix
     ../modules/fcitx5.nix
+    ../modules/tuxedo.nix
+    ../modules/tuxedo-sync.nix
   ];
 
   home.username = "nat";
@@ -25,7 +27,7 @@
 
   programs.home-manager.enable = true;
 
-  home.packages = [ noctalia-pkg agenix-pkg ];
+  home.packages = [ noctalia-pkg agenix-pkg pkgs.hyprpicker pkgs.tuxedo ];
 
   # `docker compose` v2 plugin: docker CLI chỉ tìm trong ~/.docker/cli-plugins
   # (các path /usr/... không có trên NixOS).
