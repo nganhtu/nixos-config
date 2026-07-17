@@ -20,6 +20,7 @@
     ../modules/tuxedo.nix
     ../modules/tuxedo-sync.nix
     ../modules/noctalia.nix
+    ../modules/swappy.nix
   ];
 
   home.username = "nat";

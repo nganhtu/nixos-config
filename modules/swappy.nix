@@ -1,0 +1,9 @@
+{ ... }:
+
+{
+  xdg.configFile."swappy/config".text = ''
+    [Default]
+    save_dir=$HOME/Pictures/Screenshots
+    save_filename_format=swappy-%Y%m%d_%H%M%S.png
+  '';
+}

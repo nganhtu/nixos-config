@@ -63,8 +63,6 @@
       gitcfashytuna = ''git config user.name "ashytuna" && git config user.email "ashytuna@gmail.com"'';
       gitcftuna = ''git config user.name "tuna" && git config user.email "tuna@onschool.edu.vn"'';
 
-      cdc = "cd ~/src/Onschool/SLC";
-
       sshup = "sudo systemctl start sshd";
       sshdown = "sudo systemctl stop sshd";
 
@@ -353,6 +351,20 @@
         [[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]] && sshboot="TỰ BẬT lúc boot"
         _netrow sshd          "now=$(systemctl is-active sshd 2>&1)" "port=2222, chỉ tailscale0 · boot: $sshboot"
         _netrow authorized    "$keys khoá" "(0 = chưa ai vào được, password auth đã tắt)"
+      }
+
+      # palette — in bảng màu ĐANG DÙNG (modules/palette.nix, theo theme chọn
+      # trong modules/themes/) ra ô màu thật (truecolor) + tên + hex. Đổi theme
+      # xong chạy lại là thấy ngay, không cần mở file.
+      palette() {
+        nix eval --json -f ~/nixos-config/modules/palette.nix 2>/dev/null | \
+          jq -r 'to_entries[] | "\(.key) \(.value)"' | \
+          while read -r name hex; do
+            local r=$((16#''${hex[2,3]}))
+            local g=$((16#''${hex[4,5]}))
+            local b=$((16#''${hex[6,7]}))
+            printf "  \e[48;2;%d;%d;%dm  \e[0m %-14s %s\n" "$r" "$g" "$b" "$name" "$hex"
+          done
       }
 
       # screenrec — quay màn hình chất lượng cao (VAAPI hardware encode trên Intel iGPU, 60fps).

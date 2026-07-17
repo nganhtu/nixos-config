@@ -73,13 +73,13 @@ in
 
       window_padding_width = 4;
 
-      # ─── Bliss (Joshua Jon / Eric Johnson) — màu từ modules/palette.nix ───
+      # ─── Eldritch dark (kitten themes) — màu từ modules/palette.nix ───
       foreground = palette.foreground;
       background = palette.background;
       selection_foreground = palette.brightWhite;
       selection_background = palette.selectionBg;
 
-      cursor = palette.white;
+      cursor = palette.green;
       cursor_text_color = palette.cursorText;
 
       url_color = palette.url;
