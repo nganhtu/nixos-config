@@ -200,6 +200,7 @@ in
     file-roller
     jq
     android-tools
+    hw-probe
 
     # CLI tools (Giai đoạn 4)
     lsd bat tealdeer dust gdu fzf ripgrep fd fastfetch tmux htop glab delta herdr
