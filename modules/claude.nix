@@ -12,5 +12,6 @@
       type = "command";
       command = "sh /home/nat/.claude/statusline-command.sh";
     };
+    env.CLAUDE_CODE_SCROLL_SPEED = "10";
   };
 }
