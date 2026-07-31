@@ -99,8 +99,9 @@ in
     };
   };
 
-  fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" ];
-  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI Variable" ];
+  fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" "LXGW WenKai Mono" "Noto Sans Mono CJK KR" "Noto Sans Mono CJK JP" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI Variable" "LXGW WenKai" "Noto Sans CJK KR" "Noto Sans CJK JP" ];
+  fonts.fontconfig.defaultFonts.serif = [ "Noto Serif" "LXGW WenKai" "Noto Serif CJK KR" "Noto Serif CJK JP" ];
 
   # Monaspace + Symbols Nerd Font: bản tải thẳng từ source (assets/fonts/monaspace,
   # assets/fonts/symbol-nerd-fonts), KHÔNG dùng nerd-fonts.monaspace/symbols-only
