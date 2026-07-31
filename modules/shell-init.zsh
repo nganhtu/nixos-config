@@ -3,40 +3,51 @@ export PATH="$HOME/.local/bin:$PATH"
 setopt appendhistory
 
 # ── herdr: hiện lệnh đang chạy dở lên sidebar (phần AGENTS) ──
-# Shell trần KHÔNG phải "agent" nên custom_status của nó không render;
-# report-agent "phong" pane thành agent tạm → lúc đó mới hiện. LABEL cố
-# định = glyph terminal (nf U+F120) để phân biệt với AI agent thật (claude,
-# …); custom_status = dòng lệnh. Đang chạy = chấm working cạnh space + 1
-# entry ở AGENTS; xong thì release (tắt). Lệnh LỖI nháy blocked 3s rồi tắt.
+# Shell trần KHÔNG phải "agent" nên state-label của nó không render;
+# report-agent "phong" pane thành agent tạm → lúc đó mới hiện. LABEL =
+# tên lệnh đang chạy (basename), để phân biệt với AI agent thật (claude,
+# …); text = dòng lệnh. Đang chạy = chấm working cạnh space + 1 entry ở
+# AGENTS; xong thì release (tắt). Lệnh LỖI nháy blocked 3s rồi tắt.
 # preexec set SAU ~1s để lệnh chớp nhoáng không kịp hiện. Chỉ trong herdr.
 if [[ -n $HERDR_PANE_ID ]]; then
   autoload -Uz add-zsh-hook
-  # LABEL = "$" (dòng lệnh shell), phân biệt với AI agent thật (claude…).
-  # KHÔNG dùng glyph Nerd Font (vd U+F120 ">_"): nó nằm trong Private Use
-  # Area, font sans mặc định (Segoe UI Variable — noctalia lấy qua fc-match
-  # cho notification) KHÔNG có nó → phải fallback, ra sai advance width
-  # (sidebar trông dính vào "·") và nuốt luôn dấu cách quanh label
-  # (notification thành ">_needs attention"). "$" có trong cả Monaspace lẫn
-  # Segoe UI Variable nên không cần chèn gì thêm. Ký tự khác cũng an toàn: ».
-  _herdr_glyph='$'
+  # LABEL = tên lệnh đang chạy (basename của từ đầu tiên, vd "docker"/"npm"),
+  # đổi mỗi lệnh. Vì đổi theo lệnh nên KHÔNG còn hằng số: label phải truyền
+  # tay qua _herdr_cmd/_herdr_label và dùng lại đúng giá trị đó lúc release,
+  # kẻo release nhầm agent.
   # `herdr integration` — herdr tự nhận diện các agent này và tự quản
   # label + state của chúng. 1 pane chỉ giữ 1 agent record, nên với chúng
-  # shell chỉ được góp custom_status (report-metadata), TUYỆT ĐỐI không
+  # shell chỉ được góp state-label (report-metadata), TUYỆT ĐỐI không
   # report-agent — sẽ đè mất label, state thật lẫn notification.
   _herdr_agents=(claude codex copilot cursor devin droid hermes kilo kimi
                  mastracode omp opencode pi qodercli)
 
-  _herdr_report()  { herdr pane report-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" --state "$1" --custom-status "$2" &>/dev/null; }
-  _herdr_release() { herdr pane release-agent "$HERDR_PANE_ID" --source shell --agent "$_herdr_glyph" &>/dev/null; }
+  # herdr 0.7.4 bỏ --custom-status: report-agent giờ chỉ set state, nhãn text
+  # phải đi qua report-metadata --state-label STATE=TEXT (field state_labels).
+  # state_labels bám theo (pane_id, source), KHÔNG tự dọn khi release-agent
+  # → phải --clear-state-labels tường minh, kẻo rò rỉ sang lệnh kế tiếp.
+  # $1=state $2=label $3=text
+  _herdr_report()  {
+    herdr pane report-agent "$HERDR_PANE_ID" --source shell --agent "$2" --state "$1" &>/dev/null
+    herdr pane report-metadata "$HERDR_PANE_ID" --source shell --state-label "$1=$3" &>/dev/null
+  }
+  # $1=label (PHẢI khớp label đã report, herdr match theo source+label)
+  _herdr_release() {
+    herdr pane report-metadata "$HERDR_PANE_ID" --source shell --clear-state-labels &>/dev/null
+    herdr pane release-agent "$HERDR_PANE_ID" --source shell --agent "$1" &>/dev/null
+  }
   _herdr_meta()    { herdr pane report-metadata "$HERDR_PANE_ID" --source shell "$@" &>/dev/null; }
   _herdr_focused() { [[ "$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.focused')" == true ]]; }
 
   # Cắt cho vừa sidebar (mặc định 26 cột; trừ chấm + label + " · " + lề).
   # herdr KHÔNG tự thêm "…", nó cắt cụt → phải tự cắt ngắn hơn bề rộng.
+  # label giờ động (tên lệnh) nên có budget riêng, nhỏ hơn budget của text.
   _herdr_max=16
+  _herdr_label_max=10
   _herdr_fit() {
+    local max=${2:-$_herdr_max}
     REPLY=$1
-    (( ${#REPLY} > _herdr_max )) && REPLY="${REPLY[1,_herdr_max-1]}…"
+    (( ${#REPLY} > max )) && REPLY="${REPLY[1,max-1]}…"
   }
 
   # Trạng thái của lệnh foreground, đọc từ termios + wchan:
@@ -64,18 +75,20 @@ if [[ -n $HERDR_PANE_ID ]]; then
     fi
   }
 
+  # $1=cmd (text đã fit) $2=label (đã fit) — truyền tay, KHÔNG đọc biến toàn
+  # cục: chạy nền (&!) là tiến trình con riêng, cứ để nó giữ snapshot của nó.
   _herdr_watch() {
-    local state=
+    local cmd=$1 label=$2 state=
     sleep 1
     while :; do
       _herdr_state
       if [[ $REPLY != $state ]]; then
         state=$REPLY
-        _herdr_report $state "$1"
+        _herdr_report $state "$label" "$cmd"
         # --sound none: herdr đã tự phát tiếng khi agent đổi state ở space
         # nền ([ui.sound]); toast này chỉ để đọc lệnh nào đang chờ.
         if [[ $state == blocked ]] && ! _herdr_focused; then
-          herdr notification show "$1" --body "đang chờ nhập · ${PWD:t}" --sound none &>/dev/null
+          herdr notification show "$cmd" --body "đang chờ nhập · ${PWD:t}" --sound none &>/dev/null
         fi
       fi
       sleep 2
@@ -85,28 +98,32 @@ if [[ -n $HERDR_PANE_ID ]]; then
   _herdr_preexec() {
     # lệnh mới → dẹp nháy-lỗi còn treo của lệnh trước (kẻo timer của nó
     # release nhầm, hoặc kẹt blocked nếu lệnh này chớp nhoáng < 1s).
+    # $_herdr_label lúc này vẫn là label của lệnh TRƯỚC (chưa bị ghi đè dưới).
     if [[ -n $_herdr_blocked_timer ]]; then
       kill $_herdr_blocked_timer 2>/dev/null
       _herdr_blocked_timer=
-      _herdr_release
+      _herdr_release "$_herdr_label"
     fi
-    _herdr_fit "$1"
-    local cmd=$REPLY
-    if (( $_herdr_agents[(Ie)${${1%% *}:t}] )); then
-      _herdr_agent_cmd=$cmd
-      _herdr_meta --custom-status "$cmd"
+    local bin=${${1%% *}:t}
+    if (( $_herdr_agents[(Ie)$bin] )); then
+      _herdr_fit "$1"
+      _herdr_agent_cmd=$REPLY
+      _herdr_meta --state-label "working=$REPLY"
       return
     fi
-    _herdr_cmd=$cmd
+    _herdr_fit "$bin" $_herdr_label_max
+    _herdr_label=$REPLY
+    _herdr_fit "$1"
+    _herdr_cmd=$REPLY
     _herdr_start=$SECONDS
-    _herdr_watch "$cmd" &!
+    _herdr_watch "$_herdr_cmd" "$_herdr_label" &!
     _herdr_watcher=$!
   }
 
   _herdr_precmd() {
     local ret=$?
     if [[ -n $_herdr_agent_cmd ]]; then
-      _herdr_meta --clear-custom-status
+      _herdr_meta --clear-state-labels
       _herdr_agent_cmd=
       return $ret
     fi
@@ -116,16 +133,18 @@ if [[ -n $HERDR_PANE_ID ]]; then
     if (( elapsed >= 1 )); then
       if (( ret != 0 )); then
         _herdr_fit "✗ $_herdr_cmd"   # tiền tố ✗ có thể đẩy quá bề rộng → cắt lại
-        _herdr_report blocked "$REPLY"
-        ( sleep 3 && _herdr_release ) &!
+        _herdr_report blocked "$_herdr_label" "$REPLY"
+        ( sleep 3 && _herdr_release "$_herdr_label" ) &!
         _herdr_blocked_timer=$!
       else
-        _herdr_release
+        _herdr_release "$_herdr_label"
       fi
       if (( elapsed >= 20 )) && ! _herdr_focused; then
         herdr notification show "$_herdr_cmd" --body "xong sau ${elapsed}s · ${PWD:t}" --sound done &>/dev/null
       fi
     fi
+    # KHÔNG xoá _herdr_label ở đây: nếu vừa vào nhánh blocked, preexec kế tiếp
+    # còn cần nó để release đúng agent (xem đầu _herdr_preexec).
     _herdr_cmd= _herdr_watcher=
     return $ret
   }
