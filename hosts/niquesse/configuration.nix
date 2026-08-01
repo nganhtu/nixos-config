@@ -38,6 +38,10 @@ in
   networking.networkmanager.enable = true;
   networking.nftables.enable = true;
 
+  # docker.service là thứ duy nhất kéo network-online.target, mà nó lại nằm trên
+  # critical chain tới graphical.target → chờ DHCP xong chặn thẳng màn đăng nhập.
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   time.timeZone = "Asia/Ho_Chi_Minh";
   time.hardwareClockInLocalTime = true;
 
