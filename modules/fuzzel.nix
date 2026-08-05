@@ -17,10 +17,14 @@
     vertical-pad=20
     inner-pad=10
 
-    border-width=2
-    border-radius=12
-
     include=~/.config/fuzzel/themes/noctalia
+
+    # width/radius thuộc section [border], KHÔNG phải [main] — khai trong [main]
+    # thì fuzzel bỏ qua (cảnh báo "not a valid option") và dùng default 1px/10.
+    # Đặt sau include để dòng include vẫn nằm trong [main].
+    [border]
+    width=2
+    radius=12
   '';
   };
 }
