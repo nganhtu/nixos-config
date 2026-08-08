@@ -30,9 +30,13 @@ in
     efiSupport = true;
     efiInstallAsRemovable = true;
     useOSProber = true;
-    configurationLimit = 25;
+    configurationLimit = 10;
     default = "saved";
   };
+
+  # /tmp là subvol trên đĩa, không phải tmpfs; nix-daemon chạy PrivateTmp=no và
+  # không set TMPDIR → rác build đọng lại qua mọi lần reboot nếu không dọn.
+  boot.tmp.cleanOnBoot = true;
 
   networking.hostName = "Niquesse";
   networking.networkmanager.enable = true;
@@ -81,6 +85,28 @@ in
   services.btrfs.autoScrub.enable = true;
   services.fstrim.enable = true;
   zramSwap.enable = true;
+
+  # btrfs cấp phát chunk rồi không tự trả lại khi xoá file: `df` báo còn trống
+  # nhưng Unallocated cạn → ENOSPC toàn hệ thống. Balance gom chunk dùng dở.
+  # Ngày 15 để không đụng btrfs-scrub (mùng 1).
+  systemd.services.btrfs-balance = {
+    description = "Reclaim unallocated btrfs chunks";
+    unitConfig.ConditionACPower = true;
+    serviceConfig = {
+      Type = "oneshot";
+      Nice = 19;
+      IOSchedulingClass = "idle";
+      ExecStart = "${pkgs.btrfs-progs}/bin/btrfs balance start -dusage=50 -musage=30 /";
+    };
+    startAt = "*-*-15 03:00:00";
+  };
+  systemd.timers.btrfs-balance.timerConfig = {
+    Persistent = true;
+    RandomizedDelaySec = "1h";
+  };
+
+  # Mặc định không chặn trần = 10% dung lượng fs = 20GiB.
+  services.journald.extraConfig = "SystemMaxUse=500M";
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -179,7 +205,7 @@ in
     enable = true;
     flake = "/home/nat/nixos-config";
     clean.enable = true;
-    clean.extraArgs = "--keep 25";
+    clean.extraArgs = "--keep 10 --keep-since 14d";
   };
 
   users.users.nat = {
@@ -253,9 +279,14 @@ in
 
   environment.variables.TERMINAL = "kitty";
 
+  # Hardlink file trùng trong store, nhưng qua timer riêng (Nice 19, IO idle,
+  # ConditionACPower) thay vì inline lúc build — đúng lúc metadata căng nhất,
+  # cũng là nguồn lỗi `.links` lẻ tẻ khi devenv đổ nhiều path song song.
+  nix.optimise.automatic = true;
+
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true;
+    auto-optimise-store = false;
     # devenv ép setting restricted `system` → cần trusted-user (không whitelist
     # được trong config như substituter). devenv tự thêm cache runtime khi đã trusted.
     trusted-users = [ "root" "nat" ];

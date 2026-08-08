@@ -46,6 +46,30 @@
 ## 3. Filesystem
 
 - **CẬP NHẬT (2026-06-06):** Root là **btrfs** (không label, UUID `9ecd5758-9d28-4f60-a5ce-8027ce2e3543`). Subvol: top-level cho `/`, `home` cho `/home`, `nix` cho `/nix`. KHÔNG format lại.
+- Ngoài 3 subvol mount trong `hardware-configuration.nix`, top-level còn `tmp`, `var/tmp`, `srv`, `var/lib/portables`, `var/lib/machines` — nằm sẵn dưới subvol gốc nên tự xuất hiện đúng đường dẫn, không cần khai `fileSystems`. **`/tmp` do đó nằm TRÊN ĐĨA, không phải tmpfs** (và `nix-daemon` chạy `PrivateTmp=no`, không set `TMPDIR` → rác build đổ thẳng vào đó). Không có snapshot; không dùng snapper/btrbk.
+
+### Sự cố ENOSPC 2026-08-08 — `df` VÔ DỤNG để chẩn đoán, phải nhìn `Unallocated`
+
+btrfs cấp phát không gian theo **chunk**, và **không tự trả chunk về khi xoá file** — chỗ trống nằm kẹt rải rác *bên trong* chunk đã cấp. Khi `Device unallocated` cạn, metadata không xin được chunk mới → **mọi thao tác ghi trả `ENOSPC`** dù `df` vẫn báo còn hàng chục GB.
+
+Lúc sự cố: `Device allocated 200.00GiB / 200.00GiB`, `Unallocated 1.00MiB`, `Metadata DUP 2.75/3.00GiB (91.55%)` — trong khi `Free (estimated)` 31.27GiB và `df` báo còn 31GB trống.
+
+**Triệu chứng KHÔNG trỏ về nguyên nhân** (đây là cái bẫy chính):
+- `nh os switch` chết giữa chừng vì hết chỗ.
+- Reboot xong **mọi generation** đều fail đăng nhập với `Error: authentication error: pam_open_session:: SYSTEM_ERR` — vì PAM/logind không ghi nổi `/run`, `/var/log/wtmp`; activation script của generation nào cũng cần ghi `/etc`. Rất dễ tưởng nhầm là hỏng config → **đừng bới config, kiểm `Unallocated` trước.**
+- Máy vẫn lên multi-user, tailscaled vẫn online, nhưng SSH trả `System error` (cùng lỗi PAM).
+
+**Cứu (từ USB live, mount `-o subvolid=5`):** xoá `/tmp/*`, `/var/tmp/*`, `/var/log/journal/*`, `~/.cache/*` để tạo chỗ trống trong chunk → `btrfs balance start -dusage=20` rồi `-dusage=50` (bậc thang; `-dusage=0` không ăn thua vì không chunk nào rỗng hẳn, và balance sẽ `ENOSPC` nếu không có chunk đích) → `nixos-enter` + `nix-collect-garbage`.
+
+**Chỉ báo theo dõi:** `sudo btrfs filesystem usage /`, dòng `Unallocated`. Dưới ~5GiB là sắp kẹt. Đã nối vào cuối hàm `update` (`modules/shell-init.zsh`).
+
+**Đã vá declarative** (`hosts/niquesse/configuration.nix`): `systemd.services/timers.btrfs-balance` (ngày 15 hàng tháng, `-dusage=50 -musage=30`, tránh trùng `btrfs-scrub` mùng 1) — đây là thứ DUY NHẤT sửa nguyên nhân gốc; `boot.tmp.cleanOnBoot`; `services.journald.extraConfig = "SystemMaxUse=500M"` (mặc định không chặn trần = 10% fs = 20GiB); `nh clean --keep 10 --keep-since 14d` + `grub.configurationLimit = 10`.
+
+**Xoá file KHÔNG trả lại `Unallocated`** — đã đo trực tiếp: dọn 44GiB Steam làm `Data used` tụt 147.91→103.58GiB nhưng `Data total` đứng nguyên 167.94GiB và `Unallocated` không đổi một byte. Chỉ balance mới thu hồi được.
+
+**KHÔNG dùng `boot.tmp.useTmpfs`** (đã cân nhắc và bác): RAM 15GiB → tmpfs mặc định 7.5GiB, build nặng (Rust/Java/Android) sẽ chết vì đầy tmpfs rồi kéo cả máy vào swap. `cleanOnBoot` đạt cùng mục đích, không có mặt trái.
+
+**KHÔNG thêm `nix.gc.automatic`** — `programs.nh.clean.enable` đã sinh `nh-clean.timer` chạy hàng tuần. Thêm `nix.gc` là dựng bộ GC thứ hai với chính sách đá nhau (theo tuổi vs theo số bản).
 
 ---
 
@@ -227,7 +251,7 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobuild, docobash, docosh), git config aliases (gitcfnganhtu/ashytuna/tuna), `syncdotfiles`/`dotfiles` (NHƯNG bare-repo workflow này mâu thuẫn với Home Manager thuần — hỏi user có còn muốn giữ không, hay bỏ vì giờ config quản bằng Nix), `upsync`/`update_and_merge_sync`, fzf keybindings, history settings, BAT_THEME. (`cdc` từng bê nguyên, đã bỏ 2026-07-17 vì không dùng nữa.)
 
 **PHẢI sửa/bỏ (Arch-specific):**
-- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 25`** (giữ 25 generation, đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
+- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 10 --keep-since 14d`** (đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`; `--keep-since` là lưới an toàn khi rebuild nhiều lần trong tuần) → in `btrfs filesystem usage /` (xem mục 3). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
 - oh-my-zsh plugin `archlinux` → bỏ.
 - fastfetch `-l Arch` → đổi logo NixOS.
 - `alias ssh="kitten ssh"`, `alias cat='bat'`, `alias vi='nvim'` (CHÚ Ý: note cũ cài `vi` + helix, nhưng zshrc alias vi→nvim; xác nhận user dùng nvim hay không, nvim chưa thấy trong package list).
@@ -315,7 +339,7 @@ Môi trường dev Onschool (repo riêng `~/src/nganhtu/ons-nix`) dựng bằng 
 
 **Substituter:** khi đã trusted, devenv tự thêm `devenv.cachix.org` runtime → **KHÔNG khai** trong `nix.settings.substituters` (khai vào sẽ ra cảnh báo `already present`). nixpkgs/nix-phps nằm sẵn trên `cache.nixos.org`.
 
-**Lỗi transient `.links`:** `auto-optimise-store = true` thỉnh thoảng fail hardlink dedup khi devenv đổ nhiều path song song (`linking ... to /nix/store/.links/...`). Chạy lại `direnv allow`/`devenv build` là qua.
+**Lỗi transient `.links`:** `auto-optimise-store = true` thỉnh thoảng fail hardlink dedup khi devenv đổ nhiều path song song (`linking ... to /nix/store/.links/...`). Chạy lại `direnv allow`/`devenv build` là qua. **Từ 2026-08-08 đã tắt `auto-optimise-store`, đổi sang `nix.optimise.automatic`** (cùng thuật toán hardlink, chỉ dời khỏi đường build sang timer riêng 03:45 — module nixpkgs sẵn `Nice=19`/`IOSchedulingClass=idle`/`ConditionACPower`) → không mất dedup mà hết cả lỗi này lẫn áp lực metadata lúc build.
 
 ---
 

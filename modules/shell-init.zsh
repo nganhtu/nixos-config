@@ -420,7 +420,12 @@ update() {
   sudo journalctl --vacuum-time=1w
 
   echo -e "\n[+] Dọn generation cũ + GC (nh clean, giữ 10 bản)..."
-  nh clean all --keep 25
+  nh clean all --keep 10 --keep-since 14d
+
+  # Dòng Unallocated là chỉ báo thật, không phải df: tụt dưới ~5GiB là sắp ENOSPC
+  # dù df vẫn báo còn hàng chục GB.
+  echo -e "\n[+] Dung lượng btrfs:"
+  sudo btrfs filesystem usage /
 
   echo -e "\n[✔] All tasks completed successfully."
 }
