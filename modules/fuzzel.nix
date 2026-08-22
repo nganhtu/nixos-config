@@ -7,7 +7,6 @@
     text = ''
     [main]
     font=Monaspace Xenon NF:size=9:fontfeatures=-calt:fontfeatures=ss01:fontfeatures=ss02:fontfeatures=ss03:fontfeatures=ss04:fontfeatures=ss05:fontfeatures=ss07:fontfeatures=ss08:fontfeatures=ss09:fontfeatures=ss10:fontfeatures=case,LXGW WenKai Mono:size=9
-    prompt="󰅍  Clipboard history: "
     icon-theme=Papirus
 
     line-height=24px

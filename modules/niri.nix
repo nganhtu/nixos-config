@@ -432,12 +432,15 @@ in
 
       # ─── Clipboard ───
       "Mod+V".action.spawn = [ "noctalia" "msg" "panel-toggle" "clipboard" ];
-      "Mod+Alt+V".action.spawn = [ "sh" "-c" "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy" ];
+      "Mod+Alt+V".action.spawn = [
+        "sh" "-c"
+        "cliphist list | fuzzel --dmenu --prompt \"󰅍  Clipboard history: \" | cliphist decode | wl-copy"
+      ];
 
       # ─── File search ───
       "Mod+Alt+D".action.spawn = [
         "sh" "-c"
-        "sel=$(fd --type f . \"$HOME\" | fuzzel --dmenu) && xdg-open \"$sel\""
+        "sel=$(fd --type f . \"$HOME\" | fuzzel --dmenu --prompt \"󰍉  File search: \") && xdg-open \"$sel\""
       ];
     };
   };
