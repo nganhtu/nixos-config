@@ -51,7 +51,7 @@ if [[ -n $HERDR_PANE_ID ]]; then
   }
 
   # Trạng thái của lệnh foreground, đọc từ termios + wchan:
-  #   idle    = tty ở chế độ raw → một TUI (helix, tuxedo, btop) đã chiếm
+  #   idle    = tty ở chế độ raw → một TUI (helix, yazi, btop) đã chiếm
   #             terminal và đang sẵn sàng nhận phím. KHÔNG chặn ta.
   #   blocked = canonical VÀ (tắt echo | fg kẹt read tty) → đang chờ ta gõ.
   #             -echo là prompt mật khẩu; sudo setuid root nên /proc/<pid>/wchan
