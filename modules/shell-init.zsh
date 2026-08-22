@@ -399,6 +399,20 @@ update() {
   echo -e "\n[+] Requesting sudo access..."
   sudo pwd
 
+  # flake.nix có overlay cấp lại libdisplay-info_0_2 (nixpkgs xoá alias 2026-08-04,
+  # niri-flake còn assert version đó). Chặn ngay ở đây khi upstream hết tham chiếu:
+  # dừng trước `nix flake update` nên chưa có gì bị đụng, gỡ overlay rồi chạy lại.
+  # Lỗi mạng → curl fail → grep không chạy → không chặn nhầm.
+  if curl -fsSL --max-time 10 \
+       https://raw.githubusercontent.com/sodiboo/niri-flake/main/flake.nix 2>/dev/null \
+       | grep -q libdisplay-info_0_2; then
+    :
+  elif [[ ${pipestatus[1]} -eq 0 ]]; then
+    echo -e "\n[!] niri-flake đã bỏ libdisplay-info_0_2 — overlay workaround trong flake.nix"
+    echo    "    giờ thừa. Gỡ khối overlay đó (và mục tương ứng trong CLAUDE.md), rồi chạy lại."
+    return 1
+  fi
+
   echo -e "\n[+] Updating flake inputs..."
   (cd ~/nixos-config && nix flake update)
 

@@ -104,6 +104,16 @@ nixos-config/
 - `noctalia` → **v5** (`github:noctalia-dev/noctalia`, follows nixpkgs). Đã migrate từ v4.7.7 sang v5 ngày 2026-06-09. Docs v5: https://docs.noctalia.dev/v5/getting-started/nixos/ — chỉ còn `homeModules.default` (KHÔNG có `nixosModules`), option `programs.noctalia`, binary `noctalia`, IPC `noctalia msg <command>`. Xem mục 9.
 - **Cachix:** thêm substituter `https://noctalia.cachix.org` + trusted-public-key `noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=` để KHỎI build Qt/Quickshell từ source.
 
+### Overlay `libdisplay-info_0_2` — workaround TẠM, nhớ gỡ (2026-08-22)
+
+nixpkgs xoá alias `libdisplay-info_0_2` ngày 2026-08-04 (`pkgs/top-level/aliases.nix`, lý do "unused in Nixpkgs"), xoá luôn file `pkgs/by-name/li/libdisplay-info/0.2.nix`; chỉ còn `0.3.nix` + `package.nix` (0.4.0). niri-flake `flake.nix` vẫn tham chiếu `libdisplay-info_0_2` (dòng 90 arg, 103 `assert version == "0.2.0"`, 125 buildInputs) → mọi `nix flake update` kéo nixpkgs ≥ 2026-08-04 làm `nh os switch` chết ở khâu eval.
+
+- **`libdisplay-info_0_2 ? libdisplay-info` KHÔNG cứu được.** nixpkgs không xoá hẳn attribute mà thay bằng `throw` stub → attribute **vẫn tồn tại**, `callPackage` vẫn tìm thấy và truyền vào, giá trị mặc định không bao giờ kích hoạt. Đừng mất công sửa theo hướng "để default lo".
+- **Triệu chứng đánh lạc hướng:** stack trace dừng ở `system.build.toplevel` → `xdg.portal.extraPortals` → `programs.niri.package`, trông như lỗi portal. Không phải.
+- **Pin 0.2 của niri-flake vốn đã lỗi thời:** `Cargo.toml` của niri (cả rev `7f26c3ee` đang chạy lẫn `feb3e43f` mới) đều khai `libdisplay-info = "0.3.0"`, và nixpkgs tự đóng gói niri 26.04 dùng `libdisplay-info_0_3`. Fix upstream đúng nghĩa chỉ là đổi `_0_2`→`_0_3`.
+- **Cách vá tại chỗ** (`flake.nix`, overlay đặt TRƯỚC `niri-flake.overlays.niri`): `libdisplay-info_0_3.overrideAttrs` đổi `version` + `src` về tag `0.2.0` (hash `sha256-6xmWBrPHghjok43eIDGeshpUEQTuwWLXNHg7CnBUt3Q=`). Cả 0.2/0.3/0.4 dùng chung `generic.nix` trong nixpkgs nên recipe y hệt → ra đúng derivation vẫn chạy trước giờ, assert pass, không đánh cược ABI. **Cố ý không trỏ thẳng sang 0.3** dù hợp `Cargo.toml` hơn: sẽ phải nói dối `assert` bằng `// { version = "0.2.0"; }`.
+- **Nhắc gỡ:** `update()` (`modules/shell-init.zsh`) curl `flake.nix` của niri-flake trên `main` **trước** `nix flake update`; hết chuỗi `libdisplay-info_0_2` thì in hướng dẫn rồi `return 1` — dừng hẳn, chưa đụng `flake.lock`, gỡ overlay + mục này xong chạy lại. Phân biệt "upstream đã vá" với "mất mạng" bằng `${pipestatus[1]}` (exit code của curl, không phải grep): curl fail → không chặn, kẻo mất mạng là `update` từ chối chạy kèm thông báo sai.
+
 ---
 
 ## 5. Repo dotfiles cũ (nguồn để dịch sang Nix)
@@ -256,7 +266,7 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 Bê được nguyên: alias lsd/bat/helix, docker aliases (doco, docodul, docobuild, docobash, docosh), git config aliases (gitcfnganhtu/ashytuna/tuna), `syncdotfiles`/`dotfiles` (NHƯNG bare-repo workflow này mâu thuẫn với Home Manager thuần — hỏi user có còn muốn giữ không, hay bỏ vì giờ config quản bằng Nix), `upsync`/`update_and_merge_sync`, fzf keybindings, history settings, BAT_THEME. (`cdc` từng bê nguyên, đã bỏ 2026-07-17 vì không dùng nữa.)
 
 **PHẢI sửa/bỏ (Arch-specific):**
-- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 10 --keep-since 14d`** (đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`; `--keep-since` là lưới an toàn khi rebuild nhiều lần trong tuần) → in `btrfs filesystem usage /` (xem mục 3). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
+- `update` function (paru -Syu, cachyos-rate-mirrors, pacman cache, SpotX) → viết lại cho NixOS: cổng chặn niri-flake (mục 4, overlay `libdisplay-info_0_2`) → `nix flake update` → rebuild qua **`nh os switch`** (hàm `nrs`/`update` đều dùng nh, KHÔNG gọi `nixos-rebuild` trực tiếp nữa) → docker prune → journal vacuum → GC qua **`nh clean all --keep 10 --keep-since 14d`** (đồng bộ với `programs.nh.clean` timer + GRUB `configurationLimit`; `--keep-since` là lưới an toàn khi rebuild nhiều lần trong tuần) → in `btrfs filesystem usage /` (xem mục 3). Debug build fail: `nh os switch --no-nom` ra output phẳng, `nix log <drv>` lấy full log.
 - oh-my-zsh plugin `archlinux` → bỏ.
 - fastfetch `-l Arch` → đổi logo NixOS.
 - `alias ssh="kitten ssh"`, `alias cat='bat'`, `alias vi='nvim'` (CHÚ Ý: note cũ cài `vi` + helix, nhưng zshrc alias vi→nvim; xác nhận user dùng nvim hay không, nvim chưa thấy trong package list).

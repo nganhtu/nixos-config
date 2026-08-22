@@ -41,7 +41,24 @@
           # (GTK4 popup có ô nhập liệu đóng ngay khi mở nếu đang chạy fcitx5 — do
           # Smithay chỉ cho 1 keyboard grab, popup grab với IME grab đụng nhau).
           # Fix nằm trong v26.04+. Dùng niri-unstable (theo dõi main) để có fix này.
-          nixpkgs.overlays = [ niri-flake.overlays.niri ];
+          nixpkgs.overlays = [
+            # WORKAROUND: nixpkgs xoá alias libdisplay-info_0_2 (2026-08-04) nhưng
+            # niri-flake còn assert đúng version đó. Gỡ khối này khi upstream vá —
+            # update() có sẵn cảnh báo khi tham chiếu biến mất khỏi niri-flake.
+            (final: prev: {
+              libdisplay-info_0_2 = prev.libdisplay-info_0_3.overrideAttrs (_: rec {
+                version = "0.2.0";
+                src = prev.fetchFromGitLab {
+                  domain = "gitlab.freedesktop.org";
+                  owner = "emersion";
+                  repo = "libdisplay-info";
+                  tag = version;
+                  hash = "sha256-6xmWBrPHghjok43eIDGeshpUEQTuwWLXNHg7CnBUt3Q=";
+                };
+              });
+            })
+            niri-flake.overlays.niri
+          ];
         }
         ({ pkgs, ... }: {
           programs.niri.package = pkgs.niri-unstable;
