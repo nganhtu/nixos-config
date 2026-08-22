@@ -129,9 +129,11 @@ in
     };
   };
 
-  fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" "LXGW WenKai Mono" "Noto Sans Mono CJK KR" "Noto Sans Mono CJK JP" ];
-  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI Variable" "LXGW WenKai" "Noto Sans CJK KR" "Noto Sans CJK JP" ];
-  fonts.fontconfig.defaultFonts.serif = [ "Noto Serif" "LXGW WenKai" "Noto Serif CJK KR" "Noto Serif CJK JP" ];
+  # Không liệt kê Noto CJK: LXGW phủ 100% Hangul/kana đã gán nên chúng không bao
+  # giờ tới lượt. Package vẫn giữ — fontconfig tự tìm tới khi LXGW thiếu glyph.
+  fonts.fontconfig.defaultFonts.monospace = [ "Monaspace Neon NF" "LXGW WenKai Mono" ];
+  fonts.fontconfig.defaultFonts.sansSerif = [ "Segoe UI Variable" "LXGW WenKai" ];
+  fonts.fontconfig.defaultFonts.serif = [ "Noto Serif" "LXGW WenKai" ];
 
   # Monaspace + Symbols Nerd Font: bản tải thẳng từ source (assets/fonts/monaspace,
   # assets/fonts/symbol-nerd-fonts), KHÔNG dùng nerd-fonts.monaspace/symbols-only
