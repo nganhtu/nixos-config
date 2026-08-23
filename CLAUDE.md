@@ -141,10 +141,10 @@ Nội dung đã backup:
 - **input.kdl:** numlock on; touchpad tap + natural-scroll; mouse accel-profile flat speed 1.0; focus-follows-mouse; workspace-auto-back-and-forth. (xkb layout để mặc định.)
 - **misc.kdl:** prefer-no-csd; screenshot-path null; environment vars (QT_QPA_PLATFORM=wayland, QT_QPA_PLATFORMTHEME=gtk3, QT_WAYLAND_DISABLE_WINDOWDECORATION=1, XDG_CURRENT_DESKTOP=niri, fcitx5 vars: QT_IM_MODULE/XMODIFIERS/INPUT_METHOD/SDL_IM_MODULE=fcitx5, _JAVA_AWT_WM_NONREPARENTING=1, ELECTRON_OZONE_PLATFORM_HINT=auto); cursor macOS size 24; debug honor-xdg-activation-with-invalid-serial; hotkey-overlay skip-at-startup. NOTE: nhiều env var này NixOS/niri-flake/fcitx5 module tự set — đối chiếu tránh set trùng/sai. **`recent-windows` CỐ Ý không dịch** — repo này dùng thẳng `focus-workspace-previous` (Mod+Tab) + `focus-window-previous` (Mod+Shift+Tab) của niri lõi; Alt+Tab để trống (đụng Parsec sang Windows).
 - **display.kdl:** eDP-1 mode 1920x1080@60.008 scale 1 (DP-1 đang bị disable `/-`). LƯU Ý: tên output theo máy, verify bằng `niri msg outputs`.
-- **layout.kdl:** gaps 4; center-focused-column never; **background-color transparent (BẮT BUỘC cho noctalia set wallpaper)**; preset-column-widths 1/3,1/2,2/3; focus-ring width 2.
+- **layout.kdl:** gaps 4; center-focused-column never; **background-color transparent (BẮT BUỘC cho noctalia set wallpaper)**; preset-column-widths 1/3,1/2,2/3; focus-ring width 2 (KHÔNG set màu — xem mục palette.nix).
 - **rules.kdl:** corner-radius 8 clip-to-geometry; kitty default width 0.5; steam floating rules; **layer-rule noctalia-wallpaper place-within-backdrop true**.
 - **animation.kdl:** dịch nguyên các spring/duration (workspace-switch, window-open/close, view-movement, resize, overview, screenshot-ui...).
-- **noctalia.kdl:** ~~hardcode màu~~ → **BỎ block này hoàn toàn**, để noctalia tự push màu qua IPC khi đổi wallpaper. (Quyết định 2026-06-06.)
+- **noctalia.kdl:** ~~hardcode màu~~ → **BỎ block này hoàn toàn** (2026-06-06), nhưng **PHẢI `include` file noctalia sinh ra** — xem mục 9g. Lý do ghi hồi đó ("noctalia tự push màu qua IPC") là SAI: v5 ghi file rồi nhờ include.
 - **autostart.kdl:** `qs -c noctalia-shell` (noctalia), `fcitx5 -d`, `wl-paste --watch cliphist store`. → chuyển thành `spawn-at-startup` trong niri settings. KHÔNG chạy noctalia qua systemd (docs cảnh báo lag + IPC bug).
 - **keybinds.kdl:** ~100 bind. Format Nix: action là LIST không phải string (vd `spawn = ["kitty"]`; ipc call = `["qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"]`). Binds tham chiếu binary: `kitty`, `google-chrome-stable`, `thunar`, `grim`/`slurp`/`swappy`, `cliphist`, `fuzzel`, `wl-copy` → đảm bảo các package được cài, nếu thiếu bind gãy.
 
@@ -171,13 +171,13 @@ Gotchas đã kiểm chứng (đừng thử lại đường cũ):
 - **tty ảo (`TERM=linux`, fbcon):** font kernel (VGA 8x16, 256 glyph CP437) KHÔNG có khối 1/8 của `--symbols block` (▅▆▔▊...) → ra rừng `#`. Nhánh tty trong `ff` ép `--symbols vhalf+hhalf+solid+stipple -c 16` (chỉ 8 glyph CP437: ▀▄▌▐█░▒▓, tty vẽ được thật) + `-s 30x15` KHÔNG --stretch (cell 8x16 chuẩn 1:2). Config mượn luôn `ssh.jsonc` — module GUI (wm/thm/ico/cur/fnt) chết trong tty y như qua ssh, block phần cứng thì chạy đủ — NHƯNG phải override qua CLI `--logo-width 30 --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3`: padding gốc (`top/left=0`, chỉnh cho kitty-icat) làm ảnh sát mép, còn `width=32` kế thừa > art 30 làm hở thêm 2 cột gap (data-raw lấy max(width, art) làm bề rộng logo). Muốn đẹp hơn nữa chỉ còn `services.kmscon` (thay cả console) — không đáng.
 
 ### palette.nix — nguồn màu DUY NHẤT của repo (2026-07-12, tách theme 2026-07-17)
-`modules/palette.nix` = attrset màu đặt tên theo ANSI (`black`/`red`/…/`brightWhite` + `background`/`foreground`/`selectionBg`) **+ nhóm UI ngoài ANSI** (`border`, `focusRing`, `cursorText`, `url`, `tabInactiveFg`). `kitty.nix`, `niri.nix` đều `import ./palette.nix`.
+`modules/palette.nix` = attrset màu đặt tên theo ANSI (`black`/`red`/…/`brightWhite` + `background`/`foreground`/`selectionBg`) **+ nhóm UI ngoài ANSI** (`border`, `cursorText`, `url`, `tabInactiveFg`). Nơi tiêu thụ duy nhất còn lại là `kitty.nix`.
 
-**Bộ sưu tập theme ở `modules/themes/*.nix`** (mỗi file = 1 theme trọn vẹn, VD `eldritch-dark.nix`, `bliss.nix`). `palette.nix` chỉ làm 2 việc: `theme = import ./themes/<tên>.nix;` rồi `theme // { focusRing = "#ccccff"; }`. Đổi theme = sửa đúng 1 dòng import trong `palette.nix`, không đụng gì khác.
+**Bộ sưu tập theme ở `modules/themes/*.nix`** (mỗi file = 1 theme trọn vẹn, VD `eldritch-dark.nix`, `bliss.nix`). `palette.nix` chỉ làm đúng 1 việc: `import ./themes/<tên>.nix`. Đổi theme = sửa đúng dòng đó, không đụng gì khác.
 
-**`focusRing` CỐ Ý nằm NGOÀI mọi file theme, luôn `#ccccff`** — quyết định của user (2026-07-17): không muốn màu viền focus niri đổi theo theme, và tách ra để đổi theme khỏi phải sửa lại giá trị này mỗi lần. Theme file trong `modules/themes/` do đó KHÔNG có field `focusRing` (chỉ `palette.nix` biết field này tồn tại).
+**`focusRing` ĐÃ BỎ (2026-08-23)** — trước đó `palette.nix` ghép cố định `#ccccff` (tím nhạt) cho `layout.focus-ring.active.color` của niri. User bỏ pin màu này: `modules/niri.nix` giờ chỉ khai `width = 2`, màu do template niri của noctalia cấp (mục 9g). Đừng thêm lại field `focusRing` vào palette hay theme.
 
-**QUY TẮC: KHÔNG viết mã hex ở bất kỳ file nào khác ngoài `palette.nix` và `modules/themes/*.nix`.** Thêm màu mới thì thêm vào theme đang dùng (hoặc `focusRing` trong `palette.nix` nếu là màu cố định) rồi trỏ tới, đừng hardcode tại chỗ dùng. Kiểm bằng `grep -rniE '#[0-9a-f]{6}' --include='*.nix' .` — chỉ được ra 2 nơi trên. Trong kitty, KEY option vẫn là `color0..15` nhưng VALUE trỏ palette theo tên ANSI.
+**QUY TẮC: KHÔNG viết mã hex ở bất kỳ file nào khác ngoài `palette.nix` và `modules/themes/*.nix`.** Thêm màu mới thì thêm vào theme đang dùng rồi trỏ tới, đừng hardcode tại chỗ dùng. Kiểm bằng `grep -rniE '#[0-9a-f]{6}' --include='*.nix' .` — chỉ được ra 2 nơi trên. Trong kitty, KEY option vẫn là `color0..15` nhưng VALUE trỏ palette theo tên ANSI.
 
 ### herdr sidebar command-status (2026-07-12, initContent tách file 2026-07-17, herdr 0.7.4 + label động 2026-07-26)
 `modules/shell-init.zsh` (block trong đó, chỉ chạy khi `$HERDR_PANE_ID`): hiện lệnh foreground đang chạy dở của mỗi space lên sidebar herdr qua zsh preexec/precmd hook (báo space "không sẵn sàng nhận lệnh"). File này là script zsh thật — `modules/shell.nix` chỉ còn `initContent = builtins.readFile ./shell-init.zsh;` (tách ra để khỏi phải escape `''${...}` thành `${...}` trong Nix string, editor/shellcheck nhận đúng cú pháp).
@@ -374,6 +374,23 @@ Môi trường dev Onschool (repo riêng `~/src/nganhtu/ons-nix`) dựng bằng 
 - **`systemctl is-enabled sshd` trả `linked`** (unit NixOS không có `[Install]`) → vô dụng để biết có tự bật hay không. Hỏi thẳng: `[[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]]`. `netstatus` (`modules/shell-init.zsh`) in đủ 3 tầng + sshd + số khoá.
 - Chỉ key (`PasswordAuthentication = false`), `openFirewall = false` + `networking.firewall.interfaces.tailscale0.allowedTCPPorts` → **không hở ra wifi/LAN**. Đừng nới.
 - sshd đọc **cả hai** nguồn khoá: `/etc/ssh/authorized_keys.d/nat` (từ `users.users.nat.openssh.authorizedKeys.keys`) **lẫn** `~/.ssh/authorized_keys` (`authorizedKeysInHomedir` mặc định `true`) → tool ngoài ghi vào `~/.ssh/` vẫn có tác dụng.
+
+---
+
+## 9g. Template noctalia → niri: phải tự khai `include` (2026-08-23)
+
+Bật template `niri` trong noctalia (`[theme.templates] builtin_ids = [ "niri" ]`) thì nó ghi màu-theo-wallpaper ra `~/.config/niri/noctalia.kdl` (focus-ring, border, shadow, tab-indicator, insert-hint, recent-windows.highlight). **File đó không tự có tác dụng** — phải có node `include` trong config.kdl.
+
+**Vì sao phải làm tay:** `post_hook` của template (`share/noctalia/assets/templates/niri/apply.sh`) vốn tự append `include "noctalia.kdl"` vào `~/.config/niri/config.kdl`, nhưng HM để file đó là **symlink read-only vào /nix/store** → hook fail im lặng. Template `fuzzel` (community) có `apply.sh` y hệt và cũng fail y hệt; fuzzel vẫn chạy chỉ vì dòng `include=` đã nằm sẵn trong `modules/fuzzel.nix` từ hồi bê repo CachyOS. **Đây là hệ quả cố hữu của declarative config, không phải bug** — mọi tool tự sửa file do HM quản đều đâm vào tường này.
+
+**Khai ở `modules/niri.nix`** qua `programs.niri.config` (schema `settings` không mô hình hoá `include`, và sẽ không bao giờ — đây KHÔNG phải hàng tạm chờ upstream như `open-maximized-to-edges`):
+- **Đặt ĐẦU danh sách**, trước `options.programs.niri.config.default` → node nào khai tường minh bên Nix cũng thắng màu noctalia. (Upstream append vào cuối vì họ muốn theming tool thắng; ở repo này file `.nix` mới là nguồn sự thật.) Hiện tại thứ tự chưa tạo khác biệt nào: niri merge `layout` **theo từng field** và node `layout` render từ `settings` không chứa field màu nào; chỗ giao duy nhất là `border` mà nó dùng `off |= part.off` (sticky) nên bất biến theo thứ tự.
+- **`optional=true` BẮT BUỘC** — include thiếu file mà không optional là lỗi parse cứng, chết cả config.kdl (cài lại máy / tắt template là niri không lên nổi config).
+- **Đường dẫn dạng `~/...` chứ không phải `"noctalia.kdl"` tương đối** như upstream: include tương đối resolve theo thư mục của file config, mà config.kdl của ta là symlink vào /nix/store → base dir có thể ra thư mục store (không có noctalia.kdl). `~` cắt đứt câu hỏi đó.
+
+**Không sợ dẫm chân:** niri watch cả file được include → đổi wallpaper là viền đổi màu ngay, không cần reload. Và regex dò của `apply.sh` (`^\s*include(\s.*)?"([^"]*/)?noctalia\.kdl"(\s|$)`) khớp cả dạng `~/...` → hook thấy có sẵn thì return sớm, thôi fail.
+
+**`border` vẫn tắt** dù noctalia có block `border { active-color … }`: quy tắc "có block border thì tự bật" của niri chỉ áp dụng ở `recursion == 0` (file gốc), không áp trong file được include.
 
 ---
 

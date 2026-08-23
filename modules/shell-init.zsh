@@ -322,7 +322,7 @@ palette() {
   done < <(jq -r 'to_entries[] | "\(.key) \(.value)"' <<< "$json")
 
   local k
-  for k in background foreground selectionBg border focusRing cursorText url tabInactiveFg; do
+  for k in background foreground selectionBg border cursorText url tabInactiveFg; do
     printf "  %s\n" "$(_palette_swatch "${c[$k]}" "$k")"
   done
   echo

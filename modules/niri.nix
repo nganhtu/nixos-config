@@ -6,11 +6,24 @@ in
 {
   home.packages = [ pkgs.apple-cursor ];
 
-  # open-maximized-to-edges chưa có trong schema niri-flake (PR #1382 chưa merge)
-  # → nối node KDL thô vào config render từ settings. Ristretto xin maximize lúc
-  # mở; niri unstable map maximize sang "maximized-to-edges" (sát mép, không
-  # gaps/bo góc) và chỉ rule này chặn được — open-maximized giờ chỉ là full-width.
-  programs.niri.config = options.programs.niri.config.default ++ [
+  # Node KDL thô nối vào config render từ settings — hai thứ schema niri-flake
+  # không khai được.
+  programs.niri.config = [
+    # Template niri của noctalia ghi màu-theo-wallpaper ra file này rồi tự chèn
+    # include vào config.kdl; bước chèn luôn fail vì HM để config.kdl read-only.
+    # Đặt TRƯỚC config từ settings → khai tường minh bên Nix thắng màu noctalia.
+    # optional: thiếu file mà không optional là lỗi parse cứng, chết cả config.
+    {
+      name = "include";
+      arguments = [ "~/.config/niri/noctalia.kdl" ];
+      properties.optional = true;
+      children = [ ];
+    }
+  ] ++ options.programs.niri.config.default ++ [
+    # open-maximized-to-edges chưa có trong schema niri-flake (PR #1382 chưa
+    # merge). Ristretto xin maximize lúc mở; niri unstable map maximize sang
+    # "maximized-to-edges" (sát mép, không gaps/bo góc) và chỉ rule này chặn
+    # được — open-maximized giờ chỉ là full-width.
     {
       name = "window-rule";
       arguments = [ ];
@@ -217,7 +230,6 @@ in
       ];
       focus-ring = {
         width = 2;
-        active.color = palette.focusRing;
       };
     };
 
