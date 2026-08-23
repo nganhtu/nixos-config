@@ -203,7 +203,7 @@ Theme zsh `assets/shell/themes/natys.zsh-theme` (bản `ys` đổi tên) in mộ
 - **`%{...%}` VẪN có tác dụng khi nằm trong biến được `prompt_subst` thay vào** (đã test riêng) → dựng sẵn cả chuỗi màu trong `precmd` là an toàn, không cần `$(...)` trong PROMPT. Bắt `local ret=$?` ở dòng ĐẦU hook và `return $ret` ở mọi lối ra; `_herdr_precmd` cũng làm vậy nên hai hook sống chung được bất kể thứ tự.
 - **`%f` chứ không phải `$reset_color`** để tắt màu giữa dòng — `reset_color` (`\e[0m`) tắt luôn italic.
 - **Màu đi qua `%F{red|green|yellow}` + `%F{8}`, tức ANSI** → kitty đã map `color0..15` sang `palette.nix` nên bám palette là tự động. **Đừng viết escape truecolor hex vào theme**: vừa phạm quy tắc hex của repo vừa chết trong tty.
-- **Vàng = dừng có chủ đích** (130 Ctrl-C, 143 TERM, 148 Ctrl-Z), không phải hỏng — tô đỏ hết thì dùng vài hôm là mắt bỏ qua màu đỏ. **137 (KILL) để ĐỎ**: trên máy 15GiB này gần như luôn là OOM-killer lúc build. `141` (SIGPIPE) hiếm khi lọt vào `$?` vì `$?` lấy mã của lệnh CUỐI pipeline — nó nằm trong `$pipestatus`.
+- **Vàng = dừng có chủ đích** (130 Ctrl-C, 143 TERM, 148 Ctrl-Z), không phải hỏng — danh sách mã nằm ở hai mảng `_natys_green`/`_natys_yellow` đầu file, đỏ là mặc định nên không có mảng riêng — tô đỏ hết thì dùng vài hôm là mắt bỏ qua màu đỏ. **137 (KILL) để ĐỎ**: trên máy 15GiB này gần như luôn là OOM-killer lúc build. `141` (SIGPIPE) hiếm khi lọt vào `$?` vì `$?` lấy mã của lệnh CUỐI pipeline — nó nằm trong `$pipestatus`.
 - **Italic qua `$terminfo[sitm]`/`[ritm]`** (zsh không có prompt escape cho italic). Trong `TERM=linux` hai key này không tồn tại → tự no-op, không phun rác. Glyph `󰘍` (U+F060D `md-subdirectory_arrow_right`) là PUA nên tty ra tofu → có nhánh fallback `->` khi `TERM=linux`.
 
 ---

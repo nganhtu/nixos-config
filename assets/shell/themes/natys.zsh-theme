@@ -64,6 +64,9 @@ _natys_mark='󰘍  '
 [[ $TERM == linux ]] && _natys_mark='->  '
 _natys_resp=
 
+_natys_green=( 0 )
+_natys_yellow=( 130 143 148 )   # Ctrl-C, TERM, Ctrl-Z
+
 _natys_preexec() {
     _natys_ran=1
     _natys_t0=$EPOCHREALTIME
@@ -93,13 +96,9 @@ _natys_precmd() {
         name=" (SIG$signals[ret-127])"
     fi
 
-    # Vàng = dừng có chủ đích (Ctrl-C, TERM, Ctrl-Z), không phải hỏng. 137
-    # (KILL) để đỏ: trên máy này gần như luôn là OOM-killer lúc build.
     local color=red
-    case $ret in
-        0) color=green ;;
-        130|143|148) color=yellow ;;
-    esac
+    (( $_natys_green[(I)$ret]  )) && color=green
+    (( $_natys_yellow[(I)$ret] )) && color=yellow
 
     # %f chứ không phải $reset_color — reset_color tắt luôn cả italic.
     local dur=$(_natys_duration $(( EPOCHREALTIME - _natys_t0 )))
