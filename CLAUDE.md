@@ -194,6 +194,18 @@ Gotchas đã kiểm chứng (đừng thử lại đường cũ):
 - **Đừng tự phát tiếng khi báo blocked** — herdr đã tự phát khi agent đổi state ở space nền (`[ui.sound] enabled = true` mặc định). Toast của ta phải `--sound none`, không thì kêu 2 lần.
 - Lifecycle: preexec bật watcher (report working sau ~1s để lệnh <1s không kịp nhấp nháy); precmd release khi OK, hoặc nháy blocked 3s rồi release khi lỗi ($?≠0). Race guard: lệnh mới hủy timer nháy-lỗi còn treo + release ngay (kẻo release nhầm lệnh mới / kẹt blocked). Giữ notification khi lệnh ≥20s xong ở space KHÔNG focus.
 
+### natys — dòng response sau mỗi lệnh (2026-08-23)
+
+Theme zsh `assets/shell/themes/natys.zsh-theme` (bản `ys` đổi tên) in một dòng nghiêng giữa output và prompt kế: `󰘍  <mã> [(SIGNAL)] · <thời gian>`. Thay hẳn `C:%?` cũ ở cuối dòng info. Bố cục: trống → dòng response → trống → dòng `#` → `$`; dòng `\n` mở đầu PROMPT gốc đóng vai dòng trống thứ hai.
+
+- **CHỈ đặt tên cho dải `128+N`.** Mã 1/2/126/127 không có tên chuẩn hoá — 2 là "sai cú pháp" với hầu hết app nhưng là "lỗi thật" với `grep`/`diff`, còn 64–78 (`sysexits.h`) chỉ đúng nếu app theo convention BSD. Gán bừa tên còn tệ hơn để số trần. Tên signal lấy từ mảng `$signals` sẵn có của zsh, **lệch 1 index**: mã `N` → `$signals[N-127]`.
+- **`$?` KHÔNG reset khi Enter dòng rỗng** (đã đo: `false` rồi Enter liên tục vẫn ra `?=1`). Không có cờ bật ở `preexec` thì dòng response in lại y hệt mỗi lần Enter. Cùng lý do, Ctrl-C ở prompt trống (=130) cũng không sinh dòng nào.
+- **`%{...%}` VẪN có tác dụng khi nằm trong biến được `prompt_subst` thay vào** (đã test riêng) → dựng sẵn cả chuỗi màu trong `precmd` là an toàn, không cần `$(...)` trong PROMPT. Bắt `local ret=$?` ở dòng ĐẦU hook và `return $ret` ở mọi lối ra; `_herdr_precmd` cũng làm vậy nên hai hook sống chung được bất kể thứ tự.
+- **`%f` chứ không phải `$reset_color`** để tắt màu giữa dòng — `reset_color` (`\e[0m`) tắt luôn italic.
+- **Màu đi qua `%F{red|green|yellow}` + `%F{8}`, tức ANSI** → kitty đã map `color0..15` sang `palette.nix` nên bám palette là tự động. **Đừng viết escape truecolor hex vào theme**: vừa phạm quy tắc hex của repo vừa chết trong tty.
+- **Vàng = dừng có chủ đích** (130 Ctrl-C, 143 TERM, 148 Ctrl-Z), không phải hỏng — tô đỏ hết thì dùng vài hôm là mắt bỏ qua màu đỏ. **137 (KILL) để ĐỎ**: trên máy 15GiB này gần như luôn là OOM-killer lúc build. `141` (SIGPIPE) hiếm khi lọt vào `$?` vì `$?` lấy mã của lệnh CUỐI pipeline — nó nằm trong `$pipestatus`.
+- **Italic qua `$terminfo[sitm]`/`[ritm]`** (zsh không có prompt escape cho italic). Trong `TERM=linux` hai key này không tồn tại → tự no-op, không phun rác. Glyph `󰘍` (U+F060D `md-subdirectory_arrow_right`) là PUA nên tty ra tofu → có nhánh fallback `->` khi `TERM=linux`.
+
 ---
 
 ## 6. Map imperative → declarative (từ note cài CachyOS cũ)

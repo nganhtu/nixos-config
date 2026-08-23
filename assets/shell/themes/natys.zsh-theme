@@ -53,18 +53,77 @@ virtenv_prompt() {
 	echo "${YS_THEME_VIRTUALENV_PROMPT_PREFIX}${VIRTUAL_ENV:t}${YS_THEME_VIRTUALENV_PROMPT_SUFFIX}"
 }
 
-local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
+# Dòng response sau mỗi lệnh: mã thoát + thời gian chạy, in nghiêng giữa
+# output và prompt kế. Chỉ dựng khi preexec đã chạy — $? KHÔNG reset khi Enter
+# dòng rỗng nên thiếu cờ thì mã lỗi cũ dính lại mãi.
+zmodload zsh/datetime
+zmodload zsh/terminfo
+autoload -Uz add-zsh-hook
+
+_natys_mark='󰘍  '
+[[ $TERM == linux ]] && _natys_mark='->  '
+_natys_resp=
+
+_natys_preexec() {
+    _natys_ran=1
+    _natys_t0=$EPOCHREALTIME
+}
+
+_natys_duration() {
+    local -F el=$1
+    local -i m s
+    if (( el < 1 )); then
+        printf '%.0fms' $(( el * 1000 ))
+    elif (( el < 60 )); then
+        printf '%.1fs' $el
+    else
+        m=$(( el / 60 )); s=$(( el - m * 60 ))
+        printf '%dm%02ds' $m $s
+    fi
+}
+
+_natys_precmd() {
+    local ret=$?
+    [[ -n $_natys_ran ]] || { _natys_resp=; return $ret }
+    _natys_ran=
+
+    # Mã chữ chỉ đáng tin ở dải 128+N (bị signal giết); $signals lệch 1 index.
+    local name=
+    if (( ret > 128 && ret <= 192 )) && [[ -n $signals[ret-127] ]]; then
+        name=" (SIG$signals[ret-127])"
+    fi
+
+    # Vàng = dừng có chủ đích (Ctrl-C, TERM, Ctrl-Z), không phải hỏng. 137
+    # (KILL) để đỏ: trên máy này gần như luôn là OOM-killer lúc build.
+    local color=red
+    case $ret in
+        0) color=green ;;
+        130|143|148) color=yellow ;;
+    esac
+
+    # %f chứ không phải $reset_color — reset_color tắt luôn cả italic.
+    local dur=$(_natys_duration $(( EPOCHREALTIME - _natys_t0 )))
+    _natys_resp=$'\n'"%{$terminfo[sitm]%}%F{$color}${_natys_mark}${ret}${name}%f %F{8}· ${dur}%f%{$terminfo[ritm]%}"$'\n'
+    return $ret
+}
+
+add-zsh-hook preexec _natys_preexec
+add-zsh-hook precmd _natys_precmd
 
 # Prompt format:
 #
-# PRIVILEGES USER @ MACHINE in DIRECTORY on git:BRANCH STATE [TIME] C:LAST_EXIT_CODE
+# 󰘍  EXIT_CODE (SIGNAL) · DURATION
+#
+# PRIVILEGES USER @ MACHINE in DIRECTORY on git:BRANCH STATE [TIME]
 # $ COMMAND
 #
 # For example:
 #
-# % ys @ ys-mbp in ~/.oh-my-zsh on git:master x [21:47:42] C:0
+# 󰘍  130 (SIGINT) · 2.1s
+#
+# % ys @ ys-mbp in ~/.oh-my-zsh on git:master x [21:47:42]
 # $
-PROMPT="
+PROMPT='${_natys_resp}'"
 %{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
 %(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n)\
 %{$reset_color%}@\
@@ -76,5 +135,5 @@ ${git_info}\
 ${svn_info}\
 ${venv_info}\
  \
-[%*] $exit_code
+[%*]
 %{$terminfo[bold]$fg[magenta]%}$ %{$reset_color%}"
