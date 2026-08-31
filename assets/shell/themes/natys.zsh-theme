@@ -67,6 +67,8 @@ _natys_resp=
 _natys_green=( 0 )
 _natys_yellow=( 130 143 148 )   # Ctrl-C, TERM, Ctrl-Z
 
+typeset -A _natys_names=( 126 'không chạy được' 127 'không tìm thấy lệnh' )
+
 _natys_preexec() {
     _natys_ran=1
     _natys_t0=$EPOCHREALTIME
@@ -90,10 +92,14 @@ _natys_precmd() {
     [[ -n $_natys_ran ]] || { _natys_resp=; return $ret }
     _natys_ran=
 
-    # Mã chữ chỉ đáng tin ở dải 128+N (bị signal giết); $signals lệch 1 index.
-    local name=
-    if (( ret > 128 && ret <= 192 )) && [[ -n $signals[ret-127] ]]; then
-        name=" (SIG$signals[ret-127])"
+    # Tên chỉ đáng tin ở 128+N (signal, $signals lệch 1 index; EXIT/ZERR/DEBUG là
+    # pseudo-signal của zsh) và 126/127 (do chính zsh sinh, không phải app).
+    local name= sig=
+    (( ret > 128 )) && sig=$signals[ret-127]
+    if [[ -n $sig && $sig != (EXIT|ZERR|DEBUG) ]]; then
+        name=" (SIG$sig)"
+    elif [[ -n $_natys_names[$ret] ]]; then
+        name=" ($_natys_names[$ret])"
     fi
 
     local color=red
