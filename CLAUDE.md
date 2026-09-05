@@ -12,6 +12,7 @@
 - **Làm theo giai đoạn, mỗi giai đoạn rebuild + kiểm tra trước khi sang giai đoạn sau.** Không nhồi tất cả vào một lần rebuild. Xem CHECKLIST.md.
 - **Khi không chắc cú pháp/option Nix:** tra `search.nixos.org`, `mynixos.com`, hoặc đọc file thật mà module sinh ra — KHÔNG bịa option. (Lịch sử: đã từng bịa `xdg.terminal`, `efi` protocol sai cho limine. Verify trước khi viết.)
 - **Mọi thay đổi bootloader phải cẩn thận** — máy dual-boot Windows. Xem mục Phần cứng.
+- **Mọi text người dùng nhìn thấy đều bằng TIẾNG ANH** (2026-09-05): echo/printf của hàm shell, notification, nhãn mã thoát trong `natys`, label Thunar/desktop entry. Comment trong code và tài liệu (CLAUDE.md, CHECKLIST.md, commit message) vẫn tiếng Việt.
 - Giữ commit nhỏ, message rõ. Sau mỗi giai đoạn hoàn thành, commit.
 
 ---

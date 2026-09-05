@@ -88,7 +88,7 @@ if [[ -n $HERDR_PANE_ID ]]; then
         # --sound none: herdr đã tự phát tiếng khi agent đổi state ở space
         # nền ([ui.sound]); toast này chỉ để đọc lệnh nào đang chờ.
         if [[ $state == blocked ]] && ! _herdr_focused; then
-          herdr notification show "$cmd" --body "đang chờ nhập · ${PWD:t}" --sound none &>/dev/null
+          herdr notification show "$cmd" --body "waiting for input · ${PWD:t}" --sound none &>/dev/null
         fi
       fi
       sleep 2
@@ -140,7 +140,7 @@ if [[ -n $HERDR_PANE_ID ]]; then
         _herdr_release "$_herdr_label"
       fi
       if (( elapsed >= 20 )) && ! _herdr_focused; then
-        herdr notification show "$_herdr_cmd" --body "xong sau ${elapsed}s · ${PWD:t}" --sound done &>/dev/null
+        herdr notification show "$_herdr_cmd" --body "done in ${elapsed}s · ${PWD:t}" --sound done &>/dev/null
       fi
     fi
     # KHÔNG xoá _herdr_label ở đây: nếu vừa vào nhánh blocked, preexec kế tiếp
@@ -229,7 +229,7 @@ ffcache() {
   [[ -d $dir ]] || return 0
   local pics=("$dir"/**/*.(jpg|jpeg|png|webp)(N))
   local total=${#pics}
-  (( total == 0 )) && { echo "ffcache: không có ảnh trong $dir"; return 0; }
+  (( total == 0 )) && { echo "ffcache: no images in $dir"; return 0; }
   local pic thumb
   local n=0 i=0
   local width=30                                # bề rộng thanh tiến trình
@@ -258,7 +258,7 @@ ffcache() {
     done
     find "$cache" -mindepth 1 -type d -empty -delete 2>/dev/null
   fi
-  echo "ffcache: thêm $n, xóa $p thumbnail mồ côi ($cache)"
+  echo "ffcache: added $n, pruned $p orphaned thumbnails ($cache)"
 }
 
 ff
@@ -290,14 +290,14 @@ netstatus() {
   # ~/.ssh/authorized_keys (authorizedKeysInHomedir mặc định true).
   local keys=$(grep -hvE '^[[:space:]]*($|#)' /etc/ssh/authorized_keys.d/nat ~/.ssh/authorized_keys 2>/dev/null | wc -l)
   _netrow tailscaled    "boot=$(systemctl is-enabled tailscaled 2>&1)" "now=$(systemctl is-active tailscaled 2>&1)"
-  _netrow tailnet       "nối=$(jq -r '.WantRunning // false' <<< $prefs)" "ip=$(tailscale ip -4 2>/dev/null || echo -)"
-  _netrow tailscale-ssh "bật=$(jq -r '.RunSSH // false' <<< $prefs)" "port=22 · xác thực bằng danh tính tailnet, bỏ qua key"
+  _netrow tailnet       "linked=$(jq -r '.WantRunning // false' <<< $prefs)" "ip=$(tailscale ip -4 2>/dev/null || echo -)"
+  _netrow tailscale-ssh "on=$(jq -r '.RunSSH // false' <<< $prefs)" "port=22 · authenticates by tailnet identity, ignores keys"
   # `systemctl is-enabled sshd` trả "linked" (unit NixOS không có [Install])
   # → vô nghĩa. Hỏi thẳng multi-user.target có kéo nó lên lúc boot không.
-  local sshboot="không · mở tay bằng sshup"
-  [[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]] && sshboot="TỰ BẬT lúc boot"
-  _netrow sshd          "now=$(systemctl is-active sshd 2>&1)" "port=2222, chỉ tailscale0 · boot: $sshboot"
-  _netrow authorized    "$keys khoá" "(0 = chưa ai vào được, password auth đã tắt)"
+  local sshboot="no · start it by hand with sshup"
+  [[ -e /etc/systemd/system/multi-user.target.wants/sshd.service ]] && sshboot="AUTO-STARTS at boot"
+  _netrow sshd          "now=$(systemctl is-active sshd 2>&1)" "port=2222, tailscale0 only · boot: $sshboot"
+  _netrow authorized    "$keys keys" "(0 = nobody can get in, password auth is off)"
 }
 
 # palette — in bảng màu ĐANG DÙNG (modules/palette.nix, theo theme chọn
@@ -313,7 +313,7 @@ _palette_swatch() {
 }
 palette() {
   local json=$(nix eval --json -f ~/nixos-config/modules/palette.nix 2>/dev/null)
-  [[ -z $json ]] && { echo "palette: không eval được modules/palette.nix"; return 1; }
+  [[ -z $json ]] && { echo "palette: cannot eval modules/palette.nix"; return 1; }
 
   typeset -A c
   local name hex
@@ -358,12 +358,12 @@ screenrec() {
       -r) local area; area=$(slurp) || return 1; args+=(-g "$area") ;;
       -a) audio="-a$(pactl get-default-sink).monitor" ;;
       -m) audio="-a" ;;
-      *)  echo "screenrec: tùy chọn lạ '$1' (chỉ nhận -r, -a, -m)"; return 1 ;;
+      *)  echo "screenrec: unknown option '$1' (only -r, -a, -m)"; return 1 ;;
     esac
     shift
   done
   [[ -n "$audio" ]] && args+=("$audio")
-  echo "Recording → $out   (Ctrl+C để dừng)"
+  echo "Recording → $out   (Ctrl+C to stop)"
   wf-recorder "${args[@]}" -f "$out"
 }
 
@@ -385,7 +385,7 @@ dvlog() {
   setopt local_options null_glob
   local files=(.devenv/run/processes/logs/${1:-*}.*.log)
   if (( ${#files} == 0 )); then
-    echo "Không thấy log — devenv đang chạy chưa? (cần .devenv/run/processes/logs)"
+    echo "No logs found — is devenv running? (needs .devenv/run/processes/logs)"
     return 1
   fi
   tail -F "${files[@]}"
@@ -408,8 +408,8 @@ update() {
        | grep -q libdisplay-info_0_2; then
     :
   elif [[ ${pipestatus[1]} -eq 0 ]]; then
-    echo -e "\n[!] niri-flake đã bỏ libdisplay-info_0_2 — overlay workaround trong flake.nix"
-    echo    "    giờ thừa. Gỡ khối overlay đó (và mục tương ứng trong CLAUDE.md), rồi chạy lại."
+    echo -e "\n[!] niri-flake dropped libdisplay-info_0_2 — the workaround overlay in flake.nix"
+    echo    "    is redundant now. Remove that overlay block (and the matching CLAUDE.md entry), then rerun."
     return 1
   fi
 
@@ -433,12 +433,12 @@ update() {
   echo -e "\n[+] Cleaning systemd journal (keeping last 1 week)..."
   sudo journalctl --vacuum-time=1w
 
-  echo -e "\n[+] Dọn generation cũ + GC (nh clean, giữ 10 bản)..."
+  echo -e "\n[+] Cleaning old generations + GC (nh clean, keeping 10)..."
   nh clean all --keep 10 --keep-since 14d
 
   # Dòng Unallocated là chỉ báo thật, không phải df: tụt dưới ~5GiB là sắp ENOSPC
   # dù df vẫn báo còn hàng chục GB.
-  echo -e "\n[+] Dung lượng btrfs:"
+  echo -e "\n[+] btrfs usage:"
   sudo btrfs filesystem usage /
 
   echo -e "\n[✔] All tasks completed successfully."
@@ -449,18 +449,18 @@ update_and_merge_sync() {
   local remote=$(git config --get branch.$current_branch.remote || echo "origin")
 
   if [[ -z "$current_branch" ]]; then
-    echo "❌ Lỗi: Bạn không ở trong một Git repository."
+    echo "❌ Error: you are not inside a Git repository."
     return 1
   fi
 
   local stashed=0
   if ! git diff-index --quiet HEAD --; then
-    echo "📦 Phát hiện code chưa commit. Đang tự động cất tạm (stash) để bảo vệ dữ liệu..."
+    echo "📦 Uncommitted changes found. Stashing them automatically to keep your work safe..."
     git stash push -m "Auto-stash before upsync"
     stashed=1
   fi
 
-  echo "🚀 Đang fetch dữ liệu mới nhất từ remote '$remote'..."
+  echo "🚀 Fetching the latest from remote '$remote'..."
   git fetch $remote
   git fetch $remote master:master release:release staging:staging 2>/dev/null || true
 
@@ -468,11 +468,11 @@ update_and_merge_sync() {
   local merge_failed=0
 
   for br in "${merge_order[@]}"; do
-    echo "\n=> Đang tiến hành merge '$remote/$br' vào '$current_branch'..."
+    echo "\n=> Merging '$remote/$br' into '$current_branch'..."
     if git merge "$remote/$br"; then
-      echo "✅ Merge '$br' thành công!"
+      echo "✅ Merged '$br' successfully!"
     else
-      echo "❌ LỖI: Xảy ra Conflict khi merge '$br'!"
+      echo "❌ ERROR: conflict while merging '$br'!"
       merge_failed=1
       break
     fi
@@ -480,22 +480,22 @@ update_and_merge_sync() {
 
   if [[ $stashed -eq 1 ]]; then
     if [[ $merge_failed -eq 1 ]]; then
-      echo "\n🛑 Quá trình merge đã dừng lại do conflict."
-      echo "💡 LƯU Ý: Code đang viết dở của bạn vẫn an toàn trong stash."
-      echo "Hãy giải quyết conflict của việc merge trước, commit lại, sau đó gõ lệnh 'git stash pop' để lấy lại code cũ của bạn."
+      echo "\n🛑 The merge stopped because of a conflict."
+      echo "💡 NOTE: your work in progress is still safe in the stash."
+      echo "Resolve the merge conflict first, commit, then run 'git stash pop' to get your work back."
       return 1
     else
-      echo "\n♻️ Đang khôi phục lại code chưa commit của bạn..."
+      echo "\n♻️ Restoring your uncommitted work..."
       if git stash pop; then
-        echo "✅ Đã khôi phục code dở dang thành công!"
+        echo "✅ Work in progress restored successfully!"
       else
-        echo "⚠️ CẢNH BÁO: Có conflict giữa code dở dang của bạn và code mới tải về!"
-        echo "Đừng lo, code không bị mất. Hãy mở editor lên và resolve conflict cho phần code bạn đang viết nhé."
+        echo "⚠️ WARNING: your work in progress conflicts with the newly fetched code!"
+        echo "Nothing is lost — open your editor and resolve the conflict in your own changes."
       fi
     fi
   fi
 
   if [[ $merge_failed -eq 0 ]]; then
-    echo "\n🎉 HOÀN TẤT: Nhánh '$current_branch' đã được update an toàn!"
+    echo "\n🎉 ALL DONE: branch '$current_branch' updated safely!"
   fi
 }

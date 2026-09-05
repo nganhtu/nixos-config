@@ -44,7 +44,7 @@ let
 
         pkg=$(find "$work" -iname "*.pkg" -print -quit)
         if [ -z "$pkg" ]; then
-          echo "thunar-extract-apple-fonts: không thấy .pkg trong $f" >&2
+          echo "thunar-extract-apple-fonts: no .pkg found in $f" >&2
           continue
         fi
 

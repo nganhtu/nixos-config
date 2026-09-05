@@ -67,7 +67,7 @@ _natys_resp=
 _natys_green=( 0 )
 _natys_yellow=( 130 143 148 )   # Ctrl-C, TERM, Ctrl-Z
 
-typeset -A _natys_names=( 126 'không chạy được' 127 'không tìm thấy lệnh' )
+typeset -A _natys_names=( 126 'not executable' 127 'command not found' )
 
 _natys_preexec() {
     _natys_ran=1
