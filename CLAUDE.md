@@ -63,7 +63,7 @@ Lúc sự cố: `Device allocated 200.00GiB / 200.00GiB`, `Unallocated 1.00MiB`,
 
 **Chỉ báo theo dõi:** `sudo btrfs filesystem usage /`, dòng `Unallocated`. Dưới ~5GiB là sắp kẹt. Đã nối vào cuối hàm `update` (`modules/shell-init.zsh`).
 
-**Đã vá declarative** (`hosts/niquesse/configuration.nix`): `systemd.services/timers.btrfs-balance` (ngày 15 hàng tháng, `-dusage=50 -musage=30`, tránh trùng `btrfs-scrub` mùng 1) — đây là thứ DUY NHẤT sửa nguyên nhân gốc; `boot.tmp.cleanOnBoot`; `services.journald.extraConfig = "SystemMaxUse=500M"` (mặc định không chặn trần = 10% fs = 20GiB); `nh clean --keep 10 --keep-since 14d` + `grub.configurationLimit = 10`.
+**Đã vá declarative** (`hosts/niquesse/configuration.nix`): `systemd.services/timers.btrfs-balance` (ngày 15 hàng tháng, `-dusage=50 -musage=30`, tránh trùng `btrfs-scrub` mùng 1) — đây là thứ DUY NHẤT sửa nguyên nhân gốc; `boot.tmp.cleanOnBoot`; `services.journald.settings.Journal.SystemMaxUse = "500M"` (mặc định không chặn trần = 10% fs = 20GiB); `nh clean --keep 10 --keep-since 14d` + `grub.configurationLimit = 10`.
 
 **Xoá file KHÔNG trả lại `Unallocated`** — đã đo trực tiếp: dọn 44GiB Steam làm `Data used` tụt 147.91→103.58GiB nhưng `Data total` đứng nguyên 167.94GiB và `Unallocated` không đổi một byte. Chỉ balance mới thu hồi được.
 

@@ -106,7 +106,7 @@ in
   };
 
   # Mặc định không chặn trần = 10% dung lượng fs = 20GiB.
-  services.journald.extraConfig = "SystemMaxUse=500M";
+  services.journald.settings.Journal.SystemMaxUse = "500M";
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
