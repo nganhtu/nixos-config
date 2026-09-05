@@ -231,7 +231,7 @@ in
     xwayland-satellite
     file-roller
     jq
-    android-tools
+    android-tools payload-dumper-go
     hw-probe
 
     # CLI tools (Giai đoạn 4)
