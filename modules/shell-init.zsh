@@ -19,8 +19,10 @@ if [[ -n $HERDR_PANE_ID ]]; then
   # label + state của chúng. 1 pane chỉ giữ 1 agent record, nên với chúng
   # shell chỉ được góp state-label (report-metadata), TUYỆT ĐỐI không
   # report-agent — sẽ đè mất label, state thật lẫn notification.
-  _herdr_agents=(claude codex copilot cursor devin droid hermes kilo kimi
-                 mastracode omp opencode pi qodercli)
+  # Đồng bộ với `herdr integration` mỗi lần nâng herdr — thiếu tên nào là
+  # shell report-agent đè lên record herdr tự quản của tool đó.
+  _herdr_agents=(antigravity-cli claude codex copilot cursor devin droid grok
+                 hermes kilo kimi mastracode omp opencode pi qodercli qwen)
 
   # herdr 0.7.4 bỏ --custom-status: report-agent giờ chỉ set state, nhãn text
   # phải đi qua report-metadata --state-label STATE=TEXT (field state_labels).
