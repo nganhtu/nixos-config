@@ -98,14 +98,12 @@ if [[ -n $HERDR_PANE_ID ]]; then
   }
 
   _herdr_preexec() {
-    # lệnh mới → dẹp nháy-lỗi còn treo của lệnh trước (kẻo timer của nó
-    # release nhầm, hoặc kẹt blocked nếu lệnh này chớp nhoáng < 1s).
-    # $_herdr_label lúc này vẫn là label của lệnh TRƯỚC (chưa bị ghi đè dưới).
-    if [[ -n $_herdr_blocked_timer ]]; then
-      kill $_herdr_blocked_timer 2>/dev/null
-      _herdr_blocked_timer=
-      _herdr_release "$_herdr_label"
-    fi
+    # Lệnh mới → dẹp nháy-lỗi còn treo, rồi dọn agent của lệnh TRƯỚC nếu precmd
+    # chưa dọn được ($_herdr_label chỉ còn khác rỗng đúng trong ca đó). Lưới an
+    # toàn: release hụt một lần là nhãn kẹt lại vĩnh viễn trên sidebar.
+    [[ -n $_herdr_blocked_timer ]] && kill $_herdr_blocked_timer 2>/dev/null
+    _herdr_blocked_timer=
+    [[ -n $_herdr_label ]] && { _herdr_release "$_herdr_label"; _herdr_label= }
     local bin=${${1%% *}:t}
     if (( $_herdr_agents[(Ie)$bin] )); then
       _herdr_fit "$1"
@@ -140,13 +138,15 @@ if [[ -n $HERDR_PANE_ID ]]; then
         _herdr_blocked_timer=$!
       else
         _herdr_release "$_herdr_label"
+        _herdr_label=
       fi
       if (( elapsed >= 20 )) && ! _herdr_focused; then
         herdr notification show "$_herdr_cmd" --body "done in ${elapsed}s · ${PWD:t}" --sound done &>/dev/null
       fi
     fi
-    # KHÔNG xoá _herdr_label ở đây: nếu vừa vào nhánh blocked, preexec kế tiếp
-    # còn cần nó để release đúng agent (xem đầu _herdr_preexec).
+    # _herdr_label CHỈ bị xoá ở nhánh release thành công ngay trên. Giữ lại ở
+    # mọi lối ra khác (nháy blocked, elapsed < 1s, release lỗi) để preexec kế
+    # tiếp dọn nốt — release là idempotent nên gọi thừa vô hại.
     _herdr_cmd= _herdr_watcher=
     return $ret
   }
