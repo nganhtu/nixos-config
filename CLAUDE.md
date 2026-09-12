@@ -246,8 +246,8 @@ TLP cho tinh chỉnh CPU chi tiết (note cũ dùng TLP) NHƯNG xung đột powe
 
 **KHÓ / có thể chưa có trong nixpkgs — cần wrap hoặc bỏ qua lúc đầu:**
 - `antigravity`, `antigravity-ide`, `antigravity-cli` (IDE Google mới) → gần như chắc chưa có, cần tự package (AppImage/FHS) hoặc tạm bỏ.
-- `universal-android-debloater-bin` (uad) → kiểm tra, có thể phải wrap.
-- `payload-dumper-go` → kiểm tra search.nixos.org.
+- ~~`universal-android-debloater-bin` (uad)~~ → **có sẵn nixpkgs** dưới attr `universal-android-debloater`, nhưng đó là fork **Next Generation** (homepage trỏ Universal-Debloater-Alliance), binary tên `uad-ng`. Package **không kèm .desktop lẫn icon** → desktop entry tự khai ở `home/nat.nix`, icon mượn `phone` của Adwaita.
+- ~~`payload-dumper-go`~~ → **có sẵn nixpkgs** (2.0.0), binary đúng tên `payload-dumper-go`.
 - `openai-codex`, `parsec` → verify, parsec đôi khi cần override.
 - JetBrains **Canary/EAP** (phpstorm, intellij ultimate, android-studio-canary) → nixpkgs thường chỉ stable; canary phải override version hoặc flake riêng. Cần license.
 - `vscode-langservers-extracted` ok, nhưng `github-desktop` verify.

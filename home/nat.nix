@@ -45,4 +45,17 @@
   };
   xdg.mimeApps.defaultApplications."x-scheme-handler/figma" = "figma-linux.desktop";
 
+  # nixpkgs không cài .desktop cho uad-ng (binary trần) → không lên fuzzel.
+  xdg.desktopEntries.uad-ng = {
+    name = "Universal Android Debloater";
+    genericName = "Android Package Manager";
+    comment = "Debloat non-rooted Android devices over adb";
+    exec = "uad-ng";
+    icon = "phone";
+    terminal = false;
+    type = "Application";
+    categories = [ "Utility" "System" ];
+    settings.Keywords = "android;adb;debloat;uad;";
+  };
+
 }
