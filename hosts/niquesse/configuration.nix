@@ -242,7 +242,7 @@ in
     ueberzugpp imagemagick
 
     # App GUI (Giai đoạn 5b)
-    spotify discord libreoffice-fresh pavucontrol
+    spotify discord libreoffice-fresh pavucontrol claude-desktop
     ristretto postman parsec-bin vscode figma-linux
 
     # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH

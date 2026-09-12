@@ -19,6 +19,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    claude-desktop = {
+      url = "github:aaddrick/claude-desktop-debian";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -26,7 +31,7 @@
 
   };
 
-  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, agenix, ... }:
+  outputs = { self, nixpkgs, home-manager, niri-flake, noctalia, agenix, claude-desktop, ... }:
   let
     system = "x86_64-linux";
   in {
@@ -58,6 +63,7 @@
               });
             })
             niri-flake.overlays.niri
+            claude-desktop.overlays.default
           ];
         }
         ({ pkgs, ... }: {
