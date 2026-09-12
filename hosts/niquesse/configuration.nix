@@ -15,6 +15,16 @@ let
         >> $out/lib/waydroid/data/configs/config_base
     '';
   });
+
+  # Chromium tự chọn backend lưu mật khẩu theo XDG_CURRENT_DESKTOP; "niri" không
+  # khớp GNOME/KDE nên rơi về `basic` (plaintext) và safeStorage báo KHÔNG khả
+  # dụng → Claude Desktop kêu thiếu keyring dù Secret Service vẫn chạy. Không có
+  # biến môi trường nào thay được, phải truyền cờ.
+  claude-desktop-keyring = pkgs.claude-desktop.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      wrapProgram $out/bin/claude-desktop --add-flags "--password-store=gnome-libsecret"
+    '';
+  });
 in
 {
   imports = [ ./hardware-configuration.nix ./nvidia.nix ];
@@ -242,7 +252,7 @@ in
     ueberzugpp imagemagick
 
     # App GUI (Giai đoạn 5b)
-    spotify discord libreoffice-fresh pavucontrol claude-desktop
+    spotify discord libreoffice-fresh pavucontrol claude-desktop-keyring
     ristretto postman parsec-bin vscode figma-linux
 
     # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH
