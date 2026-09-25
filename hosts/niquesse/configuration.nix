@@ -253,7 +253,7 @@ in
 
     # App GUI (Giai đoạn 5b)
     spotify discord libreoffice-fresh pavucontrol claude-desktop-keyring
-    ristretto postman parsec-bin vscode figma-linux
+    ristretto postman parsec-bin vscode figma-linux musescore
 
     # Dev / LSP / formatters (Giai đoạn 5c) — helix tự nhận qua PATH
     nodejs typescript
